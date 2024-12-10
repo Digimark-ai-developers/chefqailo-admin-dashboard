@@ -1,0 +1,22 @@
+import { Route, Routes } from "react-router-dom";
+
+import Layout from "./components/layout";
+import Dashboard from "./pages/dashboard";
+import HabitTracker from "./pages/habit-tracker";
+import Login from "./pages/login";
+import Users from "./pages/users";
+
+const App = () => {
+  return (
+    <Routes>
+      <Route index element={<Login />} />
+      <Route element={<Layout />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/habit-tracker" element={<HabitTracker />} />
+      </Route>
+    </Routes>
+  );
+};
+
+export default App;
