@@ -1,4 +1,3 @@
-import { Card } from "@/lib/constants";
 import { cn, formatNumber } from "@/lib/utils";
 
 interface CardProps {
