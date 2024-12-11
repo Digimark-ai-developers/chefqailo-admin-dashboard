@@ -20,6 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Switch } from "../ui/switch";
 import AddUserDialog from "../users/add-user-dialog";
 import WarningModal from "../warning-modal";
 
@@ -32,86 +33,93 @@ const UserTable = () => {
     <>
       <AddUserDialog id={1} open={open} setOpen={setOpen} />
       <WarningModal open={warn} message={selected} setOpen={setWarn} />
-      <div className="h-[500px] w-full lg:h-[calc(100vh-434px)]">
-        <div className="h-full w-full overflow-hidden rounded-lg border">
-          <div className="h-full overflow-y-scroll">
-            <Table>
-              <TableHeader className="sticky top-0 z-10 bg-background">
-                <TableRow>
-                  <TableHead className="rounded-tl-lg">Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[65px] rounded-tr-lg">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="h-full max-h-full w-full overflow-y-auto">
-                {users.map((user) => (
-                  <TableRow
-                    key={user.id}
-                    className={cn({
-                      "bg-muted": user.id % 2 !== 0,
-                      "rounded-br-xl": user.id === users.length,
-                    })}
-                  >
-                    <TableCell
-                      className={cn("font-medium", {
-                        "rounded-bl-lg": user.id === users.length,
-                      })}
-                    >
-                      {truncateString(user.name, 6)}
-                    </TableCell>
-                    <TableCell>{truncateString(user.email, 10)}</TableCell>
-                    <TableCell>
-                      <span className="rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary">
-                        {user.is_paid}
-                      </span>
-                    </TableCell>
-                    <TableCell
-                      className={cn(
-                        "flex w-[65px] items-center justify-center",
-                        {
-                          "rounded-br-lg": user.id === users.length,
-                        }
-                      )}
-                    >
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <EllipsisVertical />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="mr-5 w-auto">
-                          <DropdownMenuItem onClick={() => setOpen(true)}>
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelected("Delete this user");
-                              setWarn(true);
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelected("Disable this user");
-                              setWarn(true);
-                            }}
-                          >
-                            Disable
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Link to="/habit-tracker">Habit Tracking</Link>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+      <div className="max-h-full w-full overflow-y-auto rounded-xl border">
+        <Table>
+          <TableHeader className="sticky top-0 z-10 bg-background">
+            <TableRow>
+              <TableHead className="rounded-tl-lg">Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Active</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="w-[65px] rounded-tr-lg">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="h-full max-h-full w-full overflow-y-auto">
+            {users.map((user) => (
+              <TableRow
+                key={user.id}
+                className={cn({
+                  "bg-muted": user.id % 2 !== 0,
+                  "rounded-br-xl": user.id === users.length,
+                })}
+              >
+                <TableCell
+                  className={cn(
+                    "flex items-center justify-center gap-2.5 font-medium",
+                    {
+                      "rounded-bl-lg": user.id === users.length,
+                    }
+                  )}
+                >
+                  <img
+                    src="https://ui.shadcn.com/avatars/04.png"
+                    alt="user-dp"
+                    className="size-6 rounded-full"
+                  />
+                  <span className="flex-1 overflow-hidden truncate md:hidden">
+                    {truncateString(user.name, 4)}
+                  </span>
+                  <span className="hidden flex-1 overflow-hidden truncate md:flex">
+                    {user.name}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="flex-1 overflow-hidden truncate md:hidden">
+                    {truncateString(user.email, 4)}
+                  </span>
+                  <span className="hidden flex-1 overflow-hidden truncate md:flex">
+                    {user.email}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <Switch checked={user.status === "active"} />
+                </TableCell>
+                <TableCell>
+                  <span className="rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary">
+                    {user.is_paid}
+                  </span>
+                </TableCell>
+                <TableCell
+                  className={cn("flex w-[65px] items-center justify-center", {
+                    "rounded-br-lg": user.id === users.length,
+                  })}
+                >
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <EllipsisVertical />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="mr-5 w-auto">
+                      <DropdownMenuItem onClick={() => setOpen(true)}>
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelected("Delete this user");
+                          setWarn(true);
+                        }}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Link to="/users/habit-tracker">Habit Tracking</Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </>
   );

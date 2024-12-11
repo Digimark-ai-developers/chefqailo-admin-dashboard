@@ -14,7 +14,7 @@ const StatCard = ({ card, selectedStat, clickEvent }: CardProps) => {
   return (
     <div
       className={cn(
-        "col-span-1 flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-lg p-2.5 transition-colors",
+        "col-span-1 flex h-fit w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-lg p-2.5 transition-colors",
         {
           "bg-card shadow-md": selectedStat === card.tag,
           "bg-transparent": selectedStat !== card.tag,

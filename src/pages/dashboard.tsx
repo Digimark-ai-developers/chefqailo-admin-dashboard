@@ -1,8 +1,8 @@
 import { useState } from "react";
 
+import DataArea from "@/components/dashboard/data-area";
 import DataBar from "@/components/dashboard/data-bar";
 import DataLine from "@/components/dashboard/data-line";
-import DataRadial from "@/components/dashboard/data-radial";
 import StatCard from "@/components/dashboard/stat-card";
 import UserTable from "@/components/dashboard/user-table";
 import { Button } from "@/components/ui/button";
@@ -36,9 +36,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex max-h-full w-full flex-col items-start justify-start gap-5 overflow-y-auto lg:overflow-hidden">
-      <div className="grid w-full grid-cols-2 items-start justify-start gap-4 lg:grid-cols-8">
-        <div className="col-span-2 flex h-full w-full flex-col items-start justify-start gap-5 rounded-xl border bg-background p-5 shadow lg:col-span-6">
+    <div className="flex h-full w-full flex-col gap-2.5 overflow-y-auto lg:grid lg:grid-rows-3 lg:overflow-hidden">
+      <div className="row-span-2 grid w-full grid-cols-2 items-start justify-start gap-2.5 lg:grid-cols-8">
+        <div className="col-span-2 flex h-full w-full flex-col items-start justify-start gap-2.5 rounded-xl border p-2.5 lg:col-span-5 xl:col-span-6">
           <div className="flex w-full items-center justify-center">
             <span className="flex-1 text-left text-xl font-semibold">
               Overview
@@ -69,10 +69,10 @@ const Dashboard = () => {
           </div>
           <div
             className={cn(
-              "grid w-full grid-cols-1 rounded-xl bg-muted p-2.5 md:grid-cols-3",
+              "grid h-fit w-full grid-cols-1 rounded-lg bg-muted p-2.5 md:grid-cols-3",
               {
-                "gap-0 xl:gap-5": open,
-                "gap-5": !open,
+                "gap-0 xl:gap-2.5": open,
+                "gap-2.5": !open,
               }
             )}
           >
@@ -89,12 +89,14 @@ const Dashboard = () => {
             <DataLine activeChart={activeChart} />
           </div>
         </div>
-        <div className="col-span-2 flex h-full w-full flex-col items-center justify-center gap-5 rounded-xl md:grid md:grid-cols-2 lg:flex lg:flex-col">
-          <DataRadial />
+        <div className="col-span-2 flex h-full w-full flex-col items-start justify-start gap-2.5 rounded-xl md:flex-row lg:col-span-3 lg:flex-col xl:col-span-2">
           <DataBar />
+          <DataArea />
         </div>
       </div>
-      <UserTable />
+      <div className="row-span-1 h-full w-full">
+        <UserTable />
+      </div>
     </div>
   );
 };

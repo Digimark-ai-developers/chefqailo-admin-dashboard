@@ -14,6 +14,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Switch } from "../ui/switch";
 import WarningModal from "../warning-modal";
 import AddUserDialog from "./add-user-dialog";
 
@@ -31,6 +32,20 @@ export const columns: ColumnDef<User>[] = [
         </Button>
       );
     },
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center justify-center gap-2.5 font-medium">
+          <img
+            src="https://ui.shadcn.com/avatars/04.png"
+            alt="user-dp"
+            className="size-6 rounded-full"
+          />
+          <span className="hidden flex-1 overflow-hidden truncate md:flex">
+            {row.getValue("name")}
+          </span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "email",
@@ -43,6 +58,59 @@ export const columns: ColumnDef<User>[] = [
           Email
           <ArrowUpDown />
         </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              Active Status
+              <ArrowDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="mt-1.5 w-52 rounded-md border p-2.5"
+            align="end"
+          >
+            <DropdownMenuRadioGroup
+              value={column.getFilterValue()?.toString()}
+              onValueChange={(e) => column.setFilterValue(e)}
+            >
+              <DropdownMenuRadioItem value="">All</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="active">
+                Active
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="inactive">
+                Inactive
+              </DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const cellValue = row.getValue(columnId);
+      return filterValue ? cellValue === filterValue : true;
+    },
+    cell: ({ row }) => {
+      const [warn, setWarn] = useState<boolean>(false);
+      const [selected, setSelected] = useState<string>("");
+
+      return (
+        <>
+          <WarningModal open={warn} setOpen={setWarn} message={selected} />
+          <Switch
+            onClick={() => {
+              setSelected("disable this user");
+              setWarn(true);
+            }}
+            checked={row.getValue("status") === "active"}
+          />
+        </>
       );
     },
   },
@@ -113,16 +181,8 @@ export const columns: ColumnDef<User>[] = [
               >
                 Delete
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSelected("disable this user");
-                  setWarn(true);
-                }}
-              >
-                Disable
-              </DropdownMenuItem>
               <DropdownMenuItem>
-                <Link to="/habit-tracker">Habit Tracking</Link>
+                <Link to="/users/habit-tracker">Habit Tracking</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

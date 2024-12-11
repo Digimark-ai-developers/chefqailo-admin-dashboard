@@ -1,12 +1,7 @@
 import { useState } from "react";
 
 import dayjs from "dayjs";
-import {
-  CircleArrowLeft,
-  CircleArrowRight,
-  TrendingUp,
-  User,
-} from "lucide-react";
+import { CircleArrowLeft, CircleArrowRight, User } from "lucide-react";
 
 import CalendarView from "@/components/habit-tracker/calendar-view";
 import { Button } from "@/components/ui/button";
@@ -85,21 +80,8 @@ const HabitTracker = () => {
               <User />
             </Button>
           </div>
-          <div className="flex w-full flex-col items-center justify-center gap-2">
-            <div className="flex w-full items-center justify-center">
-              <p className="flex flex-1 text-left text-xs font-medium">
-                <span className="flex gap-1 text-green-500">
-                  <TrendingUp className="size-4" /> 50%
-                </span>
-                &nbsp;from the {activeTab} before
-              </p>
-              <span className="text-right text-xs font-medium">
-                86% Achieved
-              </span>
-            </div>
-            <ProgressBar width={86} />
-          </div>
-          <div className="relative flex h-full max-h-[715px] w-full flex-col items-start justify-start gap-5 overflow-y-auto rounded-xl bg-muted pb-5">
+          <ProgressBar width={86} />
+          <div className="relative flex h-full max-h-[calc(100%-173px)] w-full flex-col items-start justify-start gap-5 overflow-y-auto rounded-xl bg-muted pb-5">
             {activeTab === "week" && (
               <>
                 <div className="sticky top-0 z-10 grid w-full grid-cols-12 items-center bg-muted pt-5">
