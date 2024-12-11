@@ -32,7 +32,7 @@ const UserTable = () => {
     <>
       <AddUserDialog id={1} open={open} setOpen={setOpen} />
       <WarningModal open={warn} message={selected} setOpen={setWarn} />
-      <div className="h-[500px] w-full lg:h-[calc(100vh-434px)] xl:h-[calc(100vh-779px)]">
+      <div className="h-[500px] w-full lg:h-[calc(100vh-434px)]">
         <div className="h-full w-full overflow-hidden rounded-lg border">
           <div className="h-full overflow-y-scroll">
             <Table>
