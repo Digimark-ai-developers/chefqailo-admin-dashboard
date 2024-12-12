@@ -30,8 +30,8 @@ const DataBar = () => {
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+            <Bar dataKey="active" fill="var(--color-active)" radius={4} />
+            <Bar dataKey="inactive" fill="var(--color-inactive)" radius={4} />
             <Legend />
           </BarChart>
         </ChartContainer>

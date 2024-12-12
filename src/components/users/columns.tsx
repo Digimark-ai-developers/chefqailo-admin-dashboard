@@ -68,7 +68,7 @@ export const columns: ColumnDef<User>[] = [
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost">
-              Active Status
+              Status
               <ArrowDown />
             </Button>
           </DropdownMenuTrigger>
@@ -105,8 +105,13 @@ export const columns: ColumnDef<User>[] = [
           <WarningModal open={warn} setOpen={setWarn} message={selected} />
           <Switch
             onClick={() => {
-              setSelected("disable this user");
-              setWarn(true);
+              if (row.getValue("status") === "inactive") {
+                setSelected("active this user");
+                setWarn(true);
+              } else {
+                setSelected("inactive this user");
+                setWarn(true);
+              }
             }}
             checked={row.getValue("status") === "active"}
           />

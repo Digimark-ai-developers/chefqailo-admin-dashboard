@@ -21,14 +21,14 @@ import { cn } from "@/lib/utils";
 const Dashboard = () => {
   const { open } = useSidebar();
   const [activeChart, setActiveChart] =
-    useState<keyof typeof lineChartConfig>("desktop");
+    useState<keyof typeof lineChartConfig>("inactive");
   const [selectedStat, setSelectedStat] = useState<
     "users" | "monthly_sales_amount" | "total_sales"
   >("users");
   const [position, setPosition] = useState<string>("weekly");
 
   const clickEvent = (
-    chart: "views" | "desktop" | "mobile" | "tablet",
+    chart: "views" | "inactive" | "active" | "tablet",
     stat: "users" | "monthly_sales_amount" | "total_sales"
   ) => {
     setSelectedStat(stat);

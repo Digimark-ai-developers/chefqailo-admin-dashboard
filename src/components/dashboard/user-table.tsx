@@ -39,8 +39,8 @@ const UserTable = () => {
             <TableRow>
               <TableHead className="rounded-tl-lg">Name</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Active</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Payment Status</TableHead>
               <TableHead className="w-[65px] rounded-tr-lg">Actions</TableHead>
             </TableRow>
           </TableHeader>

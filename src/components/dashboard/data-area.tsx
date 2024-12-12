@@ -13,7 +13,7 @@ const DataArea = () => {
   return (
     <Card className="flex h-full w-full flex-col items-center justify-between p-5">
       <CardHeader className="w-full p-0">
-        <CardTitle>Active Users this Month</CardTitle>
+        <CardTitle>Active vs Inactive Users</CardTitle>
       </CardHeader>
       <CardContent className="w-full p-0">
         <ChartContainer config={areaChartConfig}>
@@ -38,19 +38,19 @@ const DataArea = () => {
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
-              dataKey="mobile"
+              dataKey="active"
               type="natural"
-              fill="var(--color-mobile)"
+              fill="var(--color-active)"
               fillOpacity={0.4}
-              stroke="var(--color-mobile)"
+              stroke="var(--color-active)"
               stackId="a"
             />
             <Area
-              dataKey="desktop"
+              dataKey="inactive"
               type="natural"
-              fill="var(--color-desktop)"
+              fill="var(--color-inactive)"
               fillOpacity={0.4}
-              stroke="var(--color-desktop)"
+              stroke="var(--color-inactive)"
               stackId="a"
             />
             <Legend />
