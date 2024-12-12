@@ -8,8 +8,8 @@ const Providers = ({ children }: { children: ReactNode }) => {
     <KindeProvider
       clientId={`${import.meta.env.VITE_KINDE_CLIENT_ID}`}
       domain={`${import.meta.env.VITE_KINDE_AUTH_DOMAIN}`}
-      logoutUri='https://chefqailo-admin-dashboard.vercel.app'
-      redirectUri='https://chefqailo-admin-dashboard.vercel.app/dashboard'
+      logoutUri={window.location.origin}
+      redirectUri={`${window.location.origin}/dashboard`}
       
       >
       <BrowserRouter>{children}</BrowserRouter>
