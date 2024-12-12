@@ -28,7 +28,7 @@ export const cards: Card[] = [
     rate: 2.8,
     icon: User2,
     tag: "users",
-    chart: "desktop",
+    chart: "inactive",
     color: "hsl(var(--chart-1))",
   },
   {
@@ -39,7 +39,7 @@ export const cards: Card[] = [
     rate: 3.4,
     icon: CircleDollarSign,
     tag: "monthly_sales_amount",
-    chart: "mobile",
+    chart: "active",
     color: "hsl(var(--chart-2))",
   },
   {
