@@ -1,6 +1,6 @@
 import { type Dispatch, type SetStateAction, useState } from "react";
 
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail} from "lucide-react";
 
 import LoginIconImg from "@/assets/img/login2.svg";
 
@@ -35,7 +35,7 @@ const UserBar = ({ open, setOpen }: SheetTriggerProps) => {
               John Doe
             </span>
             <span className="w-full text-center text-sm text-gray-400">
-              UI/UX Designer
+              {/* UI/UX Designer */}
             </span>
           </div>
           <div className="flex w-full items-center justify-center border-b py-2.5">
@@ -64,9 +64,35 @@ const UserBar = ({ open, setOpen }: SheetTriggerProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          <div className="flex w-full items-center justify-center border-b py-2.5">
+            <span className="flex-1 text-left text-sm">Status:</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="capitalize">
+                  {payStatus}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="mt-1.5 w-52 rounded-md border p-2.5"
+                align="end"
+              >
+                <DropdownMenuRadioGroup
+                  value={payStatus}
+                  onValueChange={(e) => setPayStatus(e)}
+                >
+                  <DropdownMenuRadioItem value="active">
+                    active
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="inactive">
+                    inactive
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <div className="flex w-full flex-col items-center justify-center gap-2.5 py-2.5">
             <span className="w-full text-left text-xl font-bold">
-              Contact Info
+              {/* Contact Info */}
             </span>
             <div className="flex w-full items-center justify-center gap-2.5">
               <Mail className="size-4 text-primary" />
@@ -74,16 +100,16 @@ const UserBar = ({ open, setOpen }: SheetTriggerProps) => {
                 johndoe@email.com
               </span>
             </div>
-            <div className="flex w-full items-center justify-center gap-2.5 border-y py-2.5">
+            {/* <div className="flex w-full items-center justify-center gap-2.5 border-y py-2.5">
               <Phone className="size-4 text-primary" />
               <span className="flex-1 text-left text-sm">+1 234 567 890</span>
-            </div>
-            <div className="flex w-full items-center justify-center gap-2.5">
+            </div> */}
+            {/* <div className="flex w-full items-center justify-center gap-2.5">
               <MapPin className="size-4 text-primary" />
               <span className="flex-1 text-left text-sm">
                 2239, Hog Camp, Road Schaumburg
               </span>
-            </div>
+            </div> */}
           </div>
           <div className="flex h-full w-full items-center justify-center pt-2.5">
             <DataBar />

@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Legend, XAxis } from "recharts";
 
 import {
   ChartContainer,
@@ -7,13 +7,16 @@ import {
 } from "@/components/ui/chart";
 import { barChartConfig, barChartData } from "@/lib/dashboard-graph-specs";
 
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 const DataBar = () => {
   return (
-    <Card className="h-full w-full p-0">
-      <CardContent className="flex h-full w-full items-center justify-center p-6">
-        <ChartContainer config={barChartConfig} className="size-full">
+    <Card className="flex h-full w-full flex-col items-center justify-between p-5">
+      <CardHeader className="w-full p-0">
+        <CardTitle>Paid vs Unpaid Users</CardTitle>
+      </CardHeader>
+      <CardContent className="w-full p-0">
+        <ChartContainer config={barChartConfig}>
           <BarChart accessibilityLayer data={barChartData}>
             <CartesianGrid vertical={false} />
             <XAxis
@@ -27,8 +30,9 @@ const DataBar = () => {
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+            <Bar dataKey="active" fill="var(--color-active)" radius={4} />
+            <Bar dataKey="inactive" fill="var(--color-inactive)" radius={4} />
+            <Legend />
           </BarChart>
         </ChartContainer>
       </CardContent>

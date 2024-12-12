@@ -13,7 +13,7 @@ const App = () => {
       <Route element={<Layout />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<Users />} />
-        <Route path="/habit-tracker" element={<HabitTracker />} />
+        <Route path="/users/habit-tracker" element={<HabitTracker />} />
       </Route>
     </Routes>
   );

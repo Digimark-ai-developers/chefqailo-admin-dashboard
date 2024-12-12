@@ -61,7 +61,7 @@ const CalendarView = () => {
           <div
             key={idx}
             className={cn(
-              "col-span-1 flex h-[210px] w-full flex-col items-start justify-between rounded-md p-2.5 text-center",
+              "col-span-1 flex aspect-square w-full flex-col items-start justify-between rounded-md p-2.5 text-center",
               {
                 "bg-primary text-white": isCurrentMonth && progress === 100,
                 "border border-primary text-black dark:text-white":
@@ -70,9 +70,9 @@ const CalendarView = () => {
               }
             )}
           >
-            <span>{day.day}</span>
+            <span className="text-base !leading-[16px]">{day.day}</span>
             {isCurrentMonth && progress !== undefined && (
-              <span>{progress}%</span>
+              <span className="text-base !leading-[16px]">{progress}%</span>
             )}
           </div>
         );

@@ -7,7 +7,7 @@ declare type Card = {
   value: number;
   color: string;
   increase: boolean;
-  chart: "views" | "desktop" | "mobile" | "tablet";
+  chart: "views" | "inactive" | "active" | "tablet";
   tag: "users" | "monthly_sales_amount" | "total_sales";
 };
 
@@ -15,5 +15,6 @@ declare type User = {
   id: number;
   name: string;
   email: string;
+  status: string;
   is_paid: string;
 };

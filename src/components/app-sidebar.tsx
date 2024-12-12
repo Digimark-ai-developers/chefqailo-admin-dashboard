@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Power } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 import LogoImage from "@/assets/img/login2.svg";
 import {
@@ -14,11 +15,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { items } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 import { Button } from "./ui/button";
 import WarningModal from "./warning-modal";
 
 const AppSidebar = () => {
+  const { pathname } = useLocation();
   const [open, setOpen] = useState<boolean>(false);
 
   return (
@@ -34,7 +37,14 @@ const AppSidebar = () => {
           <SidebarGroup>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem
+                  key={item.title}
+                  className={cn("", {
+                    "rounded-md bg-primary/15 text-primary": pathname.includes(
+                      item.url
+                    ),
+                  })}
+                >
                   <SidebarMenuButton asChild>
                     <a href={item.url}>
                       <item.icon />
