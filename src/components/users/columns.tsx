@@ -106,10 +106,10 @@ export const columns: ColumnDef<User>[] = [
           <Switch
             onClick={() => {
               if (row.getValue("status") === "inactive") {
-                setSelected("active this user");
+                setSelected("Activate this user");
                 setWarn(true);
               } else {
-                setSelected("inactive this user");
+                setSelected("Deactivate this user");
                 setWarn(true);
               }
             }}
