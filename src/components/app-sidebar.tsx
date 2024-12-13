@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Power } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
@@ -21,12 +22,18 @@ import { Button } from "./ui/button";
 import WarningModal from "./warning-modal";
 
 const AppSidebar = () => {
+  const { logout } = useKindeAuth();
   const { pathname } = useLocation();
   const [open, setOpen] = useState<boolean>(false);
 
   return (
     <>
-      <WarningModal open={open} setOpen={setOpen} message="Logout" />
+      <WarningModal
+        open={open}
+        setOpen={setOpen}
+        message="Logout"
+        cta={logout}
+      />
       <Sidebar>
         <SidebarHeader className="bg-sidebar-background border-b">
           <div className="flex w-full items-center justify-center">

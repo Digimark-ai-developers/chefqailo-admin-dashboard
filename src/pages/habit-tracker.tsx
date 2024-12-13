@@ -5,6 +5,7 @@ import { CircleArrowLeft, CircleArrowRight, User } from "lucide-react";
 
 import CalendarView from "@/components/habit-tracker/calendar-view";
 import { Button } from "@/components/ui/button";
+import ConicGradient from "@/components/ui/conic-gradient";
 import ProgressBar from "@/components/ui/progress-bar";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserBar from "@/components/users/user-bar";
@@ -115,17 +116,14 @@ const HabitTracker = () => {
                       )
                     )}
                     <div className="col-span-1">
-                      <div
-                        className="size-10 rounded-full bg-transparent"
-                        style={{
-                          background: `conic-gradient(#F97316 ${
-                            (Object.values(item).filter(
-                              (value) => value === true
-                            ).length /
-                              7) *
-                            100
-                          }%, #696969 0)`,
-                        }}
+                      <ConicGradient
+                        size="size-10"
+                        progress={
+                          (Object.values(item).filter((value) => value === true)
+                            .length /
+                            7) *
+                          100
+                        }
                       />
                     </div>
                   </div>
