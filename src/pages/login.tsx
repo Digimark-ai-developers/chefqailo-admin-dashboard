@@ -18,7 +18,7 @@ const Login = () => {
   return (
     <ThemeProvider>
       <div className="flex h-screen w-full items-center justify-center overflow-hidden bg-background p-5">
-        <div className="grid w-full grid-cols-1 gap-5 md:w-auto md:grid-cols-2">
+        <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 lg:max-w-4xl">
           <div className="col-span-1 hidden md:flex">
             <img src={LoginImg} alt="login-img" />
           </div>
