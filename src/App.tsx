@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 
 import Layout from "./components/layout";
+import RouteGuard from "./components/react-guard";
 import Dashboard from "./pages/dashboard";
 import HabitTracker from "./pages/habit-tracker";
 import Login from "./pages/login";
@@ -10,7 +11,13 @@ const App = () => {
   return (
     <Routes>
       <Route index element={<Login />} />
-      <Route element={<Layout />}>
+      <Route
+        element={
+          <RouteGuard>
+            <Layout />
+          </RouteGuard>
+        }
+      >
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<Users />} />
         <Route path="/users/habit-tracker" element={<HabitTracker />} />

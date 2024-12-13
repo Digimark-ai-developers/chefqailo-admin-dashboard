@@ -1,19 +1,15 @@
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 
-import { Mail} from "lucide-react";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
+import { Link } from "react-router-dom";
 
-import LoginIconImg from "@/assets/img/login2.svg";
+import { yearlyProgress } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
-import DataBar from "../dashboard/data-bar";
-import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+import { buttonVariants } from "../ui/button";
+import ConicGradient from "../ui/conic-gradient";
 import { Sheet, SheetContent } from "../ui/sheet";
+import PaymentHistory from "./payment-history";
 
 interface SheetTriggerProps {
   open: boolean;
@@ -21,98 +17,61 @@ interface SheetTriggerProps {
 }
 
 const UserBar = ({ open, setOpen }: SheetTriggerProps) => {
-  const [payStatus, setPayStatus] = useState<string>("paid");
+  const { user } = useKindeAuth();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent>
-        <div className="flex h-full w-full flex-col items-start justify-start">
-          <div className="flex w-full items-center justify-center">
-            <img src={LoginIconImg} alt="login-icon-img" className="size-40" />
-          </div>
-          <div className="flex w-full flex-col items-center justify-center gap-1.5 border-b pb-2.5">
-            <span className="w-full text-center text-xl font-bold">
-              John Doe
-            </span>
-            <span className="w-full text-center text-sm text-gray-400">
-              {/* UI/UX Designer */}
-            </span>
-          </div>
-          <div className="flex w-full items-center justify-center border-b py-2.5">
-            <span className="flex-1 text-left text-sm">Payment Status:</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="capitalize">
-                  {payStatus}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="mt-1.5 w-52 rounded-md border p-2.5"
-                align="end"
-              >
-                <DropdownMenuRadioGroup
-                  value={payStatus}
-                  onValueChange={(e) => setPayStatus(e)}
-                >
-                  <DropdownMenuRadioItem value="paid">
-                    Paid
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="unpaid">
-                    Unpaid
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className="flex w-full items-center justify-center border-b py-2.5">
-            <span className="flex-1 text-left text-sm">Status:</span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="capitalize">
-                  {payStatus}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="mt-1.5 w-52 rounded-md border p-2.5"
-                align="end"
-              >
-                <DropdownMenuRadioGroup
-                  value={payStatus}
-                  onValueChange={(e) => setPayStatus(e)}
-                >
-                  <DropdownMenuRadioItem value="active">
-                    active
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="inactive">
-                    inactive
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className="flex w-full flex-col items-center justify-center gap-2.5 py-2.5">
-            <span className="w-full text-left text-xl font-bold">
-              {/* Contact Info */}
-            </span>
-            <div className="flex w-full items-center justify-center gap-2.5">
-              <Mail className="size-4 text-primary" />
-              <span className="flex-1 text-left text-sm">
-                johndoe@email.com
+        <div className="flex h-full w-full flex-col items-start justify-start gap-5">
+          <div className="flex w-full items-center justify-center gap-2.5 border-b pb-5">
+            <img
+              src="https://ui.shadcn.com/avatars/04.png"
+              alt="user-picture"
+              className="size-16 rounded-full bg-primary"
+            />
+            <div className="flex flex-1 flex-col items-center justify-center gap-1">
+              <span className="w-full text-left text-lg font-bold leading-[18px]">
+                {user?.given_name}&nbsp;{user?.family_name}
+              </span>
+              <span className="w-full overflow-hidden truncate text-left text-xs text-gray-400">
+                {user?.email}
+              </span>
+              <span className="w-full overflow-hidden truncate text-left text-xs text-gray-400">
+                Paid | Active
               </span>
             </div>
-            {/* <div className="flex w-full items-center justify-center gap-2.5 border-y py-2.5">
-              <Phone className="size-4 text-primary" />
-              <span className="flex-1 text-left text-sm">+1 234 567 890</span>
-            </div> */}
-            {/* <div className="flex w-full items-center justify-center gap-2.5">
-              <MapPin className="size-4 text-primary" />
-              <span className="flex-1 text-left text-sm">
-                2239, Hog Camp, Road Schaumburg
-              </span>
-            </div> */}
           </div>
-          <div className="flex h-full w-full items-center justify-center pt-2.5">
-            <DataBar />
+          <div className="flex h-full w-full flex-col items-start justify-start gap-5 rounded-lg">
+            <div className="flex h-fit w-full items-center justify-center">
+              <span className="flex-1 text-left text-xl font-semibold">
+                Habit Tracker
+              </span>
+              <Link
+                to="/users/habit-tracker"
+                className={cn(
+                  buttonVariants({
+                    size: "sm",
+                    variant: "default",
+                  })
+                )}
+              >
+                View More
+              </Link>
+            </div>
+            <div className="flex h-fit w-full flex-col items-start justify-start gap-2.5">
+              {yearlyProgress.slice(0, 9).map((item) => (
+                <div
+                  key={item.id}
+                  className="flex w-full items-center justify-center rounded-md bg-muted p-3"
+                >
+                  <span className="flex-1 text-left font-semibold">
+                    {item.name}
+                  </span>
+                  <ConicGradient size="size-6" progress={item.progress} />
+                </div>
+              ))}
+            </div>
+            <PaymentHistory />
           </div>
         </div>
       </SheetContent>
