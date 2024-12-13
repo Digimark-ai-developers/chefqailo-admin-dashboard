@@ -160,6 +160,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     enableHiding: false,
     cell: () => {
       const [warn, setWarn] = useState<boolean>(false);
@@ -196,3 +197,5 @@ export const columns: ColumnDef<User>[] = [
     },
   },
 ];
+
+
