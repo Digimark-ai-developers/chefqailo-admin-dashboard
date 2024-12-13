@@ -16,14 +16,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { items } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, truncateString } from "@/lib/utils";
 
 import { Button } from "./ui/button";
 import WarningModal from "./warning-modal";
 
 const AppSidebar = () => {
-  const { logout } = useKindeAuth();
   const { pathname } = useLocation();
+  const { user, logout } = useKindeAuth();
   const [open, setOpen] = useState<boolean>(false);
 
   return (
@@ -65,30 +65,26 @@ const AppSidebar = () => {
         </SidebarContent>
         <SidebarFooter className="bg-sidebar-background border-t">
           <div className="flex w-full items-center justify-center gap-2.5">
-            <div className="size-10 overflow-hidden rounded-md">
-              <img
-                src="https://ui.shadcn.com/avatars/02.png"
-                alt="dp"
-                className="size-full"
-              />
-            </div>
-            <div className="flex flex-1 flex-col items-center justify-center gap-1">
-              <span className="w-full text-left text-sm font-semibold">
-                John Doe
+            <img
+              src="https://ui.shadcn.com/avatars/04.png"
+              alt="dp"
+              className="size-10 rounded-full"
+            />
+            <div className="flex w-full flex-col items-center justify-center gap-1">
+              <span className="w-full overflow-hidden truncate text-left text-sm font-semibold">
+                {user?.given_name}&nbsp;{user?.family_name}
               </span>
-              <span className="w-full text-left text-xs font-light">
-                johndoe@email.com
+              <span className="flex-1 overflow-hidden truncate text-left text-xs font-light">
+                {truncateString(`${user?.email}`, 19)}
               </span>
             </div>
-            <div className="flex items-center justify-center">
-              <Button
-                onClick={() => setOpen(true)}
-                variant="ghost"
-                className="text-red-500"
-              >
-                <Power className="size-full" />
-              </Button>
-            </div>
+            <Button
+              onClick={() => setOpen(true)}
+              variant="ghost"
+              className="text-red-500"
+            >
+              <Power className="size-full" />
+            </Button>
           </div>
         </SidebarFooter>
       </Sidebar>
