@@ -58,8 +58,8 @@ const UserBar = ({ open, setOpen }: SheetTriggerProps) => {
                 View More
               </Link>
             </div>
-            <div className="flex h-fit w-full flex-col items-start justify-start gap-2.5">
-              {yearlyProgress.slice(0, 9).map((item) => (
+            <div className="flex h-[calc(100vh-454px)] w-full flex-col items-start justify-start gap-2.5 overflow-y-auto">
+              {yearlyProgress.map((item) => (
                 <div
                   key={item.id}
                   className="flex w-full items-center justify-center rounded-md bg-muted p-3"
@@ -71,7 +71,9 @@ const UserBar = ({ open, setOpen }: SheetTriggerProps) => {
                 </div>
               ))}
             </div>
-            <PaymentHistory />
+            <div className="h-full max-h-[238px] w-full">
+              <PaymentHistory />
+            </div>
           </div>
         </div>
       </SheetContent>
