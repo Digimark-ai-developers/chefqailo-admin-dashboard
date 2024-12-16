@@ -5,19 +5,19 @@ import { Loader2 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
 const RouteGuard = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated, isLoading, getToken } = useKindeAuth();
+  const { isAuthenticated, isLoading, getIdToken } = useKindeAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (getToken) {
-        getToken().then((token) => {
+      if (getIdToken) {
+        getIdToken().then((token) => {
           if (token) {
-            localStorage.setItem("kinde_refresh_token", token);
+            localStorage.setItem("kinde_id_token", token);
           }
         });
       }
     }
-  }, [isAuthenticated, getToken]);
+  }, [isAuthenticated, getIdToken]);
 
   if (isLoading) {
     return (
