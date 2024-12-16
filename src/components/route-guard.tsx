@@ -1,23 +1,11 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Loader2 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
 const RouteGuard = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated, isLoading, getIdToken } = useKindeAuth();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      if (getIdToken) {
-        getIdToken().then((token) => {
-          if (token) {
-            localStorage.setItem("token", token);
-          }
-        });
-      }
-    }
-  }, [isAuthenticated, getIdToken]);
+  const { isAuthenticated, isLoading } = useKindeAuth();
 
   if (isLoading) {
     return (

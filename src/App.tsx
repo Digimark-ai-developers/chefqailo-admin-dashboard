@@ -11,31 +11,16 @@ const App = () => {
   return (
     <Routes>
       <Route index element={<Login />} />
-      <Route element={<Layout />}>
-        <Route
-          path="/dashboard"
-          element={
-            <RouteGuard>
-              <Dashboard />
-            </RouteGuard>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <RouteGuard>
-              <Users />
-            </RouteGuard>
-          }
-        />
-        <Route
-          path="/users/habit-tracker"
-          element={
-            <RouteGuard>
-              <HabitTracker />
-            </RouteGuard>
-          }
-        />
+      <Route
+        element={
+          <RouteGuard>
+            <Layout />
+          </RouteGuard>
+        }
+      >
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/users/habit-tracker" element={<HabitTracker />} />
       </Route>
     </Routes>
   );
