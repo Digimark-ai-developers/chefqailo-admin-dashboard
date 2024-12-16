@@ -12,7 +12,7 @@ const RouteGuard = ({ children }: { children: ReactNode }) => {
       if (getIdToken) {
         getIdToken().then((token) => {
           if (token) {
-            localStorage.setItem("kinde_id_token", token);
+            localStorage.setItem("token", token);
           }
         });
       }

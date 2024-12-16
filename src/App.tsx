@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 
 import Layout from "./components/layout";
-import RouteGuard from "./components/react-guard";
+import RouteGuard from "./components/route-guard";
 import Dashboard from "./pages/dashboard";
 import HabitTracker from "./pages/habit-tracker";
 import Login from "./pages/login";
