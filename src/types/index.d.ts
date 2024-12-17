@@ -1,7 +1,7 @@
 declare type Card = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon: any;
-  id: number;
+  icon: any | null;
+  id?: number;
   name: string;
   rate: number;
   value: number;
@@ -13,10 +13,13 @@ declare type Card = {
 
 declare type User = {
   id: number;
-  name: string;
+  username: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  status: string;
-  is_paid: string;
+  is_paid: boolean;
+  status: boolean;
+  createdAt: string;
 };
 
 declare type UsersResponse = {

@@ -10,17 +10,33 @@ export const userApi = api.injectEndpoints({
       providesTags: ["Users"],
       transformResponse: (response: UsersResponse) => response.data.users,
     }),
+    getUser: build.query({
+      query: (id: string) => ({
+        url: `/get-user-data/${id}/`,
+        method: "GET",
+      }),
+      providesTags: ["User"],
+      transformResponse: (response: {
+        status_code: number;
+        message: string;
+        data: User;
+      }) => response.data,
+    }),
     getUserStats: build.query({
       query: () => ({
         url: "/user_stats/",
         method: "GET",
       }),
       providesTags: ["Stats"],
-      transformResponse: (response: UsersResponse) => response.data.users,
+      transformResponse: (response: {
+        status_code: number;
+        message: string;
+        data: Card[];
+      }) => response.data,
     }),
     getPaidUserStats: build.query({
       query: () => ({
-        url: "/users_payment_stats/",
+        url: "/user_payment_stats/",
         method: "GET",
       }),
       providesTags: ["Stats"],
@@ -28,14 +44,14 @@ export const userApi = api.injectEndpoints({
     }),
     getActiveUserStats: build.query({
       query: () => ({
-        url: "/usesr_active_stats/",
+        url: "/user_active_stats/",
         method: "GET",
       }),
       providesTags: ["Stats"],
       transformResponse: (response: ActiveUserStats) => response.data,
     }),
     postUser: build.mutation({
-      query: (data: PostUser) => ({
+      query: (data: FormData) => ({
         url: "/add_user/",
         method: "POST",
         body: data,
@@ -52,12 +68,83 @@ export const userApi = api.injectEndpoints({
     }),
     deleteUser: build.mutation({
       query: (id: number) => ({
-        url: `/delete_user/${id}`,
+        url: `/delete_user/${id}/`,
         method: "DELETE",
       }),
       invalidatesTags: ["Users", "Stats"],
     }),
+    toggleUserStatus: build.mutation({
+      query: (id: string) => ({
+        url: "/toggle-active/",
+        method: "POST",
+        body: { id },
+      }),
+      invalidatesTags: ["Users"],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          api.util.updateQueryData(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            "getAllUsers",
+            undefined,
+            (draft: User[]) => {
+              const user = draft.find((p: User) => p.id === parseInt(arg));
+              if (user) {
+                user.status = user.status ? false : true;
+              }
+            }
+          )
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
+    toggleUserPaidStatus: build.mutation({
+      query: (id: string) => ({
+        url: "/toggle-paid/",
+        method: "POST",
+        body: { id },
+      }),
+      invalidatesTags: ["Users"],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          api.util.updateQueryData(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            "getAllUsers",
+            undefined,
+            (draft: User[]) => {
+              const user = draft.find((p: User) => p.id === parseInt(arg));
+              if (user) {
+                user.is_paid = user.is_paid ? false : true;
+              }
+            }
+          )
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
-export const { useGetAllUsersQuery } = userApi;
+export const {
+  useGetUserQuery,
+  useGetAllUsersQuery,
+  useGetUserStatsQuery,
+  useGetPaidUserStatsQuery,
+  useGetActiveUserStatsQuery,
+  usePostUserMutation,
+  useEditUserMutation,
+  useDeleteUserMutation,
+  useToggleUserStatusMutation,
+  useToggleUserPaidStatusMutation,
+} = userApi;

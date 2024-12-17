@@ -1,13 +1,16 @@
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
-import { Upload } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
+import { toast } from "sonner";
+
+import { useGetUserQuery, usePostUserMutation } from "@/store/services/user";
 
 import { Button } from "../ui/button";
+import CustomToast from "../ui/custom-toast";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
@@ -22,6 +25,53 @@ interface AddUserDialogProps {
 }
 
 const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
+  const { data } = useGetUserQuery(`${id}`, {
+    skip: !id,
+    refetchOnMountOrArgChange: true,
+  });
+  const [email, setEmail] = useState<string>("");
+  const [paid, setPaid] = useState<boolean>(false);
+  const [lastName, setLastName] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [addUser, { isLoading }] = usePostUserMutation();
+
+  const postUser = async () => {
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("is_paid", `${paid}`);
+    formData.append("last_name", lastName);
+    formData.append("first_name", firstName);
+
+    const response = await addUser(formData);
+
+    if (!response.error) {
+      toast.custom(() => (
+        <CustomToast
+          type="success"
+          title="Success"
+          description="Successfully Added User!"
+        />
+      ));
+    } else {
+      toast.custom(() => (
+        <CustomToast
+          type="error"
+          title="Error"
+          description="Something went wrong!"
+        />
+      ));
+    }
+  };
+
+  useEffect(() => {
+    if (data) {
+      setEmail(data.email);
+      setPaid(data.is_paid);
+      setLastName(data.last_name);
+      setFirstName(data.first_name);
+    }
+  }, [data]);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-sm md:max-w-md">
@@ -32,24 +82,51 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
             you're done.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid w-full grid-cols-2 gap-5">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            postUser();
+          }}
+          className="grid w-full grid-cols-2 gap-5"
+        >
           <div className="col-span-1 flex w-full flex-col items-center justify-center gap-1.5">
             <Label htmlFor="firstName" className="w-full text-left text-xs">
               First Name
             </Label>
-            <Input id="firstName" type="text" placeholder="John" />
+            <Input
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              id="firstName"
+              type="text"
+              placeholder="John"
+              required
+            />
           </div>
           <div className="col-span-1 flex w-full flex-col items-center justify-center gap-1.5">
             <Label htmlFor="lastName" className="w-full text-left text-xs">
               Last Name
             </Label>
-            <Input id="lastName" type="text" placeholder="Doe" />
+            <Input
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              id="lastName"
+              type="text"
+              placeholder="Doe"
+              required
+            />
           </div>
           <div className="col-span-2 flex w-full flex-col items-center justify-center gap-1.5">
             <Label htmlFor="email" className="w-full text-left text-xs">
               Email
             </Label>
-            <Input id="email" type="email" placeholder="johndoe@email.com" />
+            <Input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              id="email"
+              type="email"
+              required
+              placeholder="johndoe@email.com"
+            />
           </div>
           <div className="col-span-2 flex w-full items-center space-x-2">
             <Label
@@ -60,7 +137,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
             </Label>
             <div className="flex items-center justify-center gap-2.5">
               <span className="text-sm font-medium">Unpaid</span>
-              <Switch id="airplane-mode" />
+              <Switch checked={paid} onCheckedChange={setPaid} />
               <span className="text-sm font-medium text-primary">Paid</span>
             </div>
           </div>
@@ -79,20 +156,32 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
               </div>
             </div>
           </div>
-        </div>
-        <DialogFooter className="gap-2.5">
-          <Button
-            onClick={() => setOpen(false)}
-            type="button"
-            variant="outline"
-            size="default"
-          >
-            Cancel
-          </Button>
-          <Button type="submit" variant="default" size="default">
-            Save changes
-          </Button>
-        </DialogFooter>
+          <div className="col-span-2 flex w-full items-center justify-end gap-2.5">
+            <Button
+              onClick={() => setOpen(false)}
+              type="button"
+              variant="outline"
+              size="default"
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={isLoading}
+              type="submit"
+              variant="default"
+              size="default"
+            >
+              {isLoading ? (
+                <div className="flex w-full items-center justify-center gap-2">
+                  <Loader2 className="animate-spin" />
+                  <span>Please Wait...</span>
+                </div>
+              ) : (
+                "Save changes"
+              )}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

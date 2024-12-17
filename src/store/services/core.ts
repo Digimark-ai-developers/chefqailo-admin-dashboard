@@ -11,8 +11,8 @@ const baseQueryWith401Handling: typeof baseQuery = async (
 ) => {
   const result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401) {
-    window.location.replace("?intent=terminated");
+  if (result.error?.status === 401) {
+    window.location.replace("/?intent=terminated");
   }
 
   return result;
@@ -21,6 +21,6 @@ const baseQueryWith401Handling: typeof baseQuery = async (
 export const api = createApi({
   baseQuery: baseQueryWith401Handling,
   keepUnusedDataFor: 5,
-  tagTypes: ["Users", "Stats"],
+  tagTypes: ["Users", "User", "Stats"],
   endpoints: () => ({}),
 });

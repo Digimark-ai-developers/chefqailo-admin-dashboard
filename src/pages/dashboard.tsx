@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { CircleDollarSign, Loader2, User2, Users } from "lucide-react";
+
 import DataArea from "@/components/dashboard/data-area";
 import DataBar from "@/components/dashboard/data-bar";
 import DataLine from "@/components/dashboard/data-line";
@@ -14,9 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
-import { cards } from "@/lib/constants";
 import { lineChartConfig } from "@/lib/dashboard-graph-specs";
 import { cn } from "@/lib/utils";
+import { useGetUserStatsQuery } from "@/store/services/user";
 
 const Dashboard = () => {
   const { open } = useSidebar();
@@ -26,6 +28,36 @@ const Dashboard = () => {
     "users" | "monthly_sales_amount" | "total_sales"
   >("users");
   const [position, setPosition] = useState<string>("weekly");
+  const { data: stats, isLoading: statsLoading } = useGetUserStatsQuery({});
+
+  const statsDataFormatter = () => {
+    const icons = [User2, CircleDollarSign, Users];
+
+    if (stats) {
+      return stats.map((stat, idx) => {
+        return {
+          ...stat,
+          id: idx + 1,
+          chart:
+            idx === 0
+              ? "inactive"
+              : idx === 1
+                ? "active"
+                : ("tablet" as keyof typeof lineChartConfig),
+          tag: (stat.name === "Users"
+            ? "users"
+            : stat.name === "Monthly Sales"
+              ? "monthly_sales_amount"
+              : "total_sales") as
+            | "users"
+            | "monthly_sales_amount"
+            | "total_sales",
+          icon: icons[idx],
+          increase: stat.increase ? true : false,
+        };
+      });
+    }
+  };
 
   const clickEvent = (
     chart: "views" | "inactive" | "active" | "tablet",
@@ -69,21 +101,35 @@ const Dashboard = () => {
           </div>
           <div
             className={cn(
-              "grid h-fit w-full grid-cols-1 rounded-lg bg-muted p-2.5 md:grid-cols-3",
+              "grid h-fit min-h-[142px] w-full grid-cols-1 rounded-lg bg-muted p-2.5 md:grid-cols-3",
               {
                 "gap-0 xl:gap-2.5": open,
                 "gap-2.5": !open,
               }
             )}
           >
-            {cards.map((card) => (
-              <StatCard
-                card={card}
-                key={card.id}
-                selectedStat={selectedStat}
-                clickEvent={() => clickEvent(card.chart, card.tag)}
-              />
-            ))}
+            {statsLoading ? (
+              <div className="col-span-1 flex w-full items-center justify-center md:col-span-3">
+                <Loader2 className="size-10 animate-spin text-primary" />
+              </div>
+            ) : (
+              statsDataFormatter()?.map((card, idx) => (
+                <StatCard
+                  card={card}
+                  key={idx}
+                  selectedStat={selectedStat}
+                  clickEvent={() =>
+                    clickEvent(
+                      card.chart,
+                      card.tag as
+                        | "users"
+                        | "monthly_sales_amount"
+                        | "total_sales"
+                    )
+                  }
+                />
+              ))
+            )}
           </div>
           <div className="h-full w-full">
             <DataLine activeChart={activeChart} />
