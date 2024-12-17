@@ -18,3 +18,46 @@ declare type User = {
   status: string;
   is_paid: string;
 };
+
+declare type UsersResponse = {
+  status_code: number;
+  message: string;
+  data: {
+    total_users: number;
+    users: User[];
+  };
+};
+
+declare type PaidUserStats = {
+  status_code: number;
+  message: string;
+  data: {
+    paid: number;
+    unpaid: number;
+    total: number;
+  };
+};
+
+declare type ActiveUserStats = {
+  status_code: number;
+  message: string;
+  data: {
+    period: string | null;
+    active: number;
+    inactive: number;
+    total: number;
+  };
+};
+
+declare type PostUser = {
+  first_name: string;
+  last_name: string;
+  is_paid: boolean;
+  image: File | null;
+  email: string;
+};
+
+declare type EditUser = {
+  id: number;
+  body: PostUser;
+};

@@ -1,19 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Mail } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 import LoginIconImg from "@/assets/img/login2.svg";
 import LoginImg from "@/assets/img/login.svg";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
+import CustomToast from "@/components/ui/custom-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const Login = () => {
-  const { login } = useKindeAuth();
+  const { login, logout } = useKindeAuth();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState<string>("");
+
+  useEffect(() => {
+    const intent = searchParams.get("intent");
+    if (intent) {
+      if (intent === "terminated") {
+        logout();
+        toast.custom(() => (
+          <CustomToast
+            type="error"
+            title="Warning!"
+            description="Session Expired, Please Login Again!"
+          />
+        ));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   return (
     <ThemeProvider>
