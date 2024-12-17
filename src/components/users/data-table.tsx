@@ -122,12 +122,12 @@ const DataTable = <TData, TValue>({
                           <TableCell
                             key={cell.id}
                             onClick={() => {
-                              if (cell.column.id === "name") {
+                              if (cell.column.id === "username") {
                                 setOpen(true);
                               }
                             }}
                             className={cn("overflow-hidden truncate", {
-                              "cursor-pointer": cell.column.id === "name",
+                              "cursor-pointer": cell.column.id === "username",
                             })}
                           >
                             {flexRender(
