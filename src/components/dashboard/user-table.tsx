@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { EllipsisVertical, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { cn, truncateString } from "@/lib/utils";
 import {
+  useDeleteUserMutation,
   useGetAllUsersQuery,
   useToggleUserPaidStatusMutation,
   useToggleUserStatusMutation,
@@ -31,10 +33,13 @@ import AddUserDialog from "../users/add-user-dialog";
 import WarningModal from "../warning-modal";
 
 const UserTable = () => {
+  const { getIdToken } = useKindeAuth();
+  const [deleteUser] = useDeleteUserMutation();
   const [warn, setWarn] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
-  const [selected, setSelected] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
   const [toggleActive] = useToggleUserStatusMutation();
+  const [selected, setSelected] = useState<string>("");
   const [togglePaid] = useToggleUserPaidStatusMutation();
   const { data: users, isLoading } = useGetAllUsersQuery({});
 
@@ -82,10 +87,45 @@ const UserTable = () => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    let response = null;
+    const userToken = await getIdToken();
+
+    if (userToken) {
+      response = await deleteUser({
+        id: `${id}`,
+        token: userToken,
+      });
+    }
+
+    if (!response?.error) {
+      toast.custom(() => (
+        <CustomToast
+          type="success"
+          title="Success"
+          description="Successfully Deleted User!"
+        />
+      ));
+    } else {
+      toast.custom(() => (
+        <CustomToast
+          type="error"
+          title="Error"
+          description="Something went wrong!"
+        />
+      ));
+    }
+  };
+
   return (
     <>
       <AddUserDialog id={1} open={open} setOpen={setOpen} />
-      <WarningModal open={warn} message={selected} setOpen={setWarn} />
+      <WarningModal
+        open={warn}
+        message={message}
+        setOpen={setWarn}
+        cta={() => handleDelete(selected)}
+      />
       <div className="max-h-full w-full overflow-y-auto rounded-xl border">
         {isLoading ? (
           <div className="flex w-full items-center justify-center p-5">
@@ -177,7 +217,8 @@ const UserTable = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
-                            setSelected("Delete this user");
+                            setSelected(`${user.id}`);
+                            setMessage("Delete this user");
                             setWarn(true);
                           }}
                         >

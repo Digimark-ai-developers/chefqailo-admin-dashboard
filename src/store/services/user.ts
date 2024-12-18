@@ -67,9 +67,12 @@ export const userApi = api.injectEndpoints({
       invalidatesTags: ["Users"],
     }),
     deleteUser: build.mutation({
-      query: (id: number) => ({
+      query: ({ id, token }: { id: string; token: string }) => ({
         url: `/delete_user/${id}/`,
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }),
       invalidatesTags: ["Users", "Stats"],
     }),

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowDown, ArrowUpDown, EllipsisVertical } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -210,6 +211,7 @@ export const columns: ColumnDef<User>[] = [
     header: "Actions",
     enableHiding: false,
     cell: ({ row }) => {
+      const { getIdToken } = useKindeAuth();
       const [deleteUser] = useDeleteUserMutation();
       const [warn, setWarn] = useState<boolean>(false);
       const [open, setOpen] = useState<boolean>(false);
@@ -217,9 +219,17 @@ export const columns: ColumnDef<User>[] = [
       const [selected, setSelected] = useState<string>("");
 
       const handleDelete = async (id: number) => {
-        const response = await deleteUser(id);
+        let response = null;
+        const userToken = await getIdToken();
 
-        if (!response.error) {
+        if (userToken) {
+          response = await deleteUser({
+            id: `${id}`,
+            token: userToken,
+          });
+        }
+
+        if (!response?.error) {
           toast.custom(() => (
             <CustomToast
               type="success"
