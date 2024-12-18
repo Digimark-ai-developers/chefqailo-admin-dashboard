@@ -37,8 +37,8 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   const [email, setEmail] = useState<string>("");
   const [paid, setPaid] = useState<boolean>(false);
   const [lastName, setLastName] = useState<string>("");
-  const [image, setImage] = useState<File | null>(null);
   const [firstName, setFirstName] = useState<string>("");
+  const [image, setImage] = useState<File | string | null>(null);
   const [addUser, { isLoading: adding }] = usePostUserMutation();
   const [editUser, { isLoading: editing }] = useEditUserMutation();
 
@@ -76,7 +76,9 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
         <CustomToast
           type="error"
           title="Error"
-          description="Something went wrong!"
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          description={response.error.error.data.message}
         />
       ));
     }
@@ -85,11 +87,20 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   useEffect(() => {
     if (data) {
       setEmail(data.email);
+      setImage(data.image);
       setPaid(data.is_paid);
       setLastName(data.last_name);
       setFirstName(data.first_name);
     }
-  }, [data]);
+
+    if (!open) {
+      setEmail("");
+      setImage(null);
+      setPaid(false);
+      setLastName("");
+      setFirstName("");
+    }
+  }, [data, open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

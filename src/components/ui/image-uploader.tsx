@@ -6,8 +6,8 @@ import { useDropzone } from "react-dropzone";
 import { Button } from "./button";
 
 interface ImageUploadProps {
-  image: File | null;
-  setImage: React.Dispatch<React.SetStateAction<File | null>>;
+  image: File | string | null;
+  setImage: React.Dispatch<React.SetStateAction<File | string | null>>;
 }
 
 const ImageUploader = ({ image, setImage }: ImageUploadProps) => {
@@ -50,7 +50,9 @@ const ImageUploader = ({ image, setImage }: ImageUploadProps) => {
               <X />
             </Button>
             <img
-              src={URL.createObjectURL(image)}
+              src={
+                typeof image === "string" ? image : URL.createObjectURL(image!)
+              }
               alt="Uploaded"
               className="h-32 w-32 rounded-lg object-cover"
             />

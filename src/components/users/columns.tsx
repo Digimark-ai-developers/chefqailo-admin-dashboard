@@ -128,7 +128,9 @@ export const columns: ColumnDef<User>[] = [
             <CustomToast
               type="error"
               title="Error"
-              description="Something went wrong!"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              description={response.error.error.data.message}
             />
           ));
         }
@@ -194,7 +196,9 @@ export const columns: ColumnDef<User>[] = [
             <CustomToast
               type="error"
               title="Error"
-              description="Something went wrong!"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              description={response.error.error.data.message}
             />
           ));
         }
@@ -246,7 +250,9 @@ export const columns: ColumnDef<User>[] = [
             <CustomToast
               type="error"
               title="Error"
-              description="Something went wrong!"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              description={response.error.error.data.message}
             />
           ));
         }

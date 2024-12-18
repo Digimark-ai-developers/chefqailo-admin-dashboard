@@ -59,7 +59,9 @@ const UserTable = () => {
         <CustomToast
           type="error"
           title="Error"
-          description="Something went wrong!"
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          description={response.error.error.data.message}
         />
       ));
     }
@@ -81,7 +83,9 @@ const UserTable = () => {
         <CustomToast
           type="error"
           title="Error"
-          description="Something went wrong!"
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          description={response.error.error.data.message}
         />
       ));
     }
@@ -111,7 +115,9 @@ const UserTable = () => {
         <CustomToast
           type="error"
           title="Error"
-          description="Something went wrong!"
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          description={response.error.error.data.message}
         />
       ));
     }
@@ -119,7 +125,7 @@ const UserTable = () => {
 
   return (
     <>
-      <AddUserDialog id={1} open={open} setOpen={setOpen} />
+      <AddUserDialog id={parseInt(selected)} open={open} setOpen={setOpen} />
       <WarningModal
         open={warn}
         message={message}
@@ -216,7 +222,12 @@ const UserTable = () => {
                         <EllipsisVertical />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="mr-5 w-auto">
-                        <DropdownMenuItem onClick={() => setOpen(true)}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelected(`${user.id}`);
+                            setOpen(true);
+                          }}
+                        >
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem

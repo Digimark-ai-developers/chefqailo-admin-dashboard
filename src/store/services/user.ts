@@ -138,7 +138,7 @@ export const userApi = api.injectEndpoints({
     }),
     getStatsGraph: build.query({
       query: (time: string) => ({
-        url: `/stats_graph?period=${time}`,
+        url: `/stats_graph/?period=${time}`,
         method: "GET",
       }),
       transformResponse: (response: {
