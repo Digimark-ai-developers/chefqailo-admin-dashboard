@@ -162,7 +162,11 @@ const UserTable = () => {
                     )}
                   >
                     <img
-                      src="https://ui.shadcn.com/avatars/04.png"
+                      src={
+                        user.image
+                          ? user.image
+                          : "https://ui.shadcn.com/avatars/04.png"
+                      }
                       alt="user-dp"
                       className="size-6 rounded-full"
                     />
@@ -191,7 +195,7 @@ const UserTable = () => {
                   <TableCell>
                     <Switch
                       onClick={() => changeUserStatus(`${user.id}`)}
-                      checked={user.status}
+                      checked={user.is_active}
                     />
                   </TableCell>
                   <TableCell>

@@ -18,8 +18,9 @@ declare type User = {
   last_name: string;
   email: string;
   is_paid: boolean;
-  status: boolean;
+  is_active: boolean;
   createdAt: string;
+  image: string;
 };
 
 declare type UsersResponse = {

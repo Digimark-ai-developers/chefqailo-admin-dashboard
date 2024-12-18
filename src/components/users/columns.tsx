@@ -45,7 +45,11 @@ export const columns: ColumnDef<User>[] = [
       return (
         <div className="flex items-center justify-center gap-2.5 font-medium">
           <img
-            src="https://ui.shadcn.com/avatars/04.png"
+            src={
+              row.original.image
+                ? row.original.image
+                : "https://ui.shadcn.com/avatars/04.png"
+            }
             alt="user-dp"
             className="size-6 rounded-full"
           />
@@ -132,7 +136,7 @@ export const columns: ColumnDef<User>[] = [
 
       return (
         <Switch
-          onClick={() => changeUserStatus(`${row.getValue("email")}`)}
+          onClick={() => changeUserStatus(`${row.original.id}`)}
           checked={row.getValue("status")}
         />
       );
@@ -198,7 +202,7 @@ export const columns: ColumnDef<User>[] = [
 
       return (
         <span
-          onClick={() => changeUserPaidStatus(`${row.getValue("email")}`)}
+          onClick={() => changeUserPaidStatus(`${row.original.id}`)}
           className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary"
         >
           {row.getValue("is_paid") ? "paid" : "unpaid"}

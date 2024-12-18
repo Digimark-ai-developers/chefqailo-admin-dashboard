@@ -1,6 +1,6 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
-import { Loader2, Upload } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import ImageUploader from "../ui/image-uploader";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
@@ -36,6 +37,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   const [email, setEmail] = useState<string>("");
   const [paid, setPaid] = useState<boolean>(false);
   const [lastName, setLastName] = useState<string>("");
+  const [image, setImage] = useState<File | null>(null);
   const [firstName, setFirstName] = useState<string>("");
   const [addUser, { isLoading: adding }] = usePostUserMutation();
   const [editUser, { isLoading: editing }] = useEditUserMutation();
@@ -46,6 +48,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
     const formData = new FormData();
     formData.append("email", email);
     formData.append("is_paid", `${paid}`);
+    formData.append("image", image || "");
     formData.append("last_name", lastName);
     formData.append("first_name", firstName);
 
@@ -161,16 +164,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
             <Label className="w-full text-left text-sm">
               Upload Profile Picture
             </Label>
-            <div className="flex w-full flex-col items-center justify-center gap-5 rounded-lg border-2 border-dashed border-primary bg-muted p-5">
-              <Upload className="size-14 text-primary" />
-              <div className="flex w-full flex-col items-center justify-center gap-1">
-                <span className="w-full text-center text-sm">
-                  <span className="text-primary">Drag & Drop</span> or&nbsp;
-                  <br />
-                  <span className="text-primary">Click</span> to Upload
-                </span>
-              </div>
-            </div>
+            <ImageUploader image={image} setImage={setImage} />
           </div>
           <div className="col-span-2 flex w-full items-center justify-end gap-2.5">
             <Button

@@ -1,10 +1,10 @@
 import { type Dispatch, type SetStateAction } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Link } from "react-router-dom";
 
 import { yearlyProgress } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useGetUserQuery } from "@/store/services/user";
 
 import { buttonVariants } from "../ui/button";
 import ConicGradient from "../ui/conic-gradient";
@@ -12,12 +12,16 @@ import { Sheet, SheetContent } from "../ui/sheet";
 import PaymentHistory from "./payment-history";
 
 interface SheetTriggerProps {
+  id: string;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const UserBar = ({ open, setOpen }: SheetTriggerProps) => {
-  const { user } = useKindeAuth();
+const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
+  const { data } = useGetUserQuery(`${id}`, {
+    skip: !open,
+    refetchOnMountOrArgChange: true,
+  });
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -25,19 +29,24 @@ const UserBar = ({ open, setOpen }: SheetTriggerProps) => {
         <div className="flex h-full w-full flex-col items-start justify-start gap-5">
           <div className="flex w-full items-center justify-center gap-2.5 border-b pb-5">
             <img
-              src="https://ui.shadcn.com/avatars/04.png"
+              src={
+                data?.image
+                  ? data.image
+                  : "https://ui.shadcn.com/avatars/04.png"
+              }
               alt="user-picture"
               className="size-16 rounded-full bg-primary"
             />
             <div className="flex flex-1 flex-col items-center justify-center gap-1">
               <span className="w-full text-left text-lg font-bold leading-[18px]">
-                {user?.given_name}&nbsp;{user?.family_name}
+                {data?.first_name}&nbsp;{data?.last_name}
               </span>
               <span className="w-full overflow-hidden truncate text-left text-xs text-gray-400">
-                {user?.email}
+                {data?.email}
               </span>
               <span className="w-full overflow-hidden truncate text-left text-xs text-gray-400">
-                Paid | Active
+                {data?.is_paid ? "Paid" : "Unpaid"}&nbsp;|&nbsp;
+                {data?.is_active ? "Active" : "Inactive"}
               </span>
             </div>
           </div>

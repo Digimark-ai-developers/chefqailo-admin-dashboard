@@ -49,6 +49,7 @@ const DataTable = <TData, TValue>({
     pageSize: 20,
   });
   const [open, setOpen] = useState<boolean>(false);
+  const [selected, setSelected] = useState<string>("");
   const [addUser, setAddUser] = useState<boolean>(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -72,7 +73,7 @@ const DataTable = <TData, TValue>({
 
   return (
     <>
-      <UserBar open={open} setOpen={setOpen} />
+      <UserBar open={open} setOpen={setOpen} id={selected} />
       <AddUserDialog open={addUser} setOpen={setAddUser} />
       <div className="flex h-full w-full flex-col items-start justify-start gap-2.5 rounded-xl border p-2.5">
         <div className="flex w-full items-center justify-between gap-2.5">
@@ -123,6 +124,9 @@ const DataTable = <TData, TValue>({
                             key={cell.id}
                             onClick={() => {
                               if (cell.column.id === "username") {
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                setSelected(row.original.id);
                                 setOpen(true);
                               }
                             }}

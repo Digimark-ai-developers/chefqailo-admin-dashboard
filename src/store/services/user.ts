@@ -93,7 +93,7 @@ export const userApi = api.injectEndpoints({
             (draft: User[]) => {
               const user = draft.find((p: User) => p.id === parseInt(arg));
               if (user) {
-                user.status = user.status ? false : true;
+                user.is_active = user.is_active ? false : true;
               }
             }
           )
