@@ -30,7 +30,7 @@ interface AddUserDialogProps {
 
 const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   const { data } = useGetUserQuery(`${id}`, {
-    skip: !id,
+    skip: !open,
     refetchOnMountOrArgChange: true,
   });
   const [email, setEmail] = useState<string>("");

@@ -18,7 +18,10 @@ import {
 import { useSidebar } from "@/components/ui/sidebar";
 import { lineChartConfig } from "@/lib/dashboard-graph-specs";
 import { cn } from "@/lib/utils";
-import { useGetUserStatsQuery } from "@/store/services/user";
+import {
+  useGetStatsGraphQuery,
+  useGetUserStatsQuery,
+} from "@/store/services/user";
 
 const Dashboard = () => {
   const { open } = useSidebar();
@@ -28,6 +31,9 @@ const Dashboard = () => {
     "users" | "monthly_sales_amount" | "total_sales"
   >("users");
   const [position, setPosition] = useState<string>("weekly");
+  const { data, isLoading } = useGetStatsGraphQuery(position, {
+    refetchOnMountOrArgChange: true,
+  });
   const { data: stats, isLoading: statsLoading } = useGetUserStatsQuery({});
 
   const statsDataFormatter = () => {
@@ -92,8 +98,8 @@ const Dashboard = () => {
                   <DropdownMenuRadioItem value="monthly">
                     Monthly
                   </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="annually">
-                    Annually
+                  <DropdownMenuRadioItem value="yearly">
+                    Yearly
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
@@ -132,7 +138,13 @@ const Dashboard = () => {
             )}
           </div>
           <div className="h-full w-full">
-            <DataLine activeChart={activeChart} />
+            {isLoading ? (
+              <div className="flex h-full w-full items-center justify-center">
+                <Loader2 className="size-10 animate-spin text-primary" />
+              </div>
+            ) : (
+              <DataLine activeChart={activeChart} data={data!} />
+            )}
           </div>
         </div>
         <div className="col-span-2 flex h-full w-full flex-col items-start justify-start gap-2.5 rounded-xl md:flex-row lg:col-span-3 lg:flex-col xl:col-span-2">

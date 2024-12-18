@@ -136,6 +136,33 @@ export const userApi = api.injectEndpoints({
         }
       },
     }),
+    getStatsGraph: build.query({
+      query: (time: string) => ({
+        url: `/stats_graph?period=${time}`,
+        method: "GET",
+      }),
+      transformResponse: (response: {
+        status_code: number;
+        message: string;
+        data: {
+          date: string;
+          inactive: number;
+          active: number;
+          total: number;
+        }[];
+      }) => {
+        const formattedResponse = response.data.map((item) => {
+          return {
+            date: item.date,
+            active: item.active,
+            inactive: item.inactive,
+            tablet: item.total,
+          };
+        });
+
+        return formattedResponse;
+      },
+    }),
   }),
 });
 
@@ -150,4 +177,5 @@ export const {
   useDeleteUserMutation,
   useToggleUserStatusMutation,
   useToggleUserPaidStatusMutation,
+  useGetStatsGraphQuery,
 } = userApi;
