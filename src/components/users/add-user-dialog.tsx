@@ -3,7 +3,11 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
-import { useGetUserQuery, usePostUserMutation } from "@/store/services/user";
+import {
+  useEditUserMutation,
+  useGetUserQuery,
+  usePostUserMutation,
+} from "@/store/services/user";
 
 import { Button } from "../ui/button";
 import CustomToast from "../ui/custom-toast";
@@ -33,16 +37,26 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   const [paid, setPaid] = useState<boolean>(false);
   const [lastName, setLastName] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
-  const [addUser, { isLoading }] = usePostUserMutation();
+  const [addUser, { isLoading: adding }] = usePostUserMutation();
+  const [editUser, { isLoading: editing }] = useEditUserMutation();
 
   const postUser = async () => {
+    let response = null;
+
     const formData = new FormData();
     formData.append("email", email);
     formData.append("is_paid", `${paid}`);
     formData.append("last_name", lastName);
     formData.append("first_name", firstName);
 
-    const response = await addUser(formData);
+    if (id) {
+      response = await editUser({
+        id: `${id}`,
+        data: formData,
+      });
+    } else {
+      response = await addUser(formData);
+    }
 
     if (!response.error) {
       toast.custom(() => (
@@ -52,6 +66,8 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
           description="Successfully Added User!"
         />
       ));
+
+      setOpen(false);
     } else {
       toast.custom(() => (
         <CustomToast
@@ -166,12 +182,12 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
               Cancel
             </Button>
             <Button
-              disabled={isLoading}
+              disabled={adding || editing}
               type="submit"
               variant="default"
               size="default"
             >
-              {isLoading ? (
+              {adding || editing ? (
                 <div className="flex w-full items-center justify-center gap-2">
                   <Loader2 className="animate-spin" />
                   <span>Please Wait...</span>

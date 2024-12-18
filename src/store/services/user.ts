@@ -59,10 +59,10 @@ export const userApi = api.injectEndpoints({
       invalidatesTags: ["Users", "Stats"],
     }),
     editUser: build.mutation({
-      query: (data: EditUser) => ({
-        url: `/edit_user/${data.id}/`,
+      query: ({ id, data }: { id: string; data: FormData }) => ({
+        url: `/edit_user/${id}/`,
         method: "PUT",
-        body: data.body,
+        body: data,
       }),
       invalidatesTags: ["Users"],
     }),
