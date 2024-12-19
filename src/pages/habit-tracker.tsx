@@ -36,7 +36,7 @@ const HabitTracker = () => {
 
   return (
     <>
-      <UserBar open={open} setOpen={setOpen} />
+      <UserBar open={open} setOpen={setOpen} id="2" />
       <div className="flex h-full w-full flex-col items-start justify-start gap-5">
         <div className="flex w-full items-center justify-center border-b pb-5">
           <span className="flex-1 text-left text-3xl font-bold">

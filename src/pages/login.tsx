@@ -1,19 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Mail } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 import LoginIconImg from "@/assets/img/login2.svg";
 import LoginImg from "@/assets/img/login.svg";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
+import CustomToast from "@/components/ui/custom-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const Login = () => {
-  const { login } = useKindeAuth();
+  const { login, logout } = useKindeAuth();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState<string>("");
+
+  useEffect(() => {
+    const intent = searchParams.get("intent");
+    if (intent) {
+      if (intent === "terminated") {
+        logout();
+        toast.custom(() => (
+          <CustomToast
+            type="error"
+            title="Warning!"
+            description="Session Expired, Please Login Again!"
+          />
+        ));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   return (
     <ThemeProvider>
@@ -26,7 +47,7 @@ const Login = () => {
             <div className="absolute right-5 top-5">
               <ModeToggle />
             </div>
-            <form className="mx-auto flex w-full flex-col items-center justify-center gap-5 p-5 lg:w-2/3 lg:p-0">
+            <form className="mx-auto flex w-full flex-col items-center justify-center gap-5 p-5 lg:p-10">
               <img src={LoginIconImg} alt="login-icon-img" />
               <div className="flex flex-col items-center justify-center">
                 <span className="w-full text-center text-4xl font-extrabold">

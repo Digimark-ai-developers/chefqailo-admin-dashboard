@@ -1,12 +1,14 @@
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
-import { lineChartConfig, lineChartData } from "@/lib/dashboard-graph-specs";
+import { lineChartConfig } from "@/lib/dashboard-graph-specs";
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
 
 const DataLine = ({
+  data,
   activeChart,
 }: {
+  data: { date: string; inactive: number; active: number; tablet: number }[];
   activeChart: keyof typeof lineChartConfig;
 }) => {
   return (
@@ -16,7 +18,7 @@ const DataLine = ({
     >
       <LineChart
         accessibilityLayer
-        data={lineChartData}
+        data={data}
         margin={{
           left: 12,
           right: 12,

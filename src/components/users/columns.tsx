@@ -1,11 +1,20 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowDown, ArrowUpDown, EllipsisVertical } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+
+import {
+  useDeleteUserMutation,
+  useToggleUserPaidStatusMutation,
+  useToggleUserStatusMutation,
+} from "@/store/services/user";
 
 import { Button } from "../ui/button";
+import CustomToast from "../ui/custom-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +29,7 @@ import AddUserDialog from "./add-user-dialog";
 
 export const columns: ColumnDef<User>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "username",
     header: ({ column }) => {
       return (
         <Button
@@ -36,12 +45,18 @@ export const columns: ColumnDef<User>[] = [
       return (
         <div className="flex items-center justify-center gap-2.5 font-medium">
           <img
-            src="https://ui.shadcn.com/avatars/04.png"
+            src={
+              row.original.image
+                ? row.original.image
+                : "https://ui.shadcn.com/avatars/04.png"
+            }
             alt="user-dp"
             className="size-6 rounded-full"
           />
           <span className="hidden flex-1 overflow-hidden truncate md:flex">
-            {row.getValue("name")}
+            {row.getValue("username") !== ""
+              ? row.getValue("username")
+              : `${row.getAllCells()[0].row.original.first_name} ${row.getAllCells()[0].row.original.last_name}`}
           </span>
         </div>
       );
@@ -81,10 +96,8 @@ export const columns: ColumnDef<User>[] = [
               onValueChange={(e) => column.setFilterValue(e)}
             >
               <DropdownMenuRadioItem value="">All</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="active">
-                Active
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="inactive">
+              <DropdownMenuRadioItem value="true">Active</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="false">
                 Inactive
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
@@ -94,28 +107,40 @@ export const columns: ColumnDef<User>[] = [
     },
     filterFn: (row, columnId, filterValue) => {
       const cellValue = row.getValue(columnId);
-      return filterValue ? cellValue === filterValue : true;
+      return filterValue ? `${cellValue}` === filterValue : true;
     },
     cell: ({ row }) => {
-      const [warn, setWarn] = useState<boolean>(false);
-      const [selected, setSelected] = useState<string>("");
+      const [toggleActive] = useToggleUserStatusMutation();
+
+      const changeUserStatus = async (id: string) => {
+        const response = await toggleActive(id);
+
+        if (!response.error) {
+          toast.custom(() => (
+            <CustomToast
+              type="success"
+              title="Success"
+              description="Successfully Changed User Status!"
+            />
+          ));
+        } else {
+          toast.custom(() => (
+            <CustomToast
+              type="error"
+              title="Error"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              description={response.error.error.data.message}
+            />
+          ));
+        }
+      };
 
       return (
-        <>
-          <WarningModal open={warn} setOpen={setWarn} message={selected} />
-          <Switch
-            onClick={() => {
-              if (row.getValue("status") === "inactive") {
-                setSelected("Activate this user");
-                setWarn(true);
-              } else {
-                setSelected("Deactivate this user");
-                setWarn(true);
-              }
-            }}
-            checked={row.getValue("status") === "active"}
-          />
-        </>
+        <Switch
+          onClick={() => changeUserStatus(`${row.original.id}`)}
+          checked={row.getValue("status")}
+        />
       );
     },
   },
@@ -139,8 +164,8 @@ export const columns: ColumnDef<User>[] = [
               onValueChange={(e) => column.setFilterValue(e)}
             >
               <DropdownMenuRadioItem value="">All</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="paid">Paid</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="unpaid">
+              <DropdownMenuRadioItem value="true">Paid</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="false">
                 Unpaid
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
@@ -150,38 +175,119 @@ export const columns: ColumnDef<User>[] = [
     },
     filterFn: (row, columnId, filterValue) => {
       const cellValue = row.getValue(columnId);
-      return filterValue ? cellValue === filterValue : true;
+      return filterValue ? `${cellValue}` === filterValue : true;
     },
-    cell: ({ row }) => (
-      <span className="rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary">
-        {row.getValue("is_paid")}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const [togglePaid] = useToggleUserPaidStatusMutation();
+
+      const changeUserPaidStatus = async (id: string) => {
+        const response = await togglePaid(id);
+
+        if (!response.error) {
+          toast.custom(() => (
+            <CustomToast
+              type="success"
+              title="Success"
+              description="Successfully Changed User Payment Status!"
+            />
+          ));
+        } else {
+          toast.custom(() => (
+            <CustomToast
+              type="error"
+              title="Error"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              description={response.error.error.data.message}
+            />
+          ));
+        }
+      };
+
+      return (
+        <span
+          onClick={() => changeUserPaidStatus(`${row.original.id}`)}
+          className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary"
+        >
+          {row.getValue("is_paid") ? "paid" : "unpaid"}
+        </span>
+      );
+    },
   },
   {
     id: "actions",
     header: "Actions",
     enableHiding: false,
-    cell: () => {
+    cell: ({ row }) => {
+      const { getIdToken } = useKindeAuth();
+      const [deleteUser] = useDeleteUserMutation();
       const [warn, setWarn] = useState<boolean>(false);
       const [open, setOpen] = useState<boolean>(false);
+      const [message, setMessage] = useState<string>("");
       const [selected, setSelected] = useState<string>("");
+
+      const handleDelete = async (id: number) => {
+        let response = null;
+        const userToken = await getIdToken();
+
+        if (userToken) {
+          response = await deleteUser({
+            id: `${id}`,
+            token: userToken,
+          });
+        }
+
+        if (!response?.error) {
+          toast.custom(() => (
+            <CustomToast
+              type="success"
+              title="Success"
+              description="Successfully Deleted User!"
+            />
+          ));
+        } else {
+          toast.custom(() => (
+            <CustomToast
+              type="error"
+              title="Error"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              description={response.error.error.data.message}
+            />
+          ));
+        }
+      };
 
       return (
         <>
-          <AddUserDialog id={1} open={open} setOpen={setOpen} />
-          <WarningModal open={warn} setOpen={setWarn} message={selected} />
+          <AddUserDialog
+            id={parseInt(selected)}
+            open={open}
+            setOpen={setOpen}
+          />
+          <WarningModal
+            open={warn}
+            setOpen={setWarn}
+            message={message}
+            cta={() => handleDelete(parseInt(selected))}
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <EllipsisVertical />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="mr-5 w-auto">
-              <DropdownMenuItem onClick={() => setOpen(true)}>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelected(`${row.getAllCells()[0].row.original.id}`);
+                  setOpen(true);
+                }}
+              >
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setSelected("delete this user");
+                  setSelected(`${row.getAllCells()[0].row.original.id}`);
+                  setMessage("delete this user");
                   setWarn(true);
                 }}
               >
