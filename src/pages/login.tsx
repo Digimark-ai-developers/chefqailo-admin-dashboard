@@ -47,7 +47,7 @@ const Login = () => {
             <div className="absolute right-5 top-5">
               <ModeToggle />
             </div>
-            <form className="mx-auto flex w-full flex-col items-center justify-center gap-5 p-5 lg:w-2/3 lg:p-0">
+            <form className="mx-auto flex w-full flex-col items-center justify-center gap-5 p-5 lg:p-10">
               <img src={LoginIconImg} alt="login-icon-img" />
               <div className="flex flex-col items-center justify-center">
                 <span className="w-full text-center text-4xl font-extrabold">
