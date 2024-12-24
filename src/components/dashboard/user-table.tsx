@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { EllipsisVertical, Loader2 } from "lucide-react";
@@ -41,10 +41,29 @@ const UserTable = () => {
   const [toggleActive] = useToggleUserStatusMutation();
   const [selected, setSelected] = useState<string>("");
   const [togglePaid] = useToggleUserPaidStatusMutation();
-  const { data: users, isLoading } = useGetAllUsersQuery({});
+  const [accessToken, setAccessToken] = useState<string>("");
+  const { data: users, isLoading } = useGetAllUsersQuery(`${accessToken}`, {
+    skip: !accessToken || accessToken === "",
+    refetchOnMountOrArgChange: true,
+  });
+
+  const handleToken = async () => {
+    let token: string | undefined = "";
+
+    if (getIdToken) {
+      token = await getIdToken();
+    }
+
+    if (token) {
+      setAccessToken(token);
+    }
+  };
 
   const changeUserStatus = async (id: string) => {
-    const response = await toggleActive(id);
+    const response = await toggleActive({
+      id,
+      token: accessToken,
+    });
 
     if (!response.error) {
       toast.custom(() => (
@@ -68,7 +87,10 @@ const UserTable = () => {
   };
 
   const changeUserPaidStatus = async (id: string) => {
-    const response = await togglePaid(id);
+    const response = await togglePaid({
+      id,
+      token: accessToken,
+    });
 
     if (!response.error) {
       toast.custom(() => (
@@ -92,15 +114,10 @@ const UserTable = () => {
   };
 
   const handleDelete = async (id: string) => {
-    let response = null;
-    const userToken = await getIdToken();
-
-    if (userToken) {
-      response = await deleteUser({
-        id: `${id}`,
-        token: userToken,
-      });
-    }
+    const response = await deleteUser({
+      id: `${id}`,
+      token: accessToken,
+    });
 
     if (!response?.error) {
       toast.custom(() => (
@@ -122,6 +139,10 @@ const UserTable = () => {
       ));
     }
   };
+
+  useEffect(() => {
+    handleToken();
+  }, [getIdToken]);
 
   return (
     <>

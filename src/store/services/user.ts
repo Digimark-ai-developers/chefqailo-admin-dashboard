@@ -3,17 +3,19 @@ import { api } from "./core";
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
     getAllUsers: build.query({
-      query: () => ({
+      query: (token: string) => ({
         url: "/userslist/",
         method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
       }),
       providesTags: ["Users"],
       transformResponse: (response: UsersResponse) => response.data.users,
     }),
     getUser: build.query({
-      query: (id: string) => ({
+      query: ({ id, token }: { id: string; token: string }) => ({
         url: `/get-user-data/${id}/`,
         method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
       }),
       providesTags: ["User"],
       transformResponse: (response: {
@@ -23,9 +25,10 @@ export const userApi = api.injectEndpoints({
       }) => response.data,
     }),
     getUserStats: build.query({
-      query: () => ({
+      query: (token: string) => ({
         url: "/user_stats/",
         method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
       }),
       providesTags: ["Stats"],
       transformResponse: (response: {
@@ -51,17 +54,27 @@ export const userApi = api.injectEndpoints({
       transformResponse: (response: ActiveUserStats) => response.data,
     }),
     postUser: build.mutation({
-      query: (data: FormData) => ({
+      query: ({ data, token }: { data: FormData; token: string }) => ({
         url: "/add_user/",
         method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
         body: data,
       }),
       invalidatesTags: ["Users", "Stats"],
     }),
     editUser: build.mutation({
-      query: ({ id, data }: { id: string; data: FormData }) => ({
+      query: ({
+        id,
+        data,
+        token,
+      }: {
+        id: string;
+        data: FormData;
+        token: string;
+      }) => ({
         url: `/edit_user/${id}/`,
         method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
         body: data,
       }),
       invalidatesTags: ["Users"],
@@ -77,9 +90,10 @@ export const userApi = api.injectEndpoints({
       invalidatesTags: ["Users", "Stats"],
     }),
     toggleUserStatus: build.mutation({
-      query: (id: string) => ({
+      query: ({ id, token }: { id: string; token: string }) => ({
         url: "/toggle-active/",
         method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
         body: { id },
       }),
       invalidatesTags: ["Users"],
@@ -91,7 +105,7 @@ export const userApi = api.injectEndpoints({
             "getAllUsers",
             undefined,
             (draft: User[]) => {
-              const user = draft.find((p: User) => p.id === parseInt(arg));
+              const user = draft.find((p: User) => p.id === parseInt(arg.id));
               if (user) {
                 user.is_active = user.is_active ? false : true;
               }
@@ -107,9 +121,10 @@ export const userApi = api.injectEndpoints({
       },
     }),
     toggleUserPaidStatus: build.mutation({
-      query: (id: string) => ({
+      query: ({ id, token }: { id: string; token: string }) => ({
         url: "/toggle-paid/",
         method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
         body: { id },
       }),
       invalidatesTags: ["Users"],
@@ -121,7 +136,7 @@ export const userApi = api.injectEndpoints({
             "getAllUsers",
             undefined,
             (draft: User[]) => {
-              const user = draft.find((p: User) => p.id === parseInt(arg));
+              const user = draft.find((p: User) => p.id === parseInt(arg.id));
               if (user) {
                 user.is_paid = user.is_paid ? false : true;
               }
@@ -137,9 +152,10 @@ export const userApi = api.injectEndpoints({
       },
     }),
     getStatsGraph: build.query({
-      query: (time: string) => ({
+      query: ({ time, token }: { time: string; token: string }) => ({
         url: `/stats_graph/?period=${time}`,
         method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
       }),
       transformResponse: (response: {
         status_code: number;
