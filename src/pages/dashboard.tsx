@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { CircleDollarSign, Loader2, User2, Users } from "lucide-react";
 
 import DataArea from "@/components/dashboard/data-area";
@@ -24,6 +25,7 @@ import {
 } from "@/store/services/user";
 
 const Dashboard = () => {
+  const { getIdToken } = useKindeAuth();
   const { open } = useSidebar();
   const [activeChart, setActiveChart] =
     useState<keyof typeof lineChartConfig>("inactive");
@@ -31,10 +33,33 @@ const Dashboard = () => {
     "users" | "monthly_sales_amount" | "total_sales"
   >("users");
   const [position, setPosition] = useState<string>("weekly");
-  const { data, isLoading } = useGetStatsGraphQuery(position, {
-    refetchOnMountOrArgChange: true,
-  });
-  const { data: stats, isLoading: statsLoading } = useGetUserStatsQuery({});
+  const [accessToken, setAccessToken] = useState<string>("");
+  const { data, isLoading } = useGetStatsGraphQuery(
+    { time: position, token: `${accessToken}` },
+    {
+      skip: !accessToken || accessToken === "",
+      refetchOnMountOrArgChange: true,
+    }
+  );
+  const { data: stats, isLoading: statsLoading } = useGetUserStatsQuery(
+    `${accessToken}`,
+    {
+      skip: !accessToken || accessToken === "",
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const handleToken = async () => {
+    let token: string | undefined = "";
+
+    if (getIdToken) {
+      token = await getIdToken();
+    }
+
+    if (token) {
+      setAccessToken(token);
+    }
+  };
 
   const statsDataFormatter = () => {
     const icons = [User2, CircleDollarSign, Users];
@@ -72,6 +97,10 @@ const Dashboard = () => {
     setSelectedStat(stat);
     setActiveChart(chart);
   };
+
+  useEffect(() => {
+    handleToken();
+  }, [getIdToken]);
 
   return (
     <div className="flex h-full w-full flex-col gap-2.5 overflow-y-auto lg:grid lg:grid-rows-3 lg:overflow-hidden">

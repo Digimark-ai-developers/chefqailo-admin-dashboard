@@ -1,5 +1,6 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,10 +31,16 @@ interface AddUserDialogProps {
 }
 
 const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
-  const { data } = useGetUserQuery(`${id}`, {
-    skip: !open,
-    refetchOnMountOrArgChange: true,
-  });
+  const { getIdToken } = useKindeAuth();
+  const [accessToken, setAccessToken] = useState<string>("");
+
+  const { data } = useGetUserQuery(
+    { id: `${id}`, token: `${accessToken}` },
+    {
+      skip: !open || !accessToken || accessToken === "",
+      refetchOnMountOrArgChange: true,
+    }
+  );
   const [email, setEmail] = useState<string>("");
   const [paid, setPaid] = useState<boolean>(false);
   const [lastName, setLastName] = useState<string>("");
@@ -41,6 +48,18 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   const [image, setImage] = useState<File | string | null>(null);
   const [addUser, { isLoading: adding }] = usePostUserMutation();
   const [editUser, { isLoading: editing }] = useEditUserMutation();
+
+  const handleToken = async () => {
+    let token: string | undefined = "";
+
+    if (getIdToken) {
+      token = await getIdToken();
+    }
+
+    if (token) {
+      setAccessToken(token);
+    }
+  };
 
   const postUser = async () => {
     let response = null;
@@ -56,9 +75,10 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
       response = await editUser({
         id: `${id}`,
         data: formData,
+        token: accessToken,
       });
     } else {
-      response = await addUser(formData);
+      response = await addUser({ data: formData, token: accessToken });
     }
 
     if (!response.error) {
@@ -66,7 +86,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
         <CustomToast
           type="success"
           title="Success"
-          description="Successfully Added User!"
+          description={response.data.message}
         />
       ));
 
@@ -101,6 +121,10 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
       setFirstName("");
     }
   }, [data, open]);
+
+  useEffect(() => {
+    handleToken();
+  }, [getIdToken]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -1,5 +1,6 @@
-import { type Dispatch, type SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Link } from "react-router-dom";
 
 import { yearlyProgress } from "@/lib/constants";
@@ -18,10 +19,32 @@ interface SheetTriggerProps {
 }
 
 const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
-  const { data } = useGetUserQuery(`${id}`, {
-    skip: !open,
-    refetchOnMountOrArgChange: true,
-  });
+  const { getIdToken } = useKindeAuth();
+  const [accessToken, setAccessToken] = useState<string>("");
+
+  const { data } = useGetUserQuery(
+    { id: `${id}`, token: `${accessToken}` },
+    {
+      skip: !open || !accessToken || accessToken === "",
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const handleToken = async () => {
+    let token: string | undefined = "";
+
+    if (getIdToken) {
+      token = await getIdToken();
+    }
+
+    if (token) {
+      setAccessToken(token);
+    }
+  };
+
+  useEffect(() => {
+    handleToken();
+  }, [getIdToken]);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

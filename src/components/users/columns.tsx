@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { ColumnDef } from "@tanstack/react-table";
@@ -77,7 +77,7 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "is_active",
     header: ({ column }) => {
       return (
         <DropdownMenu>
@@ -110,10 +110,26 @@ export const columns: ColumnDef<User>[] = [
       return filterValue ? `${cellValue}` === filterValue : true;
     },
     cell: ({ row }) => {
+      const { getIdToken } = useKindeAuth();
+      const [accessToken, setAccessToken] = useState<string>("");
+      const handleToken = async () => {
+        let token: string | undefined = "";
+
+        if (getIdToken) {
+          token = await getIdToken();
+        }
+
+        if (token) {
+          setAccessToken(token);
+        }
+      };
       const [toggleActive] = useToggleUserStatusMutation();
 
       const changeUserStatus = async (id: string) => {
-        const response = await toggleActive(id);
+        const response = await toggleActive({
+          id,
+          token: accessToken,
+        });
 
         if (!response.error) {
           toast.custom(() => (
@@ -136,10 +152,14 @@ export const columns: ColumnDef<User>[] = [
         }
       };
 
+      useEffect(() => {
+        handleToken();
+      }, [getIdToken]);
+
       return (
         <Switch
           onClick={() => changeUserStatus(`${row.original.id}`)}
-          checked={row.getValue("status")}
+          checked={row.getValue("is_active")}
         />
       );
     },
@@ -178,10 +198,26 @@ export const columns: ColumnDef<User>[] = [
       return filterValue ? `${cellValue}` === filterValue : true;
     },
     cell: ({ row }) => {
+      const { getIdToken } = useKindeAuth();
+      const [accessToken, setAccessToken] = useState<string>("");
+      const handleToken = async () => {
+        let token: string | undefined = "";
+
+        if (getIdToken) {
+          token = await getIdToken();
+        }
+
+        if (token) {
+          setAccessToken(token);
+        }
+      };
       const [togglePaid] = useToggleUserPaidStatusMutation();
 
       const changeUserPaidStatus = async (id: string) => {
-        const response = await togglePaid(id);
+        const response = await togglePaid({
+          id,
+          token: accessToken,
+        });
 
         if (!response.error) {
           toast.custom(() => (
@@ -203,6 +239,10 @@ export const columns: ColumnDef<User>[] = [
           ));
         }
       };
+
+      useEffect(() => {
+        handleToken();
+      }, [getIdToken]);
 
       return (
         <span
