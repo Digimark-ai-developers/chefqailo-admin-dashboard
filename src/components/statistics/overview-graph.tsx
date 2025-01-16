@@ -66,39 +66,99 @@ const DataLine = () => {
           </Line>
           <Line
             dataKey="inventory"
-            type="monotone"
+            type="natural"
             stroke="var(--color-inventory)"
             strokeWidth={2}
-            dot={false}
-          />
+            dot={{
+              fill: "var(--color-inventory)",
+            }}
+            activeDot={{
+              r: 6,
+            }}
+          >
+            <LabelList
+              position="top"
+              offset={12}
+              className="fill-foreground"
+              fontSize={12}
+            />
+          </Line>
           <Line
             dataKey="shoppingCart"
-            type="monotone"
+            type="natural"
             stroke="var(--color-shoppingCart)"
             strokeWidth={2}
-            dot={false}
-          />
+            dot={{
+              fill: "var(--color-shoppingCart)",
+            }}
+            activeDot={{
+              r: 6,
+            }}
+          >
+            <LabelList
+              position="top"
+              offset={12}
+              className="fill-foreground"
+              fontSize={12}
+            />
+          </Line>
           <Line
             dataKey="chefAI"
-            type="monotone"
+            type="natural"
             stroke="var(--color-chefAI)"
             strokeWidth={2}
-            dot={false}
-          />
+            dot={{
+              fill: "var(--color-chefAI)",
+            }}
+            activeDot={{
+              r: 6,
+            }}
+          >
+            <LabelList
+              position="top"
+              offset={12}
+              className="fill-foreground"
+              fontSize={12}
+            />
+          </Line>
           <Line
             dataKey="social"
-            type="monotone"
+            type="natural"
             stroke="var(--color-social)"
             strokeWidth={2}
-            dot={false}
-          />
+            dot={{
+              fill: "var(--color-social)",
+            }}
+            activeDot={{
+              r: 6,
+            }}
+          >
+            <LabelList
+              position="top"
+              offset={12}
+              className="fill-foreground"
+              fontSize={12}
+            />
+          </Line>
           <Line
-            dataKey="tokenPurchase"
-            type="monotone"
-            stroke="var(--color-tokenPurchase)"
+            dataKey="extraTokens"
+            type="natural"
+            stroke="var(--color-extraTokens)"
             strokeWidth={2}
-            dot={false}
-          />
+            dot={{
+              fill: "var(--color-extraTokens)",
+            }}
+            activeDot={{
+              r: 6,
+            }}
+          >
+            <LabelList
+              position="top"
+              offset={12}
+              className="fill-foreground"
+              fontSize={12}
+            />
+          </Line>
         </LineChart>
       </ChartContainer>
     </div>

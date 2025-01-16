@@ -18,11 +18,11 @@ import {
 } from "@/components/ui/chart";
 import { peakMealChartConfig, peakMealChartData } from "@/lib/graph-specs";
 
-const PeakGraph = () => {
+const PeakGraph = ({ featureName }: { featureName: string }) => {
   return (
     <Card className="flex w-full flex-col items-start justify-between">
       <CardHeader>
-        <CardTitle>Meal Plan - Peak Usage Graph</CardTitle>
+        <CardTitle>{featureName} - Peak Usage Graph</CardTitle>
         <CardDescription>Results for the Current Date</CardDescription>
       </CardHeader>
       <CardContent className="w-full">

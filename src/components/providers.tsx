@@ -7,6 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import store from "@/store";
 
 import { Toaster } from "./ui/sonner";
+import { TooltipProvider } from "./ui/tooltip";
 
 const Providers = ({ children }: { children: ReactNode }) => {
   return (
@@ -20,7 +21,7 @@ const Providers = ({ children }: { children: ReactNode }) => {
       <Provider store={store}>
         <BrowserRouter>
           <Toaster />
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
         </BrowserRouter>
       </Provider>
     </KindeProvider>

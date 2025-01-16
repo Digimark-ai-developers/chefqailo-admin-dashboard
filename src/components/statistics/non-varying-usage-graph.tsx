@@ -1,6 +1,7 @@
-import { TrendingUp } from "lucide-react";
+import { Info, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,13 +15,34 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { mealUsageChartConfig, mealUsageChartData } from "@/lib/graph-specs";
 
-const UsageGraph = () => {
+const NonVaryingUsageGraph = ({ featureName }: { featureName: string }) => {
   return (
-    <Card className="flex w-full flex-col items-start justify-between">
+    <Card className="relative flex w-full flex-col items-start justify-between">
+      <Tooltip>
+        <TooltipTrigger asChild className="absolute right-5 top-5">
+          <Button variant="outline" size="icon">
+            <Info />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-center">
+            This Graph consistently Visualizes
+            <br />
+            the data collected in the past 6 months.
+          </p>
+        </TooltipContent>
+      </Tooltip>
       <CardHeader>
-        <CardTitle>Meal Plan - Feature Usage Graph</CardTitle>
+        <CardTitle>
+          <span>{featureName} - Feature Usage Graph</span>
+        </CardTitle>
         <CardDescription>August 2023 - January 2024</CardDescription>
       </CardHeader>
       <CardContent className="w-full">
@@ -61,4 +83,4 @@ const UsageGraph = () => {
   );
 };
 
-export default UsageGraph;
+export default NonVaryingUsageGraph;
