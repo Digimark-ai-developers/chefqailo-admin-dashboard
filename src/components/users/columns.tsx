@@ -9,7 +9,6 @@ import { toast } from "sonner";
 
 import {
   useDeleteUserMutation,
-  useToggleUserPaidStatusMutation,
   useToggleUserStatusMutation,
 } from "@/store/services/user";
 
@@ -165,13 +164,13 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "is_paid",
+    accessorKey: "plan",
     header: ({ column }) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost">
-              Payment Status
+              Payment Plan
               <ArrowDown />
             </Button>
           </DropdownMenuTrigger>
@@ -184,73 +183,15 @@ export const columns: ColumnDef<User>[] = [
               onValueChange={(e) => column.setFilterValue(e)}
             >
               <DropdownMenuRadioItem value="">All</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="true">Paid</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="false">
-                Unpaid
+              <DropdownMenuRadioItem value="Free">Free</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Basic">Basic</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Pro">Pro</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="Premium">
+                Premium
               </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      const cellValue = row.getValue(columnId);
-      return filterValue ? `${cellValue}` === filterValue : true;
-    },
-    cell: ({ row }) => {
-      const { getIdToken } = useKindeAuth();
-      const [accessToken, setAccessToken] = useState<string>("");
-      const handleToken = async () => {
-        let token: string | undefined = "";
-
-        if (getIdToken) {
-          token = await getIdToken();
-        }
-
-        if (token) {
-          setAccessToken(token);
-        }
-      };
-      const [togglePaid] = useToggleUserPaidStatusMutation();
-
-      const changeUserPaidStatus = async (id: string) => {
-        const response = await togglePaid({
-          id,
-          token: accessToken,
-        });
-
-        if (!response.error) {
-          toast.custom(() => (
-            <CustomToast
-              type="success"
-              title="Success"
-              description="Successfully Changed User Payment Status!"
-            />
-          ));
-        } else {
-          toast.custom(() => (
-            <CustomToast
-              type="error"
-              title="Error"
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              description={response.error.error.data.message}
-            />
-          ));
-        }
-      };
-
-      useEffect(() => {
-        handleToken();
-      }, [getIdToken]);
-
-      return (
-        <span
-          onClick={() => changeUserPaidStatus(`${row.original.id}`)}
-          className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary"
-        >
-          {row.getValue("is_paid") ? "paid" : "unpaid"}
-        </span>
       );
     },
   },

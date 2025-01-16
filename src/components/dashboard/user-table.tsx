@@ -165,7 +165,7 @@ const UserTable = () => {
                 <TableHead className="rounded-tl-lg">Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Payment Status</TableHead>
+                <TableHead>Payment Plan</TableHead>
                 <TableHead className="w-[65px] rounded-tr-lg">
                   Actions
                 </TableHead>
@@ -230,7 +230,7 @@ const UserTable = () => {
                       onClick={() => changeUserPaidStatus(`${user.id}`)}
                       className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary"
                     >
-                      {user.is_paid ? "paid" : "unpaid"}
+                      {user.plan}
                     </span>
                   </TableCell>
                   <TableCell

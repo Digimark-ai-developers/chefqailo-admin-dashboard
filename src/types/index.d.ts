@@ -17,7 +17,7 @@ declare type User = {
   first_name: string;
   last_name: string;
   email: string;
-  is_paid: boolean;
+  plan: "Free" | "Basic" | "Pro" | "Premium";
   is_active: boolean;
   createdAt: string;
   image: string;
