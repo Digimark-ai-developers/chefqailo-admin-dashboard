@@ -1,11 +1,23 @@
 import { useState } from "react";
 
 import dayjs from "dayjs";
-import { CircleArrowLeft, CircleArrowRight } from "lucide-react";
+import { ChevronDown, CircleArrowLeft, CircleArrowRight } from "lucide-react";
 
+import PeakGraph from "@/components/statistics/meal/peak-graph";
+import UsageGraph from "@/components/statistics/meal/usage-graph";
 import DataLine from "@/components/statistics/overview-graph";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { features } from "@/lib/constants";
 import {
   type ActiveTab,
   type DateRange,
@@ -62,19 +74,34 @@ const Statistics = () => {
             <CircleArrowRight className="text-primary" />
           </Button>
         </div>
-        <Tabs value={feature} onValueChange={setFeature}>
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="meal">Meal Plan</TabsTrigger>
-            <TabsTrigger value="inventory">Inventory</TabsTrigger>
-            <TabsTrigger value="cart">Cart</TabsTrigger>
-            <TabsTrigger value="ai">Chef AI</TabsTrigger>
-            <TabsTrigger value="social">Socializing</TabsTrigger>
-            <TabsTrigger value="extra">Extra Tokens</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              {features.find((f) => f.value === feature)?.name}
+              <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>Select Feature</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuRadioGroup value={feature} onValueChange={setFeature}>
+              {features.map((feature) => (
+                <DropdownMenuRadioItem key={feature.id} value={feature.value}>
+                  {feature.name}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-      <DataLine />
+      {feature === "overview" ? (
+        <DataLine />
+      ) : (
+        <div className="grid h-full w-full grid-cols-2 gap-5">
+          <UsageGraph />
+          <PeakGraph />
+        </div>
+      )}
     </div>
   );
 };

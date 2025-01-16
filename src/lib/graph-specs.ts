@@ -157,3 +157,35 @@ export const planChartConfig = {
     color: "hsl(var(--chart-6))",
   },
 } satisfies ChartConfig;
+
+export const mealUsageChartData = [
+  { month: "August", desktop: 186 },
+  { month: "September", desktop: 305 },
+  { month: "October", desktop: 237 },
+  { month: "November", desktop: 73 },
+  { month: "December", desktop: 209 },
+  { month: "January", desktop: 214 },
+];
+
+export const mealUsageChartConfig = {
+  desktop: {
+    label: "Desktop",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig;
+
+export const peakMealChartData = [
+  { month: "January", desktop: 186 },
+  { month: "February", desktop: 305 },
+  { month: "March", desktop: 237 },
+  { month: "April", desktop: 73 },
+  { month: "May", desktop: 209 },
+  { month: "June", desktop: 214 },
+];
+
+export const peakMealChartConfig = {
+  desktop: {
+    label: "Desktop",
+    color: "hsl(var(--chart-2))",
+  },
+} satisfies ChartConfig;

@@ -217,3 +217,41 @@ export const yearlyProgress = [
     progress: 58.1,
   },
 ];
+
+export const features = [
+  {
+    id: 1,
+    name: "Overview",
+    value: "overview",
+  },
+  {
+    id: 2,
+    name: "Meal Plan",
+    value: "meal",
+  },
+  {
+    id: 3,
+    name: "Inventory",
+    value: "inventory",
+  },
+  {
+    id: 4,
+    name: "Cart",
+    value: "cart",
+  },
+  {
+    id: 5,
+    name: "Chef AI",
+    value: "chefAI",
+  },
+  {
+    id: 6,
+    name: "Socializing",
+    value: "social",
+  },
+  {
+    id: 7,
+    name: "Extra Tokens",
+    value: "extraTokens",
+  },
+];

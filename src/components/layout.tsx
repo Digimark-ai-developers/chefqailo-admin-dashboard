@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 
 import AppSidebar from "./app-sidebar";
-import { ModeToggle } from "./mode-toggle";
+import ModeToggle from "./mode-toggle";
 import { ThemeProvider } from "./theme-provider";
 import { SidebarProvider, SidebarTrigger } from "./ui/sidebar";
 
