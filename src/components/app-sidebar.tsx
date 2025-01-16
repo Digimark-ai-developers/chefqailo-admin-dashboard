@@ -74,7 +74,7 @@ const AppSidebar = () => {
               <span className="w-full overflow-hidden truncate text-left text-sm font-semibold">
                 {user?.given_name}&nbsp;{user?.family_name}
               </span>
-              <span className="flex-1 overflow-hidden truncate text-left text-xs font-light">
+              <span className="w-full overflow-hidden truncate text-left text-xs font-light">
                 {truncateString(`${user?.email}`, 19)}
               </span>
             </div>
