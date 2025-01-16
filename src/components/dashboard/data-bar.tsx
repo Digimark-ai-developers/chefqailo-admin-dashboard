@@ -5,7 +5,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { barChartConfig, barChartData } from "@/lib/dashboard-graph-specs";
+import { barChartConfig, barChartData } from "@/lib/graph-specs";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 

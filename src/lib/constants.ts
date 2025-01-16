@@ -1,4 +1,4 @@
-import { LayoutDashboard, User } from "lucide-react";
+import { ChartSpline, LayoutDashboard, User } from "lucide-react";
 
 export const items = [
   {
@@ -10,6 +10,11 @@ export const items = [
     title: "Users",
     url: "/users",
     icon: User,
+  },
+  {
+    title: "Statistics",
+    url: "/statistics",
+    icon: ChartSpline,
   },
 ];
 

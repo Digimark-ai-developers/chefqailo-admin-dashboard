@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
-import { lineChartConfig } from "@/lib/dashboard-graph-specs";
+import { lineChartConfig } from "@/lib/graph-specs";
 import { cn } from "@/lib/utils";
 import {
   useGetStatsGraphQuery,

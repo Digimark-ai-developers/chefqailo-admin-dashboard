@@ -6,10 +6,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  paymentHistoryConfig,
-  paymentHistoryData,
-} from "@/lib/dashboard-graph-specs";
+import { paymentHistoryConfig, paymentHistoryData } from "@/lib/graph-specs";
 
 const PaymentHistory = () => {
   return (

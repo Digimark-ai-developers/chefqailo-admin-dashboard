@@ -5,6 +5,7 @@ import RouteGuard from "./components/route-guard";
 import Dashboard from "./pages/dashboard";
 import HabitTracker from "./pages/habit-tracker";
 import Login from "./pages/login";
+import Statistics from "./pages/statistics";
 import Users from "./pages/users";
 
 const App = () => {
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<Users />} />
         <Route path="/users/habit-tracker" element={<HabitTracker />} />
+        <Route path="statistics" element={<Statistics />} />
       </Route>
     </Routes>
   );

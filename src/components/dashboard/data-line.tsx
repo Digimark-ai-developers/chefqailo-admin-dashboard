@@ -1,6 +1,6 @@
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
-import { lineChartConfig } from "@/lib/dashboard-graph-specs";
+import { lineChartConfig } from "@/lib/graph-specs";
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
 

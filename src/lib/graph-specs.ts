@@ -73,3 +73,87 @@ export const paymentHistoryConfig = {
     color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
+
+export const planChartData = [
+  {
+    month: "January",
+    mealPlan: 12,
+    inventory: 20,
+    shoppingCart: 15,
+    chefAI: 8,
+    social: 10,
+    extraTokens: 5,
+  },
+  {
+    month: "February",
+    mealPlan: 18,
+    inventory: 25,
+    shoppingCart: 20,
+    chefAI: 10,
+    social: 12,
+    extraTokens: 8,
+  },
+  {
+    month: "March",
+    mealPlan: 22,
+    inventory: 30,
+    shoppingCart: 18,
+    chefAI: 12,
+    social: 14,
+    extraTokens: 10,
+  },
+  {
+    month: "April",
+    mealPlan: 14,
+    inventory: 18,
+    shoppingCart: 12,
+    chefAI: 7,
+    social: 9,
+    extraTokens: 6,
+  },
+  {
+    month: "May",
+    mealPlan: 20,
+    inventory: 28,
+    shoppingCart: 22,
+    chefAI: 14,
+    social: 16,
+    extraTokens: 11,
+  },
+  {
+    month: "June",
+    mealPlan: 25,
+    inventory: 35,
+    shoppingCart: 30,
+    chefAI: 18,
+    social: 20,
+    extraTokens: 15,
+  },
+];
+
+export const planChartConfig = {
+  mealPlan: {
+    label: "Meal Plan",
+    color: "hsl(var(--chart-1))",
+  },
+  inventory: {
+    label: "Inventory",
+    color: "hsl(var(--chart-2))",
+  },
+  shoppingCart: {
+    label: "Cart",
+    color: "hsl(var(--chart-3))",
+  },
+  chefAI: {
+    label: "Chef AI",
+    color: "hsl(var(--chart-4))",
+  },
+  social: {
+    label: "Socializing",
+    color: "hsl(var(--chart-5))",
+  },
+  extraTokens: {
+    label: "Extra Tokens",
+    color: "hsl(var(--chart-6))",
+  },
+} satisfies ChartConfig;
