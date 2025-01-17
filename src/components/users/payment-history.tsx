@@ -12,7 +12,7 @@ const PaymentHistory = () => {
   return (
     <Card className="flex h-full w-full flex-col items-center justify-between p-5">
       <CardHeader className="w-full p-0">
-        <CardTitle>Payment History</CardTitle>
+        <CardTitle>Token Usage History</CardTitle>
       </CardHeader>
       <CardContent className="w-full p-0">
         <ChartContainer config={paymentHistoryConfig}>

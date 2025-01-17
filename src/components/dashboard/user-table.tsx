@@ -16,8 +16,7 @@ import {
 import { cn, truncateString } from "@/lib/utils";
 import {
   useDeleteUserMutation,
-  useGetAllUsersQuery,
-  // useToggleUserPaidStatusMutation,
+  useGetAllUsersQuery, // useToggleUserPaidStatusMutation,
   useToggleUserStatusMutation,
 } from "@/store/services/user";
 
@@ -201,9 +200,9 @@ const UserTable = () => {
                       {user.username !== ""
                         ? truncateString(user.username, 4)
                         : truncateString(
-                          `${user.first_name} ${user.last_name}`,
-                          4
-                        )}
+                            `${user.first_name} ${user.last_name}`,
+                            4
+                          )}
                     </span>
                     <span className="hidden flex-1 overflow-hidden truncate md:flex">
                       {user.username !== ""
