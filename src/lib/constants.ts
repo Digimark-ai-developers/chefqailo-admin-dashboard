@@ -1,4 +1,4 @@
-import { ChartSpline, LayoutDashboard, User } from "lucide-react";
+import { BadgeCheck, ChartSpline, LayoutDashboard, User } from "lucide-react";
 
 export const items = [
   {
@@ -15,6 +15,11 @@ export const items = [
     title: "Statistics",
     url: "/statistics",
     icon: ChartSpline,
+  },
+  {
+    title: "Subscriptions",
+    url: "/subscriptions",
+    icon: BadgeCheck,
   },
 ];
 
@@ -253,5 +258,40 @@ export const features = [
     id: 7,
     name: "Extra Tokens",
     value: "extraTokens",
+  },
+];
+
+export const plans = [
+  {
+    id: 1,
+    name: "Free",
+    price: 0,
+    users: 441,
+    trend: "+20.1% more than last month.",
+    bgColor: "chart-1",
+  },
+  {
+    id: 2,
+    name: "Basic",
+    price: 20,
+    users: 343,
+    trend: "+20.1% more than last month.",
+    bgColor: "chart-2",
+  },
+  {
+    id: 3,
+    name: "Pro",
+    price: 50,
+    users: 268,
+    trend: "-20.1% less than last month.",
+    bgColor: "chart-3",
+  },
+  {
+    id: 4,
+    name: "Premium",
+    price: 100,
+    users: 192,
+    trend: "-20.1% less than last month.",
+    bgColor: "chart-4",
   },
 ];

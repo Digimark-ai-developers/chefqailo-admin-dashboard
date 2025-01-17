@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/chart";
 import { planChartConfig, planChartData } from "@/lib/graph-specs";
 
-const DataLine = () => {
+const OverviewGraph = () => {
   return (
     <div className="flex w-full flex-col items-start justify-start gap-5">
       <div className="flex w-full items-center justify-center">
@@ -165,4 +165,4 @@ const DataLine = () => {
   );
 };
 
-export default DataLine;
+export default OverviewGraph;

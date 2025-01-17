@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { ChevronDown, CircleArrowLeft, CircleArrowRight } from "lucide-react";
 
 import NonVaryingUsageGraph from "@/components/statistics/non-varying-usage-graph";
-import DataLine from "@/components/statistics/overview-graph";
+import OverviewGraph from "@/components/statistics/overview-graph";
 import PeakGraph from "@/components/statistics/peak-graph";
 import VaryingUsageGraph from "@/components/statistics/varying-usage-graph";
 import { Button } from "@/components/ui/button";
@@ -95,7 +95,7 @@ const Statistics = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {feature === "overview" && <DataLine />}
+      {feature === "overview" && <OverviewGraph />}
       {feature === "meal" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph

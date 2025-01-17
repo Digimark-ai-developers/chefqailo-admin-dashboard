@@ -189,3 +189,67 @@ export const peakMealChartConfig = {
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
+
+export const subscriptionChartData = [
+  {
+    month: "January",
+    free: 186,
+    basic: 80,
+    pro: Math.floor(Math.random() * 100),
+    premium: Math.floor(Math.random() * 50),
+  },
+  {
+    month: "February",
+    free: 305,
+    basic: 200,
+    pro: Math.floor(Math.random() * 100),
+    premium: Math.floor(Math.random() * 50),
+  },
+  {
+    month: "March",
+    free: 237,
+    basic: 120,
+    pro: Math.floor(Math.random() * 100),
+    premium: Math.floor(Math.random() * 50),
+  },
+  {
+    month: "April",
+    free: 73,
+    basic: 190,
+    pro: Math.floor(Math.random() * 100),
+    premium: Math.floor(Math.random() * 50),
+  },
+  {
+    month: "May",
+    free: 209,
+    basic: 130,
+    pro: Math.floor(Math.random() * 100),
+    premium: Math.floor(Math.random() * 50),
+  },
+  {
+    month: "June",
+    free: 214,
+    basic: 140,
+    pro: Math.floor(Math.random() * 100),
+    premium: Math.floor(Math.random() * 50),
+  },
+];
+
+export const subscriptionChartConfig = {
+  free: {
+    label: "Free",
+    color: "hsl(var(--chart-1))",
+  },
+  basic: {
+    label: "Basic",
+    color: "hsl(var(--chart-2))",
+  },
+  pro: {
+    label: "Pro",
+    color: "hsl(var(--chart-3))",
+  },
+  premium: {
+    label: "Premium",
+    color: "hsl(var(--chart-4))",
+  },
+} satisfies ChartConfig;

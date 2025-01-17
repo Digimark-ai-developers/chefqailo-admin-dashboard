@@ -65,3 +65,12 @@ declare type EditUser = {
   id: number;
   body: PostUser;
 };
+
+declare type Plan = {
+  id: number;
+  name: string;
+  price: number;
+  users: number;
+  trend: string;
+  bgColor: string;
+};
