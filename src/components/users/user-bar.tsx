@@ -68,7 +68,7 @@ const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
                 {data?.email}
               </span>
               <span className="w-full overflow-hidden truncate text-left text-xs text-gray-400">
-                {data?.is_paid ? "Paid" : "Unpaid"}&nbsp;|&nbsp;
+                {/* {data?.is_paid ? "Paid" : "Unpaid"}&nbsp;|&nbsp; */}
                 {data?.is_active ? "Active" : "Inactive"}
               </span>
             </div>

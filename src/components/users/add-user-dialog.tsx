@@ -22,7 +22,6 @@ import {
 import ImageUploader from "../ui/image-uploader";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
 
 interface AddUserDialogProps {
   open: boolean;
@@ -42,7 +41,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
     }
   );
   const [email, setEmail] = useState<string>("");
-  const [paid, setPaid] = useState<boolean>(false);
+  const [paid, setPaid] = useState<string>("Free");
   const [lastName, setLastName] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [image, setImage] = useState<File | string | null>(null);
@@ -108,7 +107,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
     if (data) {
       setEmail(data.email);
       setImage(data.image);
-      setPaid(data.is_paid);
+      setPaid(data.plan as "Free" | "Basic" | "Pro" | "Premium");
       setLastName(data.last_name);
       setFirstName(data.first_name);
     }
@@ -116,7 +115,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
     if (!open) {
       setEmail("");
       setImage(null);
-      setPaid(false);
+      setPaid("Free");
       setLastName("");
       setFirstName("");
     }
@@ -191,7 +190,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
             </Label>
             <div className="flex items-center justify-center gap-2.5">
               <span className="text-sm font-medium">Unpaid</span>
-              <Switch checked={paid} onCheckedChange={setPaid} />
+              {/* <Switch checked={paid} onCheckedChange={setPaid} /> */}
               <span className="text-sm font-medium text-primary">Paid</span>
             </div>
           </div>
