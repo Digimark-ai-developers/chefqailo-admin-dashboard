@@ -17,7 +17,7 @@ import { cn, truncateString } from "@/lib/utils";
 import {
   useDeleteUserMutation,
   useGetAllUsersQuery,
-  useToggleUserPaidStatusMutation,
+  // useToggleUserPaidStatusMutation,
   useToggleUserStatusMutation,
 } from "@/store/services/user";
 
@@ -40,7 +40,7 @@ const UserTable = () => {
   const [message, setMessage] = useState<string>("");
   const [toggleActive] = useToggleUserStatusMutation();
   const [selected, setSelected] = useState<string>("");
-  const [togglePaid] = useToggleUserPaidStatusMutation();
+  // const [togglePaid] = useToggleUserPaidStatusMutation();
   const [accessToken, setAccessToken] = useState<string>("");
   const { data: users, isLoading } = useGetAllUsersQuery(`${accessToken}`, {
     skip: !accessToken || accessToken === "",
@@ -86,32 +86,32 @@ const UserTable = () => {
     }
   };
 
-  const changeUserPaidStatus = async (id: string) => {
-    const response = await togglePaid({
-      id,
-      token: accessToken,
-    });
+  // const changeUserPaidStatus = async (id: string) => {
+  //   const response = await togglePaid({
+  //     id,
+  //     token: accessToken,
+  //   });
 
-    if (!response.error) {
-      toast.custom(() => (
-        <CustomToast
-          type="success"
-          title="Success"
-          description="Successfully Changed User Payment Status!"
-        />
-      ));
-    } else {
-      toast.custom(() => (
-        <CustomToast
-          type="error"
-          title="Error"
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          description={response.error.error.data.message}
-        />
-      ));
-    }
-  };
+  //   if (!response.error) {
+  //     toast.custom(() => (
+  //       <CustomToast
+  //         type="success"
+  //         title="Success"
+  //         description="Successfully Changed User Payment Status!"
+  //       />
+  //     ));
+  //   } else {
+  //     toast.custom(() => (
+  //       <CustomToast
+  //         type="error"
+  //         title="Error"
+  //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //         // @ts-ignore
+  //         description={response.error.error.data.message}
+  //       />
+  //     ));
+  //   }
+  // };
 
   const handleDelete = async (id: string) => {
     const response = await deleteUser({
@@ -201,9 +201,9 @@ const UserTable = () => {
                       {user.username !== ""
                         ? truncateString(user.username, 4)
                         : truncateString(
-                            `${user.first_name} ${user.last_name}`,
-                            4
-                          )}
+                          `${user.first_name} ${user.last_name}`,
+                          4
+                        )}
                     </span>
                     <span className="hidden flex-1 overflow-hidden truncate md:flex">
                       {user.username !== ""
@@ -227,7 +227,7 @@ const UserTable = () => {
                   </TableCell>
                   <TableCell>
                     <span
-                      onClick={() => changeUserPaidStatus(`${user.id}`)}
+                      // onClick={() => changeUserPaidStatus(`${user.id}`)}
                       className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary"
                     >
                       {user.plan}
