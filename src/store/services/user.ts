@@ -120,37 +120,37 @@ export const userApi = api.injectEndpoints({
         }
       },
     }),
-    toggleUserPaidStatus: build.mutation({
-      query: ({ id, token }: { id: string; token: string }) => ({
-        url: "/toggle-paid/",
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: { id },
-      }),
-      invalidatesTags: ["Users"],
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        const patchResult = dispatch(
-          api.util.updateQueryData(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            "getAllUsers",
-            undefined,
-            (draft: User[]) => {
-              const user = draft.find((p: User) => p.id === parseInt(arg.id));
-              if (user) {
-                user.is_paid = user.is_paid ? false : true;
-              }
-            }
-          )
-        );
+    // toggleUserPaidStatus: build.mutation({
+    //   query: ({ id, token }: { id: string; token: string }) => ({
+    //     url: "/toggle-paid/",
+    //     method: "POST",
+    //     headers: { Authorization: `Bearer ${token}` },
+    //     body: { id },
+    //   }),
+    //   invalidatesTags: ["Users"],
+    //   async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+    //     const patchResult = dispatch(
+    //       api.util.updateQueryData(
+    //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //         // @ts-ignore
+    //         "getAllUsers",
+    //         undefined,
+    //         (draft: User[]) => {
+    //           const user = draft.find((p: User) => p.id === parseInt(arg.id));
+    //           if (user) {
+    //             user.is_paid = user.is_paid ? false : true;
+    //           }
+    //         }
+    //       )
+    //     );
 
-        try {
-          await queryFulfilled;
-        } catch {
-          patchResult.undo();
-        }
-      },
-    }),
+    //     try {
+    //       await queryFulfilled;
+    //     } catch {
+    //       patchResult.undo();
+    //     }
+    //   },
+    // }),
     getStatsGraph: build.query({
       query: ({ time, token }: { time: string; token: string }) => ({
         url: `/stats_graph/?period=${time}`,
@@ -192,6 +192,6 @@ export const {
   useEditUserMutation,
   useDeleteUserMutation,
   useToggleUserStatusMutation,
-  useToggleUserPaidStatusMutation,
+  // useToggleUserPaidStatusMutation,
   useGetStatsGraphQuery,
 } = userApi;
