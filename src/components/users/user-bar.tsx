@@ -1,16 +1,12 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import { Link } from "react-router-dom";
 
-import { yearlyProgress } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useGetUserQuery } from "@/store/services/user";
 
-import { buttonVariants } from "../ui/button";
-import ConicGradient from "../ui/conic-gradient";
 import { Sheet, SheetContent } from "../ui/sheet";
-import PaymentHistory from "./payment-history";
+import TokenHistory from "./token-history";
 
 interface SheetTriggerProps {
   id: string;
@@ -73,38 +69,40 @@ const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
               </span>
             </div>
           </div>
-          <div className="flex h-full w-full flex-col items-start justify-start gap-5 rounded-lg">
-            <div className="flex h-fit w-full items-center justify-center">
-              <span className="flex-1 text-left text-xl font-semibold">
-                Habit Tracker
-              </span>
-              <Link
-                to="/users/habit-tracker"
-                className={cn(
-                  buttonVariants({
-                    size: "sm",
-                    variant: "default",
-                  })
-                )}
-              >
-                View More
-              </Link>
-            </div>
-            <div className="flex h-[calc(100vh-454px)] w-full flex-col items-start justify-start gap-2.5 overflow-y-auto">
-              {yearlyProgress.map((item) => (
+          <div className="flex h-full w-full flex-col items-start justify-start gap-5 overflow-hidden rounded-lg">
+            <div className="relative flex h-full max-h-full w-full flex-col items-start justify-start overflow-y-auto rounded-lg border">
+              <div className="sticky top-0 z-[1] grid w-full grid-cols-3 bg-muted py-2.5">
+                <span className="col-span-1 w-full text-center text-sm font-bold">
+                  Date
+                </span>
+                <span className="col-span-1 w-full text-center text-sm font-bold">
+                  Tokens
+                </span>
+                <span className="col-span-1 w-full text-center text-sm font-bold">
+                  Price
+                </span>
+              </div>
+              {[...Array(20)].map((_, idx) => (
                 <div
-                  key={item.id}
-                  className="flex w-full items-center justify-center rounded-md bg-muted p-3"
+                  key={idx}
+                  className={cn("grid w-full grid-cols-3 py-2.5", {
+                    "bg-primary/30": idx % 2 !== 0,
+                  })}
                 >
-                  <span className="flex-1 text-left font-semibold">
-                    {item.name}
+                  <span className="col-span-1 w-full text-center text-sm">
+                    24-01-2025
                   </span>
-                  <ConicGradient size="size-6" progress={item.progress} />
+                  <span className="col-span-1 w-full text-center text-sm">
+                    1337
+                  </span>
+                  <span className="col-span-1 w-full text-center text-sm">
+                    $213.34
+                  </span>
                 </div>
               ))}
             </div>
             <div className="h-full max-h-[238px] w-full">
-              <PaymentHistory />
+              <TokenHistory />
             </div>
           </div>
         </div>

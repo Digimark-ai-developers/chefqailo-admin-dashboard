@@ -58,7 +58,7 @@ export const areaChartConfig = {
   },
 } satisfies ChartConfig;
 
-export const paymentHistoryData = [
+export const tokenHistoryData = [
   { month: "January", amount: 186 },
   { month: "February", amount: 305 },
   { month: "March", amount: 237 },
@@ -67,7 +67,7 @@ export const paymentHistoryData = [
   { month: "June", amount: 214 },
 ];
 
-export const paymentHistoryConfig = {
+export const tokenHistoryConfig = {
   amount: {
     label: "Amount",
     color: "hsl(var(--chart-1))",

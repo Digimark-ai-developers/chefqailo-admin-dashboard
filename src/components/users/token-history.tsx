@@ -6,19 +6,24 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { paymentHistoryConfig, paymentHistoryData } from "@/lib/graph-specs";
+import { tokenHistoryConfig, tokenHistoryData } from "@/lib/graph-specs";
 
-const PaymentHistory = () => {
+import { Button } from "../ui/button";
+
+const TokenHistory = () => {
   return (
-    <Card className="flex h-full w-full flex-col items-center justify-between p-5">
-      <CardHeader className="w-full p-0">
+    <Card className="flex h-full w-full flex-col items-center justify-between p-2.5">
+      <CardHeader className="flex w-full flex-row items-start justify-between gap-0 space-x-0 space-y-0 p-0">
         <CardTitle>Token Usage History</CardTitle>
+        <Button variant="outline" size="sm" className="gap-0">
+          Monthly
+        </Button>
       </CardHeader>
       <CardContent className="w-full p-0">
-        <ChartContainer config={paymentHistoryConfig}>
+        <ChartContainer config={tokenHistoryConfig}>
           <LineChart
             accessibilityLayer
-            data={paymentHistoryData}
+            data={tokenHistoryData}
             margin={{
               top: 20,
               left: 12,
@@ -63,4 +68,4 @@ const PaymentHistory = () => {
   );
 };
 
-export default PaymentHistory;
+export default TokenHistory;
