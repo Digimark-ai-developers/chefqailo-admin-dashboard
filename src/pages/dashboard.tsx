@@ -25,8 +25,8 @@ import {
 } from "@/store/services/user";
 
 const Dashboard = () => {
-  const { getIdToken } = useKindeAuth();
   const { open } = useSidebar();
+  const { getIdToken } = useKindeAuth();
   const [activeChart, setActiveChart] =
     useState<keyof typeof lineChartConfig>("inactive");
   const [selectedStat, setSelectedStat] = useState<

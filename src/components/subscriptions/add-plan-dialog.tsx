@@ -1,14 +1,17 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import {
-  useEditUserMutation,
-  useGetUserQuery,
-  usePostUserMutation,
-} from "@/store/services/user";
+  useAddPlanMutation,
+  useEditPlanMutation,
+  useGetPlanQuery,
+} from "@/store/services/subscriptions";
 
 import { Button } from "../ui/button";
 import CustomToast from "../ui/custom-toast";
@@ -19,9 +22,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import ImageUploader from "../ui/image-uploader";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import WarningModal from "../warning-modal";
 
 interface AddPlanDialogProps {
   open: boolean;
@@ -29,24 +39,31 @@ interface AddPlanDialogProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
+const planFormSchema = z.object({
+  payment_status: z.enum(["free", "basic", "standard", "premium"]),
+  amount: z.string(),
+});
+
 const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
   const { getIdToken } = useKindeAuth();
+  const [warn, setWarn] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string>("");
-
-  const { data } = useGetUserQuery(
-    { id: `${id}`, token: `${accessToken}` },
+  const [addPlan, { isLoading: adding }] = useAddPlanMutation();
+  const [editPlan, { isLoading: editing }] = useEditPlanMutation();
+  const { data } = useGetPlanQuery(
     {
-      skip: !open || !accessToken || accessToken === "",
+      id: `${id}`,
+      token: accessToken,
+    },
+    {
+      skip: !open || !accessToken || accessToken === "" || !id,
       refetchOnMountOrArgChange: true,
     }
   );
-  const [email, setEmail] = useState<string>("");
-  const [paid, setPaid] = useState<string>("Free");
-  const [lastName, setLastName] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [image, setImage] = useState<File | string | null>(null);
-  const [addUser, { isLoading: adding }] = usePostUserMutation();
-  const [editUser, { isLoading: editing }] = useEditUserMutation();
+
+  const form = useForm<z.infer<typeof planFormSchema>>({
+    resolver: zodResolver(planFormSchema),
+  });
 
   const handleToken = async () => {
     let token: string | undefined = "";
@@ -60,24 +77,26 @@ const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
     }
   };
 
-  const postUser = async () => {
+  const onSubmit = async (values: z.infer<typeof planFormSchema>) => {
     let response = null;
 
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("is_paid", `${paid}`);
-    formData.append("image", image || "");
-    formData.append("last_name", lastName);
-    formData.append("first_name", firstName);
-
-    if (id) {
-      response = await editUser({
-        id: `${id}`,
-        data: formData,
+    if (!id) {
+      response = await addPlan({
+        plan: {
+          payment_status: values.payment_status,
+          amount: Number(values.amount),
+        },
         token: accessToken,
       });
     } else {
-      response = await addUser({ data: formData, token: accessToken });
+      response = await editPlan({
+        id: `${id}`,
+        plan: {
+          payment_status: values.payment_status,
+          amount: Number(values.amount),
+        },
+        token: accessToken,
+      });
     }
 
     if (!response.error) {
@@ -104,130 +123,88 @@ const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
   };
 
   useEffect(() => {
-    if (data) {
-      setEmail(data.email);
-      setImage(data.image);
-      setPaid(data.payment_status as "Free" | "Basic" | "Pro" | "Premium");
-      setLastName(data.last_name);
-      setFirstName(data.first_name);
-    }
-
-    if (!open) {
-      setEmail("");
-      setImage(null);
-      setPaid("Free");
-      setLastName("");
-      setFirstName("");
-    }
-  }, [data, open]);
-
-  useEffect(() => {
     handleToken();
-  }, [getIdToken]);
+
+    if (data) {
+      // @ts-ignore
+      form.setValue("payment_status", data.payment_status);
+      form.setValue("amount", String(data.amount));
+    }
+  }, [getIdToken, data]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-sm md:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{id ? "Edit" : "Add"} Plan</DialogTitle>
-          <DialogDescription>
-            {id ? "Edit user here" : "Add a new plan here"}. Click save when
-            you're done.
-          </DialogDescription>
-        </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            postUser();
-          }}
-          className="grid w-full grid-cols-2 gap-5"
-        >
-          <div className="col-span-1 flex w-full flex-col items-center justify-center gap-1.5">
-            <Label htmlFor="firstName" className="w-full text-left text-xs">
-              First Name
-            </Label>
-            <Input
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              id="firstName"
-              type="text"
-              placeholder="John"
-              required
-            />
-          </div>
-          <div className="col-span-1 flex w-full flex-col items-center justify-center gap-1.5">
-            <Label htmlFor="lastName" className="w-full text-left text-xs">
-              Last Name
-            </Label>
-            <Input
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              id="lastName"
-              type="text"
-              placeholder="Doe"
-              required
-            />
-          </div>
-          <div className="col-span-2 flex w-full flex-col items-center justify-center gap-1.5">
-            <Label htmlFor="email" className="w-full text-left text-xs">
-              Email
-            </Label>
-            <Input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              id="email"
-              type="email"
-              required
-              placeholder="johndoe@email.com"
-            />
-          </div>
-          <div className="col-span-2 flex w-full items-center space-x-2">
-            <Label
-              htmlFor="payment-status"
-              className="flex-1 text-left text-sm"
+    <>
+      <WarningModal open={warn} setOpen={setWarn} message="Delete this Plan" />
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-sm md:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{id ? "Edit" : "Add"} Plan</DialogTitle>
+            <DialogDescription>
+              {id ? "Edit user here" : "Add a new plan here"}. Click save when
+              you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="grid w-full grid-cols-2 gap-5"
             >
-              Payment Status:
-            </Label>
-            <div className="flex items-center justify-center gap-2.5">
-              <span className="text-sm font-medium">Unpaid</span>
-              {/* <Switch checked={paid} onCheckedChange={setPaid} /> */}
-              <span className="text-sm font-medium text-primary">Paid</span>
-            </div>
-          </div>
-          <div className="col-span-2 flex w-full flex-col items-center justify-center gap-1.5">
-            <Label className="w-full text-left text-sm">
-              Upload Profile Picture
-            </Label>
-            <ImageUploader image={image} setImage={setImage} />
-          </div>
-          <div className="col-span-2 flex w-full items-center justify-end gap-2.5">
-            <Button
-              onClick={() => setOpen(false)}
-              type="button"
-              variant="outline"
-              size="default"
-            >
-              Cancel
-            </Button>
-            <Button
-              disabled={adding || editing}
-              type="submit"
-              variant="default"
-              size="default"
-            >
-              {adding || editing ? (
-                <div className="flex w-full items-center justify-center gap-2">
-                  <Loader2 className="animate-spin" />
-                  <span>Please Wait...</span>
-                </div>
-              ) : (
-                "Save changes"
-              )}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+              <FormField
+                control={form.control}
+                name="payment_status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Plan Name</FormLabel>
+                    <FormControl>
+                      <Input type="text" placeholder="Premium" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Plan Amount</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="20" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="col-span-2 flex w-full items-center justify-end gap-2.5">
+                <Button
+                  onClick={() => setOpen(false)}
+                  type="button"
+                  variant="outline"
+                  size="default"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  disabled={adding || editing}
+                  type="submit"
+                  variant="default"
+                  size="default"
+                >
+                  {adding || editing ? (
+                    <div className="flex w-full items-center justify-center gap-2">
+                      <Loader2 className="animate-spin" />
+                      <span>Please Wait...</span>
+                    </div>
+                  ) : (
+                    "Save changes"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

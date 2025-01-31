@@ -16,7 +16,7 @@ import {
 import { cn, truncateString } from "@/lib/utils";
 import {
   useDeleteUserMutation,
-  useGetAllUsersQuery, // useToggleUserPaidStatusMutation,
+  useGetAllUsersQuery,
   useToggleUserStatusMutation,
 } from "@/store/services/user";
 
@@ -34,20 +34,17 @@ import WarningModal from "../warning-modal";
 const UserTable = () => {
   const { getIdToken } = useKindeAuth();
   const [deleteUser] = useDeleteUserMutation();
+  const [users, setUsers] = useState<User[]>([]);
   const [warn, setWarn] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [toggleActive] = useToggleUserStatusMutation();
   const [selected, setSelected] = useState<string>("");
-  // const [togglePaid] = useToggleUserPaidStatusMutation();
   const [accessToken, setAccessToken] = useState<string>("");
-  const { data: users, isLoading } = useGetAllUsersQuery(
-    {},
-    {
-      skip: !accessToken || accessToken === "",
-      refetchOnMountOrArgChange: true,
-    }
-  );
+  const { data, isLoading } = useGetAllUsersQuery(accessToken, {
+    skip: !accessToken || accessToken === "",
+    refetchOnMountOrArgChange: true,
+  });
 
   const handleToken = async () => {
     let token: string | undefined = "";
@@ -62,12 +59,20 @@ const UserTable = () => {
   };
 
   const changeUserStatus = async (id: string) => {
-    const response = await toggleActive({
-      id,
-      token: accessToken,
-    });
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === parseInt(id)
+          ? { ...user, is_active: !user.is_active }
+          : user
+      )
+    );
 
-    if (!response.error) {
+    try {
+      await toggleActive({
+        id: parseInt(id),
+        token: accessToken,
+      });
+
       toast.custom(() => (
         <CustomToast
           type="success"
@@ -75,45 +80,25 @@ const UserTable = () => {
           description="Successfully Changed User Status!"
         />
       ));
-    } else {
+    } catch (error) {
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === parseInt(id)
+            ? { ...user, is_active: !user.is_active }
+            : user
+        )
+      );
+
       toast.custom(() => (
         <CustomToast
           type="error"
           title="Error"
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          description={response.error.error.data.message}
+          description={`${response.error.error.data.message}`}
         />
       ));
     }
   };
-
-  // const changeUserPaidStatus = async (id: string) => {
-  //   const response = await togglePaid({
-  //     id,
-  //     token: accessToken,
-  //   });
-
-  //   if (!response.error) {
-  //     toast.custom(() => (
-  //       <CustomToast
-  //         type="success"
-  //         title="Success"
-  //         description="Successfully Changed User Payment Status!"
-  //       />
-  //     ));
-  //   } else {
-  //     toast.custom(() => (
-  //       <CustomToast
-  //         type="error"
-  //         title="Error"
-  //         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //         // @ts-ignore
-  //         description={response.error.error.data.message}
-  //       />
-  //     ));
-  //   }
-  // };
 
   const handleDelete = async (id: string) => {
     const response = await deleteUser({
@@ -134,9 +119,8 @@ const UserTable = () => {
         <CustomToast
           type="error"
           title="Error"
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          description={response.error.error.data.message}
+          description={`${response.error.error.data.message}`}
         />
       ));
     }
@@ -144,7 +128,11 @@ const UserTable = () => {
 
   useEffect(() => {
     handleToken();
-  }, [getIdToken]);
+
+    if (data) {
+      setUsers(data);
+    }
+  }, [data, getIdToken]);
 
   return (
     <>
@@ -199,18 +187,16 @@ const UserTable = () => {
                       alt="user-dp"
                       className="size-6 rounded-full"
                     />
-                    <span className="flex-1 overflow-hidden truncate md:hidden">
+                    <span
+                      title={`${user.first_name} ${user.last_name}`}
+                      className="flex-1 overflow-hidden truncate"
+                    >
                       {user.username !== ""
                         ? truncateString(user.username, 4)
                         : truncateString(
                             `${user.first_name} ${user.last_name}`,
                             4
                           )}
-                    </span>
-                    <span className="hidden flex-1 overflow-hidden truncate md:flex">
-                      {user.username !== ""
-                        ? user.username
-                        : `${user.first_name} ${user.last_name}`}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -228,10 +214,7 @@ const UserTable = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <span
-                      // onClick={() => changeUserPaidStatus(`${user.id}`)}
-                      className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary"
-                    >
+                    <span className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary">
                       {user.payment_status}
                     </span>
                   </TableCell>

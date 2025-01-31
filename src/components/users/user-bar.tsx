@@ -2,7 +2,7 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 
-import { cn } from "@/lib/utils";
+import { cn, truncateString } from "@/lib/utils";
 import { useGetUserQuery } from "@/store/services/user";
 
 import { Sheet, SheetContent } from "../ui/sheet";
@@ -54,18 +54,18 @@ const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
                   : "https://ui.shadcn.com/avatars/04.png"
               }
               alt="user-picture"
-              className="size-16 rounded-full bg-primary"
+              className="aspect-square size-16 rounded-full bg-primary object-cover"
             />
             <div className="flex flex-1 flex-col items-center justify-center gap-1">
               <span className="w-full text-left text-lg font-bold leading-[18px]">
-                {data?.first_name}&nbsp;{data?.last_name}
+                {truncateString(`${data?.first_name} ${data?.last_name}`, 10)}
               </span>
               <span className="w-full overflow-hidden truncate text-left text-xs text-gray-400">
                 {data?.email}
               </span>
-              <span className="w-full overflow-hidden truncate text-left text-xs text-gray-400">
-                {/* {data?.is_paid ? "Paid" : "Unpaid"}&nbsp;|&nbsp; */}
-                {data?.is_active ? "Active" : "Inactive"}
+              <span className="w-full overflow-hidden truncate text-left text-xs capitalize text-gray-400">
+                {data?.is_active ? "Active" : "Inactive"} |&nbsp;
+                {data?.payment_status}
               </span>
             </div>
           </div>

@@ -6,8 +6,8 @@ import { useDropzone } from "react-dropzone";
 import { Button } from "./button";
 
 interface ImageUploadProps {
+  setImage: any;
   image: File | string | null;
-  setImage: React.Dispatch<React.SetStateAction<File | string | null>>;
 }
 
 const ImageUploader = ({ image, setImage }: ImageUploadProps) => {

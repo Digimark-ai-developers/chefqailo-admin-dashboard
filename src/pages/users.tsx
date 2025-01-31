@@ -10,13 +10,10 @@ import { useGetAllUsersQuery } from "@/store/services/user";
 const Users = () => {
   const { getIdToken } = useKindeAuth();
   const [accessToken, setAccessToken] = useState<string>("");
-  const { data, isLoading } = useGetAllUsersQuery(
-    {},
-    {
-      skip: !accessToken || accessToken === "",
-      refetchOnMountOrArgChange: true,
-    }
-  );
+  const { data, isLoading } = useGetAllUsersQuery(accessToken, {
+    skip: !accessToken || accessToken === "",
+    refetchOnMountOrArgChange: true,
+  });
 
   const handleToken = async () => {
     let token: string | undefined = "";

@@ -7,6 +7,8 @@ import { ArrowDown, ArrowUpDown, EllipsisVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
+import { truncateString } from "@/lib/utils";
+import { useGiftTokensMutation } from "@/store/services/token";
 import {
   useDeleteUserMutation,
   useToggleUserStatusMutation,
@@ -29,16 +31,8 @@ import AddUserDialog from "./add-user-dialog";
 export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "username",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown />
-        </Button>
-      );
+    header: () => {
+      return <span className="px-4">Name</span>;
     },
     cell: ({ row }) => {
       return (
@@ -52,10 +46,16 @@ export const columns: ColumnDef<User>[] = [
             alt="user-dp"
             className="size-6 rounded-full"
           />
-          <span className="hidden flex-1 overflow-hidden truncate md:flex">
+          <span
+            title={`${row.getAllCells()[0].row.original.first_name} ${row.getAllCells()[0].row.original.last_name}`}
+            className="hidden flex-1 overflow-hidden truncate md:flex"
+          >
             {row.getValue("username") !== ""
               ? row.getValue("username")
-              : `${row.getAllCells()[0].row.original.first_name} ${row.getAllCells()[0].row.original.last_name}`}
+              : truncateString(
+                  `${row.getAllCells()[0].row.original.first_name} ${row.getAllCells()[0].row.original.last_name}`,
+                  10
+                )}
           </span>
         </div>
       );
@@ -126,7 +126,7 @@ export const columns: ColumnDef<User>[] = [
 
       const changeUserStatus = async (id: string) => {
         const response = await toggleActive({
-          id,
+          id: parseInt(id),
           token: accessToken,
         });
 
@@ -202,6 +202,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const { getIdToken } = useKindeAuth();
       const [deleteUser] = useDeleteUserMutation();
+      const [giftTokens] = useGiftTokensMutation();
       const [warn, setWarn] = useState<boolean>(false);
       const [open, setOpen] = useState<boolean>(false);
       const [message, setMessage] = useState<string>("");
@@ -234,6 +235,36 @@ export const columns: ColumnDef<User>[] = [
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               description={response.error.error.data.message}
+            />
+          ));
+        }
+      };
+
+      const giftUserTokens = async (id: number) => {
+        let response = null;
+        const userToken = await getIdToken();
+
+        if (userToken) {
+          response = await giftTokens({
+            id,
+            token: userToken,
+          });
+        }
+
+        if (!response?.error) {
+          toast.custom(() => (
+            <CustomToast
+              type="success"
+              title="Success"
+              description="Successfully Gifted Tokens!"
+            />
+          ));
+        } else {
+          toast.custom(() => (
+            <CustomToast
+              type="error"
+              title="Error"
+              description="Failed to Gift Tokens!"
             />
           ));
         }
@@ -273,6 +304,14 @@ export const columns: ColumnDef<User>[] = [
                 }}
               >
                 Delete
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelected(`${row.getAllCells()[0].row.original.id}`);
+                  giftUserTokens(row.getAllCells()[0].row.original.id);
+                }}
+              >
+                Gift Tokens
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Link to="/users/habit-tracker">Habit Tracking</Link>

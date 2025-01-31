@@ -3,9 +3,10 @@ import { api } from "./core";
 export const statisticsApi = api.injectEndpoints({
   endpoints: (build) => ({
     getOverallStats: build.query({
-      query: (time: string) => ({
+      query: ({ time, token }: { time: string; token: string }) => ({
         url: `/overall-statistics/?period=${time}`,
         method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
       }),
       transformResponse: (response: {
         status_code: number;
@@ -14,9 +15,10 @@ export const statisticsApi = api.injectEndpoints({
       }) => response.data,
     }),
     getFeatureUsageGraph: build.query({
-      query: (params: string) => ({
+      query: ({ params, token }: { params: string; token: string }) => ({
         url: `/get-feature-plans/${params}`,
         method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
       }),
       transformResponse: (response: {
         status_code: number;
@@ -28,9 +30,10 @@ export const statisticsApi = api.injectEndpoints({
       }) => response.data,
     }),
     getPeakUsageGraph: build.query({
-      query: (feature: string) => ({
+      query: ({ feature, token }: { feature: string; token: string }) => ({
         url: `/get-peak-plans/?feature=${feature}`,
         method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
       }),
       transformResponse: (response: {
         status_code: number;

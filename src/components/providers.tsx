@@ -20,7 +20,11 @@ const Providers = ({ children }: { children: ReactNode }) => {
     >
       <Provider store={store}>
         <BrowserRouter>
-          <Toaster />
+          <Toaster
+            toastOptions={{
+              duration: 1500,
+            }}
+          />
           <TooltipProvider>{children}</TooltipProvider>
         </BrowserRouter>
       </Provider>

@@ -68,10 +68,9 @@ declare type EditUser = {
 
 declare type Plan = {
   id: number;
-  name: string;
-  price: number;
+  payment_status: string;
+  amount: number;
   users: number;
-  trend: string;
   bgColor: string;
 };
 

@@ -78,10 +78,12 @@ const DataTable = <TData, TValue>({
       <div className="flex h-full w-full flex-col items-start justify-start gap-2.5 rounded-xl border p-2.5">
         <div className="flex w-full items-center justify-between gap-2.5">
           <Input
-            placeholder="Filter emails..."
-            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            placeholder="Filter by name..."
+            value={
+              (table.getColumn("username")?.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
-              table.getColumn("email")?.setFilterValue(event.target.value)
+              table.getColumn("username")?.setFilterValue(event.target.value)
             }
             className="flex-1 md:max-w-sm md:flex-none"
           />

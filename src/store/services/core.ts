@@ -21,6 +21,6 @@ const baseQueryWith401Handling: typeof baseQuery = async (
 export const api = createApi({
   baseQuery: baseQueryWith401Handling,
   keepUnusedDataFor: 5,
-  tagTypes: ["Users", "User", "Stats"],
+  tagTypes: ["Users", "User", "Stats", "Plan", "Plans"],
   endpoints: () => ({}),
 });

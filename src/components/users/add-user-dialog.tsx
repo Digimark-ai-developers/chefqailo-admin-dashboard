@@ -1,8 +1,11 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import {
   useEditUserMutation,
@@ -19,6 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import ImageUploader from "../ui/image-uploader";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -29,9 +40,37 @@ interface AddUserDialogProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
+const userFormSchema = z.object({
+  username: z
+    .string()
+    .min(3, { message: "Username must be at least 3 characters long" })
+    .regex(/^[A-Za-z0-9]+$/, {
+      message:
+        "Username must only contain alphabets and numbers, no spaces or special characters",
+    }),
+  email: z.string().email({ message: "Invalid email address" }),
+  firstName: z
+    .string()
+    .min(1, { message: "First name is required" })
+    .regex(/^[A-Za-z\s]+$/, {
+      message: "First name must only contain alphabets and spaces",
+    }),
+  lastName: z
+    .string()
+    .min(1, { message: "Last name is required" })
+    .regex(/^[A-Za-z\s]+$/, {
+      message: "Last name must only contain alphabets and spaces",
+    }),
+});
+
 const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   const { getIdToken } = useKindeAuth();
   const [accessToken, setAccessToken] = useState<string>("");
+  const [image, setImage] = useState<string | File | null>(null);
+
+  const form = useForm<z.infer<typeof userFormSchema>>({
+    resolver: zodResolver(userFormSchema),
+  });
 
   const { data } = useGetUserQuery(
     { id: `${id}`, token: `${accessToken}` },
@@ -40,11 +79,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
       refetchOnMountOrArgChange: true,
     }
   );
-  const [email, setEmail] = useState<string>("");
-  const [paid, setPaid] = useState<string>("Free");
-  const [lastName, setLastName] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [image, setImage] = useState<File | string | null>(null);
+
   const [addUser, { isLoading: adding }] = usePostUserMutation();
   const [editUser, { isLoading: editing }] = useEditUserMutation();
 
@@ -60,15 +95,15 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
     }
   };
 
-  const postUser = async () => {
+  const postUser = async (values: z.infer<typeof userFormSchema>) => {
     let response = null;
 
     const formData = new FormData();
-    formData.append("email", email);
-    formData.append("is_paid", `${paid}`);
-    formData.append("image", image || "");
-    formData.append("last_name", lastName);
-    formData.append("first_name", firstName);
+    formData.append("email", values.email);
+    formData.append("image", image as File);
+    formData.append("username", values.username);
+    formData.append("last_name", values.lastName);
+    formData.append("first_name", values.firstName);
 
     if (id) {
       response = await editUser({
@@ -104,26 +139,16 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   };
 
   useEffect(() => {
-    if (data) {
-      setEmail(data.email);
-      setImage(data.image);
-      setPaid(data.payment_status as "Free" | "Basic" | "Pro" | "Premium");
-      setLastName(data.last_name);
-      setFirstName(data.first_name);
-    }
-
-    if (!open) {
-      setEmail("");
-      setImage(null);
-      setPaid("Free");
-      setLastName("");
-      setFirstName("");
-    }
-  }, [data, open]);
-
-  useEffect(() => {
     handleToken();
-  }, [getIdToken]);
+
+    if (data) {
+      setImage(data.image);
+      form.setValue("email", data.email);
+      form.setValue("username", data.username);
+      form.setValue("lastName", data.last_name);
+      form.setValue("firstName", data.first_name);
+    }
+  }, [getIdToken, data]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -135,97 +160,100 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
             you're done.
           </DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            postUser();
-          }}
-          className="grid w-full grid-cols-2 gap-5"
-        >
-          <div className="col-span-1 flex w-full flex-col items-center justify-center gap-1.5">
-            <Label htmlFor="firstName" className="w-full text-left text-xs">
-              First Name
-            </Label>
-            <Input
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              id="firstName"
-              type="text"
-              placeholder="John"
-              required
-            />
-          </div>
-          <div className="col-span-1 flex w-full flex-col items-center justify-center gap-1.5">
-            <Label htmlFor="lastName" className="w-full text-left text-xs">
-              Last Name
-            </Label>
-            <Input
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              id="lastName"
-              type="text"
-              placeholder="Doe"
-              required
-            />
-          </div>
-          <div className="col-span-2 flex w-full flex-col items-center justify-center gap-1.5">
-            <Label htmlFor="email" className="w-full text-left text-xs">
-              Email
-            </Label>
-            <Input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              id="email"
-              type="email"
-              required
-              placeholder="johndoe@email.com"
-            />
-          </div>
-          <div className="col-span-2 flex w-full items-center space-x-2">
-            <Label
-              htmlFor="payment-status"
-              className="flex-1 text-left text-sm"
-            >
-              Payment Status:
-            </Label>
-            <div className="flex items-center justify-center gap-2.5">
-              <span className="text-sm font-medium">Unpaid</span>
-              {/* <Switch checked={paid} onCheckedChange={setPaid} /> */}
-              <span className="text-sm font-medium text-primary">Paid</span>
-            </div>
-          </div>
-          <div className="col-span-2 flex w-full flex-col items-center justify-center gap-1.5">
-            <Label className="w-full text-left text-sm">
-              Upload Profile Picture
-            </Label>
-            <ImageUploader image={image} setImage={setImage} />
-          </div>
-          <div className="col-span-2 flex w-full items-center justify-end gap-2.5">
-            <Button
-              onClick={() => setOpen(false)}
-              type="button"
-              variant="outline"
-              size="default"
-            >
-              Cancel
-            </Button>
-            <Button
-              disabled={adding || editing}
-              type="submit"
-              variant="default"
-              size="default"
-            >
-              {adding || editing ? (
-                <div className="flex w-full items-center justify-center gap-2">
-                  <Loader2 className="animate-spin" />
-                  <span>Please Wait...</span>
-                </div>
-              ) : (
-                "Save changes"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(postUser)}
+            className="grid w-full grid-cols-2 gap-5"
+          >
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="johndoe123" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </Button>
-          </div>
-        </form>
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="johndoe@example.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="col-span-2 flex w-full flex-col items-center justify-center gap-1.5">
+              <Label className="w-full text-left text-sm">
+                Upload Profile Picture
+              </Label>
+              <ImageUploader image={image} setImage={setImage} />
+            </div>
+            <div className="col-span-2 flex w-full items-center justify-end gap-2.5">
+              <Button
+                onClick={() => setOpen(false)}
+                type="button"
+                variant="outline"
+                size="default"
+              >
+                Cancel
+              </Button>
+              <Button
+                disabled={adding || editing}
+                type="submit"
+                variant="default"
+                size="default"
+              >
+                {adding || editing ? (
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <Loader2 className="animate-spin" />
+                    <span>Please Wait...</span>
+                  </div>
+                ) : (
+                  "Save changes"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

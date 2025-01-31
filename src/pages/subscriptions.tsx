@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Loader2, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import AddPlanDialog from "@/components/subscriptions/add-plan-dialog";
 import DataLine from "@/components/subscriptions/data-line";
 import PlanCard from "@/components/subscriptions/plan-card";
 import { Button } from "@/components/ui/button";
+import CustomToast from "@/components/ui/custom-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,16 +16,47 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { plans } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { useGetSubscriptionStatsQuery } from "@/store/services/subscriptions";
+import {
+  useGetPlansQuery,
+  useGetSubscriptionStatsQuery,
+} from "@/store/services/subscriptions";
 
 const Subscriptions = () => {
+  const { getIdToken } = useKindeAuth();
   const [add, setAdd] = useState<boolean>(false);
   const [position, setPosition] = useState<string>("weekly");
-  const { data, isLoading } = useGetSubscriptionStatsQuery(position, {
+  const [accessToken, setAccessToken] = useState<string>("");
+  const { data, isLoading } = useGetSubscriptionStatsQuery(
+    {
+      period: position,
+      token: `${accessToken}`,
+    },
+    {
+      skip: !accessToken || accessToken === "",
+      refetchOnMountOrArgChange: true,
+    }
+  );
+  const { data: plans, isLoading: fetching } = useGetPlansQuery(accessToken, {
+    skip: !accessToken || accessToken === "",
     refetchOnMountOrArgChange: true,
   });
+
+  const handleToken = async () => {
+    let token: string | undefined = "";
+
+    if (getIdToken) {
+      token = await getIdToken();
+    }
+
+    if (token) {
+      setAccessToken(token);
+    }
+  };
+
+  useEffect(() => {
+    handleToken();
+  }, [getIdToken]);
 
   return (
     <>
@@ -35,7 +69,19 @@ const Subscriptions = () => {
           <div className="flex items-center justify-center gap-5">
             <Button
               type="button"
-              onClick={() => setAdd(true)}
+              onClick={() => {
+                if (plans?.length === 4) {
+                  toast.custom(() => (
+                    <CustomToast
+                      type="error"
+                      title="Error"
+                      description="You cannot add more than 4 plans."
+                    />
+                  ));
+                } else {
+                  setAdd(true);
+                }
+              }}
               variant="default"
               size="sm"
             >
@@ -67,10 +113,18 @@ const Subscriptions = () => {
             </DropdownMenu>
           </div>
         </div>
-        <div className="grid w-full grid-cols-4 gap-5">
-          {plans.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} />
-          ))}
+        <div
+          className={cn("grid w-full grid-cols-4 gap-5", {
+            "h-full": fetching,
+          })}
+        >
+          {fetching ? (
+            <div className="col-span-4 flex h-full w-full items-center justify-center">
+              <Loader2 className="size-10 animate-spin text-primary" />
+            </div>
+          ) : (
+            plans?.map((plan, idx) => <PlanCard key={idx} plan={plan} />)
+          )}
         </div>
         <div
           className={cn("flex h-full w-full items-start justify-start", {

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { ChevronDown, Loader2 } from "lucide-react";
 
 import NonVaryingUsageGraph from "@/components/statistics/non-varying-usage-graph";
@@ -45,25 +46,58 @@ const featureChangeEnum = {
 };
 
 const Statistics = () => {
+  const { getIdToken } = useKindeAuth();
+  const [accessToken, setAccessToken] = useState<string>("");
   const [feature, setFeature] = useState<keyof typeof featureEnum>("overview");
   const [activeTab, setActiveTab] = useState<string>("weekly");
-  const { data, isLoading } = useGetOverallStatsQuery(activeTab, {
-    skip: !activeTab,
-    refetchOnMountOrArgChange: true,
-  });
+  const { data, isLoading } = useGetOverallStatsQuery(
+    {
+      time: activeTab,
+      token: `${accessToken}`,
+    },
+    {
+      skip: !activeTab,
+      refetchOnMountOrArgChange: true,
+    }
+  );
   const { data: featureData } = useGetFeatureUsageGraphQuery(
-    featureChangeEnum[feature]
-      ? `?feature=${featureEnum[feature]}&period=${activeTab}`
-      : `?feature=${featureEnum[feature]}`,
+    {
+      params: featureChangeEnum[feature]
+        ? `?feature=${featureEnum[feature]}&period=${activeTab}`
+        : `?feature=${featureEnum[feature]}`,
+      token: `${accessToken}`,
+    },
     {
       skip: !feature || feature === "overview",
       refetchOnMountOrArgChange: true,
     }
   );
-  const { data: peakData } = useGetPeakUsageGraphQuery(featureEnum[feature], {
-    skip: !feature || feature === "overview",
-    refetchOnMountOrArgChange: true,
-  });
+  const { data: peakData } = useGetPeakUsageGraphQuery(
+    {
+      feature: featureEnum[feature],
+      token: `${accessToken}`,
+    },
+    {
+      skip: !feature || feature === "overview",
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  const handleToken = async () => {
+    let token: string | undefined = "";
+
+    if (getIdToken) {
+      token = await getIdToken();
+    }
+
+    if (token) {
+      setAccessToken(token);
+    }
+  };
+
+  useEffect(() => {
+    handleToken();
+  }, [getIdToken]);
 
   return (
     <div className="flex h-full w-full flex-col items-start justify-start gap-5">
