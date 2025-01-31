@@ -130,8 +130,9 @@ const DataTable = <TData, TValue>({
                                 setOpen(true);
                               }
                             }}
-                            className={cn("overflow-hidden truncate", {
+                            className={cn("overflow-hidden truncate px-6", {
                               "cursor-pointer": cell.column.id === "username",
+                              capitalize: cell.column.id === "payment_status",
                             })}
                           >
                             {flexRender(

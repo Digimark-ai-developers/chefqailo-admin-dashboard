@@ -17,10 +17,10 @@ declare type User = {
   first_name: string;
   last_name: string;
   email: string;
-  plan: "Free" | "Basic" | "Pro" | "Premium";
+  payment_status: "Free" | "Basic" | "Pro" | "Premium";
   is_active: boolean;
-  createdAt: string;
   image: string;
+  createdAt: string;
 };
 
 declare type UsersResponse = {
@@ -73,4 +73,22 @@ declare type Plan = {
   users: number;
   trend: string;
   bgColor: string;
+};
+
+declare type OverallStats = {
+  date: string;
+  meal_plan_count: number;
+  inventory_count: number;
+  chat_history_count: number;
+  culinary_recipe_count: number;
+  token_tracking_count: number;
+  shopping_count: number;
+};
+
+declare type SubscriptionStats = {
+  date: string;
+  free: number;
+  basic: number;
+  pro: number;
+  premium: number;
 };

@@ -20,9 +20,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { mealUsageChartConfig, mealUsageChartData } from "@/lib/graph-specs";
+import { mealUsageChartConfig } from "@/lib/graph-specs";
 
-const NonVaryingUsageGraph = ({ featureName }: { featureName: string }) => {
+const NonVaryingUsageGraph = ({
+  featureName,
+  data,
+}: {
+  featureName: string;
+  data: { count: number; date: string }[];
+}) => {
   return (
     <Card className="relative flex w-full flex-col items-start justify-between">
       <Tooltip>
@@ -47,10 +53,10 @@ const NonVaryingUsageGraph = ({ featureName }: { featureName: string }) => {
       </CardHeader>
       <CardContent className="w-full">
         <ChartContainer config={mealUsageChartConfig}>
-          <BarChart accessibilityLayer data={mealUsageChartData}>
+          <BarChart accessibilityLayer data={data}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="date"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
@@ -60,7 +66,7 @@ const NonVaryingUsageGraph = ({ featureName }: { featureName: string }) => {
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8}>
+            <Bar dataKey="count" fill="var(--color-count)" radius={8}>
               <LabelList
                 position="top"
                 offset={12}

@@ -5,9 +5,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { planChartConfig, planChartData } from "@/lib/graph-specs";
+import { planChartConfig } from "@/lib/graph-specs";
 
-const OverviewGraph = () => {
+const OverviewGraph = ({ data }: { data: OverallStats[] }) => {
   return (
     <div className="flex w-full flex-col items-start justify-start gap-5">
       <div className="flex w-full items-center justify-center">
@@ -20,11 +20,11 @@ const OverviewGraph = () => {
       </div>
       <ChartContainer
         config={planChartConfig}
-        className="max-h-[calc(100vh-282px)] w-full rounded-lg border p-2.5"
+        className="max-h-[calc(100vh-221px)] w-full rounded-lg border p-2.5"
       >
         <LineChart
           accessibilityLayer
-          data={planChartData}
+          data={data}
           margin={{
             left: 12,
             right: 12,
@@ -38,7 +38,7 @@ const OverviewGraph = () => {
             shapeRendering="crispEdges"
           />
           <XAxis
-            dataKey="month"
+            dataKey="date"
             tickLine={false}
             axisLine={false}
             tickMargin={8}
@@ -46,12 +46,12 @@ const OverviewGraph = () => {
           />
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
           <Line
-            dataKey="mealPlan"
+            dataKey="meal_plan_count"
             type="natural"
-            stroke="var(--color-mealPlan)"
+            stroke="var(--color-meal_plan_count)"
             strokeWidth={2}
             dot={{
-              fill: "var(--color-mealPlan)",
+              fill: "var(--color-meal_plan_count)",
             }}
             activeDot={{
               r: 6,
@@ -65,12 +65,12 @@ const OverviewGraph = () => {
             />
           </Line>
           <Line
-            dataKey="inventory"
+            dataKey="inventory_count"
             type="natural"
-            stroke="var(--color-inventory)"
+            stroke="var(--color-inventory_count)"
             strokeWidth={2}
             dot={{
-              fill: "var(--color-inventory)",
+              fill: "var(--color-inventory_count)",
             }}
             activeDot={{
               r: 6,
@@ -84,12 +84,12 @@ const OverviewGraph = () => {
             />
           </Line>
           <Line
-            dataKey="shoppingCart"
+            dataKey="shopping_count"
             type="natural"
-            stroke="var(--color-shoppingCart)"
+            stroke="var(--color-shopping_count)"
             strokeWidth={2}
             dot={{
-              fill: "var(--color-shoppingCart)",
+              fill: "var(--color-shopping_count)",
             }}
             activeDot={{
               r: 6,
@@ -103,12 +103,12 @@ const OverviewGraph = () => {
             />
           </Line>
           <Line
-            dataKey="chefAI"
+            dataKey="chat_history_count"
             type="natural"
-            stroke="var(--color-chefAI)"
+            stroke="var(--color-chat_history_count)"
             strokeWidth={2}
             dot={{
-              fill: "var(--color-chefAI)",
+              fill: "var(--color-chat_history_count)",
             }}
             activeDot={{
               r: 6,
@@ -122,12 +122,12 @@ const OverviewGraph = () => {
             />
           </Line>
           <Line
-            dataKey="social"
+            dataKey="culinary_recipe_count"
             type="natural"
-            stroke="var(--color-social)"
+            stroke="var(--color-culinary_recipe_count)"
             strokeWidth={2}
             dot={{
-              fill: "var(--color-social)",
+              fill: "var(--color-culinary_recipe_count)",
             }}
             activeDot={{
               r: 6,
@@ -141,12 +141,12 @@ const OverviewGraph = () => {
             />
           </Line>
           <Line
-            dataKey="extraTokens"
+            dataKey="token_tracking_count"
             type="natural"
-            stroke="var(--color-extraTokens)"
+            stroke="var(--color-token_tracking_count)"
             strokeWidth={2}
             dot={{
-              fill: "var(--color-extraTokens)",
+              fill: "var(--color-token_tracking_count)",
             }}
             activeDot={{
               r: 6,

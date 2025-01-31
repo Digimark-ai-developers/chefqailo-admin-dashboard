@@ -41,10 +41,13 @@ const UserTable = () => {
   const [selected, setSelected] = useState<string>("");
   // const [togglePaid] = useToggleUserPaidStatusMutation();
   const [accessToken, setAccessToken] = useState<string>("");
-  const { data: users, isLoading } = useGetAllUsersQuery(`${accessToken}`, {
-    skip: !accessToken || accessToken === "",
-    refetchOnMountOrArgChange: true,
-  });
+  const { data: users, isLoading } = useGetAllUsersQuery(
+    {},
+    {
+      skip: !accessToken || accessToken === "",
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const handleToken = async () => {
     let token: string | undefined = "";
@@ -229,7 +232,7 @@ const UserTable = () => {
                       // onClick={() => changeUserPaidStatus(`${user.id}`)}
                       className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary"
                     >
-                      {user.plan}
+                      {user.payment_status}
                     </span>
                   </TableCell>
                   <TableCell

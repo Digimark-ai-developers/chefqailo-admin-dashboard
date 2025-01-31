@@ -3,10 +3,9 @@ import { api } from "./core";
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
     getAllUsers: build.query({
-      query: (token: string) => ({
+      query: () => ({
         url: "/userslist/",
         method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
       }),
       providesTags: ["Users"],
       transformResponse: (response: UsersResponse) => response.data.users,

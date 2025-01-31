@@ -164,7 +164,7 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "plan",
+    accessorKey: "payment_status",
     header: ({ column }) => {
       return (
         <DropdownMenu>

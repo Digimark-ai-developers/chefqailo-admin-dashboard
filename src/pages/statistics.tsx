@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import dayjs from "dayjs";
-import { ChevronDown, CircleArrowLeft, CircleArrowRight } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 
 import NonVaryingUsageGraph from "@/components/statistics/non-varying-usage-graph";
 import OverviewGraph from "@/components/statistics/overview-graph";
@@ -20,88 +19,106 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { features } from "@/lib/constants";
 import {
-  type ActiveTab,
-  type DateRange,
-  getUpdatedDateRange,
-} from "@/lib/utils";
+  useGetFeatureUsageGraphQuery,
+  useGetOverallStatsQuery,
+  useGetPeakUsageGraphQuery,
+} from "@/store/services/statistics";
+
+const featureEnum = {
+  overview: "Overview",
+  meal: "MealPlan",
+  extraTokens: "ExtraTokens",
+  chefAI: "ChefAI",
+  cart: "Shopping",
+  inventory: "Inventory",
+  social: "Culinary",
+};
+
+const featureChangeEnum = {
+  overview: false,
+  meal: true,
+  extraTokens: true,
+  chefAI: true,
+  cart: false,
+  inventory: false,
+  social: true,
+};
 
 const Statistics = () => {
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: dayjs().startOf("week"),
-    endDate: dayjs().endOf("week"),
+  const [feature, setFeature] = useState<keyof typeof featureEnum>("overview");
+  const [activeTab, setActiveTab] = useState<string>("weekly");
+  const { data, isLoading } = useGetOverallStatsQuery(activeTab, {
+    skip: !activeTab,
+    refetchOnMountOrArgChange: true,
   });
-  const [activeTab, setActiveTab] = useState<string>("week");
-  const [feature, setFeature] = useState<string>("overview");
-
-  const handleNavigation = (direction: "previous" | "next") => {
-    const updatedRange = getUpdatedDateRange(
-      activeTab as ActiveTab,
-      dateRange,
-      direction
-    );
-    setDateRange(updatedRange);
-  };
+  const { data: featureData } = useGetFeatureUsageGraphQuery(
+    featureChangeEnum[feature]
+      ? `?feature=${featureEnum[feature]}&period=${activeTab}`
+      : `?feature=${featureEnum[feature]}`,
+    {
+      skip: !feature || feature === "overview",
+      refetchOnMountOrArgChange: true,
+    }
+  );
+  const { data: peakData } = useGetPeakUsageGraphQuery(featureEnum[feature], {
+    skip: !feature || feature === "overview",
+    refetchOnMountOrArgChange: true,
+  });
 
   return (
     <div className="flex h-full w-full flex-col items-start justify-start gap-5">
       <div className="flex w-full items-center justify-center border-b pb-5">
         <span className="flex-1 text-left text-3xl font-bold">Statistics</span>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="week">Week</TabsTrigger>
-            <TabsTrigger value="month">Month</TabsTrigger>
-            <TabsTrigger value="year">Year</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      <div className="flex w-full items-center justify-between">
-        <div className="flex w-full items-center justify-start gap-2.5">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handleNavigation("previous")}
-          >
-            <CircleArrowLeft className="text-primary" />
-          </Button>
-          <span>
-            {dateRange.startDate.format("DD MMM, YYYY")} -&nbsp;
-            {dateRange.endDate.format("DD MMM, YYYY")}
-          </span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handleNavigation("next")}
-          >
-            <CircleArrowRight className="text-primary" />
-          </Button>
+        <div className="flex items-center justify-center gap-2.5">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                {features.find((f) => f.value === feature)?.name}
+                <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Select Feature</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={feature}
+                // @ts-ignore
+                onValueChange={setFeature}
+              >
+                {features.map((feature) => (
+                  <DropdownMenuRadioItem key={feature.id} value={feature.value}>
+                    {feature.name}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="weekly">Week</TabsTrigger>
+              <TabsTrigger value="monthly">Month</TabsTrigger>
+              <TabsTrigger value="yearly">Year</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              {features.find((f) => f.value === feature)?.name}
-              <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Select Feature</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup value={feature} onValueChange={setFeature}>
-              {features.map((feature) => (
-                <DropdownMenuRadioItem key={feature.id} value={feature.value}>
-                  {feature.name}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
-      {feature === "overview" && <OverviewGraph />}
+      {feature === "overview" ? (
+        isLoading ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <Loader2 className="size-10 animate-spin text-primary" />
+          </div>
+        ) : (
+          <OverviewGraph data={data!} />
+        )
+      ) : null}
       {feature === "meal" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph
+            data={featureData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
           <PeakGraph
+            data={peakData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
         </div>
@@ -109,9 +126,11 @@ const Statistics = () => {
       {feature === "inventory" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <NonVaryingUsageGraph
+            data={featureData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
           <PeakGraph
+            data={peakData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
         </div>
@@ -119,9 +138,11 @@ const Statistics = () => {
       {feature === "cart" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <NonVaryingUsageGraph
+            data={featureData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
           <PeakGraph
+            data={peakData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
         </div>
@@ -129,9 +150,11 @@ const Statistics = () => {
       {feature === "chefAI" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph
+            data={featureData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
           <PeakGraph
+            data={peakData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
         </div>
@@ -139,9 +162,11 @@ const Statistics = () => {
       {feature === "social" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph
+            data={featureData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
           <PeakGraph
+            data={peakData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
         </div>
@@ -149,9 +174,11 @@ const Statistics = () => {
       {feature === "extraTokens" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph
+            data={featureData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
           <PeakGraph
+            data={peakData!}
             featureName={features.find((f) => f.value === feature)!.name}
           />
         </div>

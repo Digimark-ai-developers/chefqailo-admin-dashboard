@@ -23,13 +23,13 @@ import ImageUploader from "../ui/image-uploader";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
-interface AddUserDialogProps {
+interface AddPlanDialogProps {
   open: boolean;
   id?: number | null;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
+const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
   const { getIdToken } = useKindeAuth();
   const [accessToken, setAccessToken] = useState<string>("");
 
@@ -129,9 +129,9 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-sm md:max-w-md">
         <DialogHeader>
-          <DialogTitle>{id ? "Edit" : "Add"} User</DialogTitle>
+          <DialogTitle>{id ? "Edit" : "Add"} Plan</DialogTitle>
           <DialogDescription>
-            {id ? "Edit user here" : "Add a new user here"}. Click save when
+            {id ? "Edit user here" : "Add a new plan here"}. Click save when
             you're done.
           </DialogDescription>
         </DialogHeader>
@@ -231,4 +231,4 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   );
 };
 
-export default AddUserDialog;
+export default AddPlanDialog;

@@ -76,158 +76,158 @@ export const paymentHistoryConfig = {
 
 export const planChartData = [
   {
-    month: "January",
-    mealPlan: 12,
-    inventory: 20,
-    shoppingCart: 15,
-    chefAI: 8,
-    social: 10,
-    extraTokens: 5,
+    date: "January",
+    meal_plan_count: 12,
+    inventory_count: 20,
+    shopping_count: 15,
+    chat_history_count: 8,
+    culinary_recipe_count: 10,
+    token_tracking_count: 5,
   },
   {
-    month: "February",
-    mealPlan: 18,
-    inventory: 25,
-    shoppingCart: 20,
-    chefAI: 10,
-    social: 12,
-    extraTokens: 8,
+    date: "February",
+    meal_plan_count: 18,
+    inventory_count: 25,
+    shopping_count: 20,
+    chat_history_count: 10,
+    culinary_recipe_count: 12,
+    token_tracking_count: 8,
   },
   {
-    month: "March",
-    mealPlan: 22,
-    inventory: 30,
-    shoppingCart: 18,
-    chefAI: 12,
-    social: 14,
-    extraTokens: 10,
+    date: "March",
+    meal_plan_count: 22,
+    inventory_count: 30,
+    shopping_count: 18,
+    chat_history_count: 12,
+    culinary_recipe_count: 14,
+    token_tracking_count: 10,
   },
   {
-    month: "April",
-    mealPlan: 14,
-    inventory: 18,
-    shoppingCart: 12,
-    chefAI: 7,
-    social: 9,
-    extraTokens: 6,
+    date: "April",
+    meal_plan_count: 14,
+    inventory_count: 18,
+    shopping_count: 12,
+    chat_history_count: 7,
+    culinary_recipe_count: 9,
+    token_tracking_count: 6,
   },
   {
-    month: "May",
-    mealPlan: 20,
-    inventory: 28,
-    shoppingCart: 22,
-    chefAI: 14,
-    social: 16,
-    extraTokens: 11,
+    date: "May",
+    meal_plan_count: 20,
+    inventory_count: 28,
+    shopping_count: 22,
+    chat_history_count: 14,
+    culinary_recipe_count: 16,
+    token_tracking_count: 11,
   },
   {
-    month: "June",
-    mealPlan: 25,
-    inventory: 35,
-    shoppingCart: 30,
-    chefAI: 18,
-    social: 20,
-    extraTokens: 15,
+    date: "June",
+    meal_plan_count: 25,
+    inventory_count: 35,
+    shopping_count: 30,
+    chat_history_count: 18,
+    culinary_recipe_count: 20,
+    token_tracking_count: 15,
   },
 ];
 
 export const planChartConfig = {
-  mealPlan: {
+  meal_plan_count: {
     label: "Meal Plan",
     color: "hsl(var(--chart-1))",
   },
-  inventory: {
+  inventory_count: {
     label: "Inventory",
     color: "hsl(var(--chart-2))",
   },
-  shoppingCart: {
+  shopping_count: {
     label: "Cart",
     color: "hsl(var(--chart-3))",
   },
-  chefAI: {
+  chat_history_count: {
     label: "Chef AI",
     color: "hsl(var(--chart-4))",
   },
-  social: {
+  culinary_recipe_count: {
     label: "Socializing",
     color: "hsl(var(--chart-5))",
   },
-  extraTokens: {
+  token_tracking_count: {
     label: "Extra Tokens",
     color: "hsl(var(--chart-6))",
   },
 } satisfies ChartConfig;
 
 export const mealUsageChartData = [
-  { month: "August", desktop: 186 },
-  { month: "September", desktop: 305 },
-  { month: "October", desktop: 237 },
-  { month: "November", desktop: 73 },
-  { month: "December", desktop: 209 },
-  { month: "January", desktop: 214 },
+  { date: "August", count: 186 },
+  { date: "September", count: 305 },
+  { date: "October", count: 237 },
+  { date: "November", count: 73 },
+  { date: "December", count: 209 },
+  { date: "January", count: 214 },
 ];
 
 export const mealUsageChartConfig = {
-  desktop: {
-    label: "Desktop",
+  count: {
+    label: "Count",
     color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
 
 export const peakMealChartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
+  { date: "January", count: 186 },
+  { date: "February", count: 305 },
+  { date: "March", count: 237 },
+  { date: "April", count: 73 },
+  { date: "May", count: 209 },
+  { date: "June", count: 214 },
 ];
 
 export const peakMealChartConfig = {
-  desktop: {
-    label: "Desktop",
+  count: {
+    label: "Count",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
 export const subscriptionChartData = [
   {
-    month: "January",
+    date: "January",
     free: 186,
     basic: 80,
     pro: Math.floor(Math.random() * 100),
     premium: Math.floor(Math.random() * 50),
   },
   {
-    month: "February",
+    date: "February",
     free: 305,
     basic: 200,
     pro: Math.floor(Math.random() * 100),
     premium: Math.floor(Math.random() * 50),
   },
   {
-    month: "March",
+    date: "March",
     free: 237,
     basic: 120,
     pro: Math.floor(Math.random() * 100),
     premium: Math.floor(Math.random() * 50),
   },
   {
-    month: "April",
+    date: "April",
     free: 73,
     basic: 190,
     pro: Math.floor(Math.random() * 100),
     premium: Math.floor(Math.random() * 50),
   },
   {
-    month: "May",
+    date: "May",
     free: 209,
     basic: 130,
     pro: Math.floor(Math.random() * 100),
     premium: Math.floor(Math.random() * 50),
   },
   {
-    month: "June",
+    date: "June",
     free: 214,
     basic: 140,
     pro: Math.floor(Math.random() * 100),

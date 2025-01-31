@@ -1,16 +1,13 @@
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  subscriptionChartConfig,
-  subscriptionChartData,
-} from "@/lib/graph-specs";
+import { subscriptionChartConfig } from "@/lib/graph-specs";
 
-const DataLine = () => {
+const DataLine = ({ data }: { data: SubscriptionStats[] }) => {
   return (
     <ChartContainer
       config={subscriptionChartConfig}
@@ -18,15 +15,21 @@ const DataLine = () => {
     >
       <LineChart
         accessibilityLayer
-        data={subscriptionChartData}
+        data={data}
         margin={{
           left: 12,
           right: 12,
         }}
       >
-        <CartesianGrid vertical={false} />
+        <CartesianGrid
+          vertical={true}
+          horizontal={true}
+          className="!stroke-gray-300 dark:!stroke-gray-800"
+          strokeDasharray="5 5"
+          shapeRendering="crispEdges"
+        />
         <XAxis
-          dataKey="month"
+          dataKey="date"
           tickLine={false}
           axisLine={false}
           tickMargin={8}
@@ -39,28 +42,56 @@ const DataLine = () => {
           stroke="var(--color-free)"
           strokeWidth={2}
           dot={false}
-        />
+        >
+          <LabelList
+            position="top"
+            offset={12}
+            className="fill-foreground"
+            fontSize={12}
+          />
+        </Line>
         <Line
           dataKey="basic"
           type="monotone"
           stroke="var(--color-basic)"
           strokeWidth={2}
           dot={false}
-        />
+        >
+          <LabelList
+            position="top"
+            offset={12}
+            className="fill-foreground"
+            fontSize={12}
+          />
+        </Line>
         <Line
           dataKey="pro"
           type="monotone"
           stroke="var(--color-pro)"
           strokeWidth={2}
           dot={false}
-        />
+        >
+          <LabelList
+            position="top"
+            offset={12}
+            className="fill-foreground"
+            fontSize={12}
+          />
+        </Line>
         <Line
           dataKey="premium"
           type="monotone"
           stroke="var(--color-premium)"
           strokeWidth={2}
           dot={false}
-        />
+        >
+          <LabelList
+            position="top"
+            offset={12}
+            className="fill-foreground"
+            fontSize={12}
+          />
+        </Line>
       </LineChart>
     </ChartContainer>
   );
