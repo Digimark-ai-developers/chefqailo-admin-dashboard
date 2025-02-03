@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 
-import { TriangleAlert } from "lucide-react";
+import { Loader2, TriangleAlert } from "lucide-react";
 
 import { Button } from "./ui/button";
 import {
@@ -16,10 +16,17 @@ interface WarningModalProps {
   open: boolean;
   message: string;
   cta?: () => void;
+  loading?: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const WarningModal = ({ cta, open, message, setOpen }: WarningModalProps) => {
+const WarningModal = ({
+  cta,
+  open,
+  message,
+  loading,
+  setOpen,
+}: WarningModalProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-sm md:max-w-md">
@@ -45,6 +52,7 @@ const WarningModal = ({ cta, open, message, setOpen }: WarningModalProps) => {
             Cancel
           </Button>
           <Button
+            disabled={loading}
             onClick={() => {
               if (cta) {
                 cta();
@@ -55,7 +63,7 @@ const WarningModal = ({ cta, open, message, setOpen }: WarningModalProps) => {
             variant="destructive"
             size="default"
           >
-            Confirm
+            {loading ? <Loader2 className="animate-spin" /> : "Confirm"}
           </Button>
         </DialogFooter>
       </DialogContent>

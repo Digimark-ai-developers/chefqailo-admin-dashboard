@@ -145,7 +145,7 @@ export const columns: ColumnDef<User>[] = [
               title="Error"
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              description={response.error.error.data.message}
+              description={response.error.data.message}
             />
           ));
         }
@@ -201,12 +201,12 @@ export const columns: ColumnDef<User>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const { getIdToken } = useKindeAuth();
-      const [deleteUser] = useDeleteUserMutation();
       const [giftTokens] = useGiftTokensMutation();
       const [warn, setWarn] = useState<boolean>(false);
       const [open, setOpen] = useState<boolean>(false);
       const [message, setMessage] = useState<string>("");
       const [selected, setSelected] = useState<string>("");
+      const [deleteUser, { isLoading }] = useDeleteUserMutation();
 
       const handleDelete = async (id: number) => {
         let response = null;
@@ -234,7 +234,7 @@ export const columns: ColumnDef<User>[] = [
               title="Error"
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              description={response.error.error.data.message}
+              description={response.error.data.message}
             />
           ));
         }
@@ -281,6 +281,7 @@ export const columns: ColumnDef<User>[] = [
             open={warn}
             setOpen={setWarn}
             message={message}
+            loading={isLoading}
             cta={() => handleDelete(parseInt(selected))}
           />
           <DropdownMenu>

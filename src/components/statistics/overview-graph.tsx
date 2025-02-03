@@ -1,4 +1,11 @@
-import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
+import {
+  CartesianGrid,
+  LabelList,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import {
   ChartContainer,
@@ -42,8 +49,8 @@ const OverviewGraph = ({ data }: { data: OverallStats[] }) => {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 3)}
           />
+          <YAxis interval={0} width={10} />
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
           <Line
             dataKey="meal_plan_count"

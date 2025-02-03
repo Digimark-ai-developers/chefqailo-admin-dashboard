@@ -76,7 +76,7 @@ const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
                   Date
                 </span>
                 <span className="col-span-1 w-full text-center text-sm font-bold">
-                  Tokens
+                  Qailos
                 </span>
                 <span className="col-span-1 w-full text-center text-sm font-bold">
                   Price

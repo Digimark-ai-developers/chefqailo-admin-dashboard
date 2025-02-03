@@ -1,4 +1,11 @@
-import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
+import {
+  CartesianGrid,
+  LabelList,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import {
   ChartContainer,
@@ -33,8 +40,8 @@ const DataLine = ({ data }: { data: SubscriptionStats[] }) => {
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={(value) => value.slice(0, 3)}
         />
+        <YAxis interval={0} width={10} />
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Line
           dataKey="free"
@@ -65,9 +72,9 @@ const DataLine = ({ data }: { data: SubscriptionStats[] }) => {
           />
         </Line>
         <Line
-          dataKey="pro"
+          dataKey="standard"
           type="monotone"
-          stroke="var(--color-pro)"
+          stroke="var(--color-standard)"
           strokeWidth={2}
           dot={false}
         >

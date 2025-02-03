@@ -56,7 +56,7 @@ const Statistics = () => {
       token: `${accessToken}`,
     },
     {
-      skip: !activeTab,
+      skip: !activeTab || !accessToken,
       refetchOnMountOrArgChange: true,
     }
   );

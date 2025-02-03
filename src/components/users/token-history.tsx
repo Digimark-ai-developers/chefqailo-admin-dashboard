@@ -12,7 +12,7 @@ const TokenHistory = () => {
   return (
     <Card className="flex h-full w-full flex-col items-center justify-between p-2.5">
       <CardHeader className="flex w-full flex-row items-start justify-between gap-0 space-x-0 space-y-0 p-0">
-        <CardTitle>Token Usage History</CardTitle>
+        <CardTitle>Qailos Usage History</CardTitle>
       </CardHeader>
       <CardContent className="w-full p-0">
         <ChartContainer config={tokenHistoryConfig}>
