@@ -23,9 +23,9 @@ import AddPlanDialog from "./add-plan-dialog";
 
 const PlanCard = ({ plan }: { plan: Plan }) => {
   const { getIdToken } = useKindeAuth();
-  const [deletePlan] = useDeletePlanMutation();
   const [edit, setEdit] = useState<boolean>(false);
   const [warn, setWarn] = useState<boolean>(false);
+  const [deletePlan, { isLoading }] = useDeletePlanMutation();
 
   const handleDelete = async (id: number) => {
     let response = null;
@@ -50,7 +50,7 @@ const PlanCard = ({ plan }: { plan: Plan }) => {
           title="Error"
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          description={response.error.error.data.message}
+          description={response.error.data.message}
         />
       ));
     }
@@ -62,11 +62,12 @@ const PlanCard = ({ plan }: { plan: Plan }) => {
       <WarningModal
         open={warn}
         setOpen={setWarn}
+        loading={isLoading}
         message="Delete this Plan"
         cta={() => handleDelete(plan.id)}
       />
       <div className="flex w-full flex-col items-center justify-center gap-5 rounded-lg border p-2.5">
-        <div className="flex w-full items-center justify-center">
+        <div className="flex w-full items-start justify-center">
           <div className="flex flex-1 flex-col items-center justify-center">
             <span
               className={cn(
@@ -83,16 +84,9 @@ const PlanCard = ({ plan }: { plan: Plan }) => {
               </span>
             </p>
           </div>
-          <div
-            className={cn(
-              "flex size-[62px] items-center justify-center rounded-full",
-              `bg-[${plan.bgColor}]/30`
-            )}
-          >
-            <span className={cn("text-xl font-bold", `text-[${plan.bgColor}]`)}>
-              ${plan.amount}
-            </span>
-          </div>
+          <span className={cn("text-xl font-bold", `text-[${plan.bgColor}]`)}>
+            ${plan.amount}
+          </span>
         </div>
         <div className="flex w-full items-end justify-between gap-2.5">
           <Button

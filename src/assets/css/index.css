@@ -7,13 +7,14 @@
 * {
   margin: 0;
   padding: 0;
+  scrollbar-width: thin;
   box-sizing: border-box;
   scroll-behavior: smooth;
   font-family: "Poppins", sans-serif;
+  scrollbar-color: #e46c07 transparent;
 }
 
 ::-webkit-scrollbar {
-  display: none;
 }
 
 @layer base {
@@ -36,6 +37,23 @@
   textarea {
     @apply focus:outline-none focus:outline-0 focus:ring-0 focus-visible:outline-none focus-visible:outline-0 focus-visible:ring-0;
   }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e46c07;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c35f06;
 }
 
 @layer base {
@@ -120,4 +138,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

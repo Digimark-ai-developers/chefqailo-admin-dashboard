@@ -31,7 +31,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import WarningModal from "../warning-modal";
 
 interface AddPlanDialogProps {
   open: boolean;
@@ -39,14 +38,33 @@ interface AddPlanDialogProps {
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const planFormSchema = z.object({
-  payment_status: z.enum(["free", "basic", "standard", "premium"]),
-  amount: z.string(),
-});
+const planFormSchema = z
+  .object({
+    payment_status: z.enum(["free", "basic", "standard", "premium"], {
+      errorMap: () => ({
+        message:
+          "Please select a valid payment plan (Free, Basic, Standard, or Premium).",
+      }),
+    }),
+    amount: z
+      .string()
+      .refine((val) => !isNaN(Number(val)), {
+        message: "Amount must be a valid number.",
+      })
+      .refine((val) => Number(val) >= 0, {
+        message: "Amount cannot be negative.",
+      }),
+  })
+  .refine(
+    (data) => !(data.payment_status === "free" && Number(data.amount) !== 0),
+    {
+      message: "Amount must be 0 for a Free plan.",
+      path: ["amount"],
+    }
+  );
 
 const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
   const { getIdToken } = useKindeAuth();
-  const [warn, setWarn] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string>("");
   const [addPlan, { isLoading: adding }] = useAddPlanMutation();
   const [editPlan, { isLoading: editing }] = useEditPlanMutation();
@@ -116,10 +134,12 @@ const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
           title="Error"
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          description={response.error.error.data.message}
+          description={response.error.data.message}
         />
       ));
     }
+
+    form.reset();
   };
 
   useEffect(() => {
@@ -133,78 +153,81 @@ const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
   }, [getIdToken, data]);
 
   return (
-    <>
-      <WarningModal open={warn} setOpen={setWarn} message="Delete this Plan" />
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm md:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{id ? "Edit" : "Add"} Plan</DialogTitle>
-            <DialogDescription>
-              {id ? "Edit user here" : "Add a new plan here"}. Click save when
-              you're done.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="grid w-full grid-cols-2 gap-5"
-            >
-              <FormField
-                control={form.control}
-                name="payment_status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Plan Name</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="Premium" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-w-sm md:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{id ? "Edit" : "Add"} Plan</DialogTitle>
+          <DialogDescription>
+            {id ? "Edit user here" : "Add a new plan here"}. Click save when
+            you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid w-full grid-cols-2 gap-5"
+          >
+            <FormField
+              control={form.control}
+              name="payment_status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Plan Name</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder="Free" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Plan Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={9999}
+                      placeholder="0"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="col-span-2 flex w-full items-center justify-end gap-2.5">
+              <Button
+                onClick={() => setOpen(false)}
+                type="button"
+                variant="outline"
+                size="default"
+              >
+                Cancel
+              </Button>
+              <Button
+                disabled={adding || editing}
+                type="submit"
+                variant="default"
+                size="default"
+              >
+                {adding || editing ? (
+                  <div className="flex w-full items-center justify-center gap-2">
+                    <Loader2 className="animate-spin" />
+                    <span>Please Wait...</span>
+                  </div>
+                ) : (
+                  "Save changes"
                 )}
-              />
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Plan Amount</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="20" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="col-span-2 flex w-full items-center justify-end gap-2.5">
-                <Button
-                  onClick={() => setOpen(false)}
-                  type="button"
-                  variant="outline"
-                  size="default"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  disabled={adding || editing}
-                  type="submit"
-                  variant="default"
-                  size="default"
-                >
-                  {adding || editing ? (
-                    <div className="flex w-full items-center justify-center gap-2">
-                      <Loader2 className="animate-spin" />
-                      <span>Please Wait...</span>
-                    </div>
-                  ) : (
-                    "Save changes"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </>
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

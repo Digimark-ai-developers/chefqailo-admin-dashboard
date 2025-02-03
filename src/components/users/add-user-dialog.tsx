@@ -44,6 +44,7 @@ const userFormSchema = z.object({
   username: z
     .string()
     .min(3, { message: "Username must be at least 3 characters long" })
+    .max(10, { message: "Username must be at most 10 characters long" })
     .regex(/^[A-Za-z0-9]+$/, {
       message:
         "Username must only contain alphabets and numbers, no spaces or special characters",
@@ -75,7 +76,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   const { data } = useGetUserQuery(
     { id: `${id}`, token: `${accessToken}` },
     {
-      skip: !open || !accessToken || accessToken === "",
+      skip: !open || !accessToken || accessToken === "" || !id,
       refetchOnMountOrArgChange: true,
     }
   );
@@ -132,10 +133,13 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
           title="Error"
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          description={response.error.error.data.message}
+          description={response.error.data.message}
         />
       ));
     }
+
+    form.reset();
+    setImage(null);
   };
 
   useEffect(() => {

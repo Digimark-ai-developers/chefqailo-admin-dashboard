@@ -33,7 +33,6 @@ import WarningModal from "../warning-modal";
 
 const UserTable = () => {
   const { getIdToken } = useKindeAuth();
-  const [deleteUser] = useDeleteUserMutation();
   const [users, setUsers] = useState<User[]>([]);
   const [warn, setWarn] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
@@ -45,6 +44,7 @@ const UserTable = () => {
     skip: !accessToken || accessToken === "",
     refetchOnMountOrArgChange: true,
   });
+  const [deleteUser, { isLoading: deleting }] = useDeleteUserMutation();
 
   const handleToken = async () => {
     let token: string | undefined = "";
@@ -94,7 +94,7 @@ const UserTable = () => {
           type="error"
           title="Error"
           // @ts-ignore
-          description={`${response.error.error.data.message}`}
+          description={`${response.error.data.message}`}
         />
       ));
     }
@@ -120,7 +120,7 @@ const UserTable = () => {
           type="error"
           title="Error"
           // @ts-ignore
-          description={`${response.error.error.data.message}`}
+          description={`${response.error.data.message}`}
         />
       ));
     }
@@ -141,6 +141,7 @@ const UserTable = () => {
         open={warn}
         message={message}
         setOpen={setWarn}
+        loading={deleting}
         cta={() => handleDelete(selected)}
       />
       <div className="max-h-full w-full overflow-y-auto rounded-xl border">
@@ -214,7 +215,7 @@ const UserTable = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <span className="cursor-pointer rounded-full bg-primary/20 px-2 py-0.5 font-medium capitalize text-primary">
+                    <span className="rounded-full px-2 py-0.5 font-medium capitalize">
                       {user.payment_status}
                     </span>
                   </TableCell>

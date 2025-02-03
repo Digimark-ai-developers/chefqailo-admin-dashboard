@@ -1,4 +1,4 @@
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 import { lineChartConfig } from "@/lib/graph-specs";
 
@@ -39,6 +39,7 @@ const DataLine = ({
             });
           }}
         />
+        <YAxis interval={0} width={10} />
         <ChartTooltip
           content={
             <ChartTooltipContent
