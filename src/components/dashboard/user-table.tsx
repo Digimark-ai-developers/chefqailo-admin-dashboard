@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import { EllipsisVertical, Loader2 } from "lucide-react";
+import {
+  Activity,
+  Edit,
+  EllipsisVertical,
+  Gift,
+  Loader2,
+  Trash2,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -14,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn, truncateString } from "@/lib/utils";
+import { useGiftTokensMutation } from "@/store/services/token";
 import {
   useDeleteUserMutation,
   useGetAllUsersQuery,
@@ -33,6 +41,7 @@ import WarningModal from "../warning-modal";
 
 const UserTable = () => {
   const { getIdToken } = useKindeAuth();
+  const [giftTokens] = useGiftTokensMutation();
   const [users, setUsers] = useState<User[]>([]);
   const [warn, setWarn] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
@@ -133,6 +142,36 @@ const UserTable = () => {
       setUsers(data);
     }
   }, [data, getIdToken]);
+
+  const giftUserTokens = async (id: number) => {
+    let response = null;
+    const userToken = await getIdToken();
+
+    if (userToken) {
+      response = await giftTokens({
+        id,
+        token: userToken,
+      });
+    }
+
+    if (!response?.error) {
+      toast.custom(() => (
+        <CustomToast
+          type="success"
+          title="Success"
+          description="Successfully Gifted Tokens!"
+        />
+      ));
+    } else {
+      toast.custom(() => (
+        <CustomToast
+          type="error"
+          title="Error"
+          description="Failed to Gift Tokens!"
+        />
+      ));
+    }
+  };
 
   return (
     <>
@@ -235,7 +274,7 @@ const UserTable = () => {
                             setOpen(true);
                           }}
                         >
-                          Edit
+                          <Edit className="mr-2 h-4 w-4" /> Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => {
@@ -244,9 +283,17 @@ const UserTable = () => {
                             setWarn(true);
                           }}
                         >
+                          <Trash2 className="mr-2 h-4 w-4 text-red-500" />{" "}
                           Delete
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => giftUserTokens(user.id)}
+                        >
+                          <Gift className="mr-2 h-4 w-4 text-yellow-500" /> Gift
+                          Qailos
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
+                          <Activity className="mr-2 h-4 w-4 text-blue-500" />
                           <Link to="/users/habit-tracker">Habit Tracking</Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
