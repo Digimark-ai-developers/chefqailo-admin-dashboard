@@ -3,7 +3,15 @@ import { useEffect, useState } from "react";
 
 import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowDown, ArrowUpDown, EllipsisVertical } from "lucide-react";
+import {
+  Activity,
+  ArrowDown,
+  ArrowUpDown,
+  Edit,
+  EllipsisVertical,
+  Gift,
+  Trash2,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -295,7 +303,7 @@ export const columns: ColumnDef<User>[] = [
                   setOpen(true);
                 }}
               >
-                Edit
+                <Edit className="mr-2 h-4 w-4" /> Edit
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
@@ -304,7 +312,7 @@ export const columns: ColumnDef<User>[] = [
                   setWarn(true);
                 }}
               >
-                Delete
+                <Trash2 className="mr-2 h-4 w-4 text-red-500" /> Delete
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
@@ -312,9 +320,10 @@ export const columns: ColumnDef<User>[] = [
                   giftUserTokens(row.getAllCells()[0].row.original.id);
                 }}
               >
-                Gift Tokens
+                <Gift className="mr-2 h-4 w-4 text-yellow-500" /> Gift Qailos
               </DropdownMenuItem>
               <DropdownMenuItem>
+                <Activity className="mr-2 h-4 w-4 text-blue-500" />
                 <Link to="/users/habit-tracker">Habit Tracking</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
