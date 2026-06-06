@@ -9,10 +9,13 @@ const unwrapData = <T>(response: ApiEnvelope<T> | T): T => {
   if (
     response &&
     typeof response === "object" &&
-    "data" in response &&
-    (response as ApiEnvelope<T>).data !== undefined
+    "data" in response
   ) {
-    return (response as ApiEnvelope<T>).data;
+    const payload = (response as ApiEnvelope<T>).data;
+
+    if (payload !== undefined) {
+      return payload;
+    }
   }
 
   return response as T;
