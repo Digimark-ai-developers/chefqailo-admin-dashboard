@@ -1,7 +1,6 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,6 +11,7 @@ import {
   useEditPlanMutation,
   useGetPlanQuery,
 } from "@/store/services/subscriptions";
+import { getAdminAccessToken } from "@/lib/admin-auth";
 
 import { Button } from "../ui/button";
 import CustomToast from "../ui/custom-toast";
@@ -64,7 +64,6 @@ const planFormSchema = z
   );
 
 const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
-  const { getIdToken } = useKindeAuth();
   const [accessToken, setAccessToken] = useState<string>("");
   const [addPlan, { isLoading: adding }] = useAddPlanMutation();
   const [editPlan, { isLoading: editing }] = useEditPlanMutation();
@@ -84,11 +83,7 @@ const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
   });
 
   const handleToken = async () => {
-    let token: string | undefined = "";
-
-    if (getIdToken) {
-      token = await getIdToken();
-    }
+    const token = getAdminAccessToken();
 
     if (token) {
       setAccessToken(token);
@@ -150,7 +145,7 @@ const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
       form.setValue("payment_status", data.payment_status);
       form.setValue("amount", String(data.amount));
     }
-  }, [getIdToken, data]);
+  }, [data]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

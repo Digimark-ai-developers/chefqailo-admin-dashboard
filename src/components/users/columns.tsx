@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   Activity,
@@ -15,6 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
+import { getAdminAccessToken } from "@/lib/admin-auth";
 import { truncateString } from "@/lib/utils";
 import { useGiftTokensMutation } from "@/store/services/token";
 import {
@@ -117,19 +117,7 @@ export const columns: ColumnDef<User>[] = [
       return filterValue ? `${cellValue}` === filterValue : true;
     },
     cell: ({ row }) => {
-      const { getIdToken } = useKindeAuth();
-      const [accessToken, setAccessToken] = useState<string>("");
-      const handleToken = async () => {
-        let token: string | undefined = "";
-
-        if (getIdToken) {
-          token = await getIdToken();
-        }
-
-        if (token) {
-          setAccessToken(token);
-        }
-      };
+      const accessToken = getAdminAccessToken();
       const [toggleActive] = useToggleUserStatusMutation();
 
       const changeUserStatus = async (id: string) => {
@@ -158,10 +146,6 @@ export const columns: ColumnDef<User>[] = [
           ));
         }
       };
-
-      useEffect(() => {
-        handleToken();
-      }, [getIdToken]);
 
       return (
         <Switch
@@ -208,7 +192,6 @@ export const columns: ColumnDef<User>[] = [
     header: "Actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const { getIdToken } = useKindeAuth();
       const [giftTokens] = useGiftTokensMutation();
       const [warn, setWarn] = useState<boolean>(false);
       const [open, setOpen] = useState<boolean>(false);
@@ -218,7 +201,7 @@ export const columns: ColumnDef<User>[] = [
 
       const handleDelete = async (id: number) => {
         let response = null;
-        const userToken = await getIdToken();
+        const userToken = getAdminAccessToken();
 
         if (userToken) {
           response = await deleteUser({
@@ -250,7 +233,7 @@ export const columns: ColumnDef<User>[] = [
 
       const giftUserTokens = async (id: number) => {
         let response = null;
-        const userToken = await getIdToken();
+        const userToken = getAdminAccessToken();
 
         if (userToken) {
           response = await giftTokens({

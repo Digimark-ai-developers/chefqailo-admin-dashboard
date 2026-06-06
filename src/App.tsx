@@ -4,6 +4,7 @@ import Layout from "./components/layout";
 import RouteGuard from "./components/route-guard";
 import Dashboard from "./pages/dashboard";
 import HabitTracker from "./pages/habit-tracker";
+import InfluencerReferrals from "./pages/influencer-referrals";
 import Login from "./pages/login";
 import Statistics from "./pages/statistics";
 import Subscriptions from "./pages/subscriptions";
@@ -25,6 +26,10 @@ const App = () => {
         <Route path="/users/habit-tracker" element={<HabitTracker />} />
         <Route path="statistics" element={<Statistics />} />
         <Route path="subscriptions" element={<Subscriptions />} />
+        <Route
+          path="influencer-referrals"
+          element={<InfluencerReferrals />}
+        />
       </Route>
     </Routes>
   );

@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Edit, Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
+import { getAdminAccessToken } from "@/lib/admin-auth";
 import { useDeletePlanMutation } from "@/store/services/subscriptions";
 
 import { Button } from "../ui/button";
@@ -22,14 +22,13 @@ import AddPlanDialog from "./add-plan-dialog";
 // bg-[hsl(var(--chart-4))]/30
 
 const PlanCard = ({ plan }: { plan: Plan }) => {
-  const { getIdToken } = useKindeAuth();
   const [edit, setEdit] = useState<boolean>(false);
   const [warn, setWarn] = useState<boolean>(false);
   const [deletePlan, { isLoading }] = useDeletePlanMutation();
 
   const handleDelete = async (id: number) => {
     let response = null;
-    const userToken = await getIdToken();
+    const userToken = getAdminAccessToken();
 
     if (userToken) {
       response = await deletePlan({ id: `${id}`, token: userToken });

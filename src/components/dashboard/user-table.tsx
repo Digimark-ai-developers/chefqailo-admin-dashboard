@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import {
   Activity,
   Edit,
@@ -20,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getAdminAccessToken } from "@/lib/admin-auth";
 import { cn, truncateString } from "@/lib/utils";
 import { useGiftTokensMutation } from "@/store/services/token";
 import {
@@ -40,7 +40,6 @@ import AddUserDialog from "../users/add-user-dialog";
 import WarningModal from "../warning-modal";
 
 const UserTable = () => {
-  const { getIdToken } = useKindeAuth();
   const [giftTokens] = useGiftTokensMutation();
   const [users, setUsers] = useState<User[]>([]);
   const [warn, setWarn] = useState<boolean>(false);
@@ -56,11 +55,7 @@ const UserTable = () => {
   const [deleteUser, { isLoading: deleting }] = useDeleteUserMutation();
 
   const handleToken = async () => {
-    let token: string | undefined = "";
-
-    if (getIdToken) {
-      token = await getIdToken();
-    }
+    const token = getAdminAccessToken();
 
     if (token) {
       setAccessToken(token);
@@ -89,7 +84,7 @@ const UserTable = () => {
           description="Successfully Changed User Status!"
         />
       ));
-    } catch (error) {
+    } catch {
       setUsers((prev) =>
         prev.map((user) =>
           user.id === parseInt(id)
@@ -102,8 +97,7 @@ const UserTable = () => {
         <CustomToast
           type="error"
           title="Error"
-          // @ts-ignore
-          description={`${response.error.data.message}`}
+          description="Failed to change user status."
         />
       ));
     }
@@ -141,11 +135,11 @@ const UserTable = () => {
     if (data) {
       setUsers(data);
     }
-  }, [data, getIdToken]);
+  }, [data]);
 
   const giftUserTokens = async (id: number) => {
     let response = null;
-    const userToken = await getIdToken();
+    const userToken = getAdminAccessToken();
 
     if (userToken) {
       response = await giftTokens({

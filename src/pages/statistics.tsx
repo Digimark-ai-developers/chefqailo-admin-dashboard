@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { ChevronDown, Loader2 } from "lucide-react";
 
 import NonVaryingUsageGraph from "@/components/statistics/non-varying-usage-graph";
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { features } from "@/lib/constants";
+import { getAdminAccessToken } from "@/lib/admin-auth";
 import {
   useGetFeatureUsageGraphQuery,
   useGetOverallStatsQuery,
@@ -46,7 +46,6 @@ const featureChangeEnum = {
 };
 
 const Statistics = () => {
-  const { getIdToken } = useKindeAuth();
   const [accessToken, setAccessToken] = useState<string>("");
   const [feature, setFeature] = useState<keyof typeof featureEnum>("overview");
   const [activeTab, setActiveTab] = useState<string>("weekly");
@@ -84,11 +83,7 @@ const Statistics = () => {
   );
 
   const handleToken = async () => {
-    let token: string | undefined = "";
-
-    if (getIdToken) {
-      token = await getIdToken();
-    }
+    const token = getAdminAccessToken();
 
     if (token) {
       setAccessToken(token);
@@ -97,7 +92,7 @@ const Statistics = () => {
 
   useEffect(() => {
     handleToken();
-  }, [getIdToken]);
+  }, []);
 
   return (
     <div className="flex h-full w-full flex-col items-start justify-start gap-5">

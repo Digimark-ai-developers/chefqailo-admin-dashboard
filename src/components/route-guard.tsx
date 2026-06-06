@@ -1,21 +1,11 @@
 import { ReactNode } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import { Loader2 } from "lucide-react";
 import { Navigate } from "react-router-dom";
 
+import { isAdminAuthenticated } from "@/lib/admin-auth";
+
 const RouteGuard = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated, isLoading } = useKindeAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center overflow-hidden bg-background">
-        <Loader2 className="size-16 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
+  if (!isAdminAuthenticated()) {
     return <Navigate to="/" replace />;
   }
 

@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import { Mail } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { Loader2, Lock, Mail } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import LoginIconImg from "@/assets/img/login2.svg";
@@ -13,17 +12,75 @@ import { Button } from "@/components/ui/button";
 import CustomToast from "@/components/ui/custom-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  clearAdminSession,
+  extractAdminEmail,
+  extractAdminAccessToken,
+  extractAdminRefreshToken,
+  isAdminAuthenticated,
+  setAdminSession,
+} from "@/lib/admin-auth";
+import { useAdminLoginMutation } from "@/store/services/auth";
 
 const Login = () => {
-  const { login, logout } = useKindeAuth();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [adminLogin, { isLoading }] = useAdminLoginMutation();
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
+    if (!event.currentTarget.checkValidity()) {
+      setError("Please enter valid admin credentials.");
+      return;
+    }
+
+    setError("");
+
+    try {
+      const response = await adminLogin({
+        email: trimmedEmail,
+        password,
+      }).unwrap();
+      const accessToken = extractAdminAccessToken(response);
+      const refreshToken = extractAdminRefreshToken(response);
+      const sessionEmail = extractAdminEmail(response, trimmedEmail);
+
+      if (!accessToken) {
+        setError("Login succeeded, but no access token was returned.");
+        return;
+      }
+
+      setAdminSession({
+        accessToken,
+        refreshToken,
+        email: sessionEmail,
+      });
+      navigate("/dashboard", { replace: true });
+    } catch (loginError) {
+      const message =
+        loginError && typeof loginError === "object" && "data" in loginError
+          ? JSON.stringify((loginError as { data?: unknown }).data)
+          : "Unable to login. Please check your credentials and try again.";
+
+      setError(message);
+    }
+  };
 
   useEffect(() => {
     const intent = searchParams.get("intent");
     if (intent) {
       if (intent === "terminated") {
-        logout();
+        clearAdminSession();
         toast.custom(() => (
           <CustomToast
             type="error"
@@ -33,8 +90,11 @@ const Login = () => {
         ));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+
+    if (!intent && isAdminAuthenticated()) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate, searchParams]);
 
   return (
     <ThemeProvider>
@@ -47,7 +107,11 @@ const Login = () => {
             <div className="absolute right-5 top-5">
               <ModeToggle />
             </div>
-            <form className="mx-auto flex w-full flex-col items-center justify-center gap-5 p-5 lg:p-10">
+            <form
+              className="mx-auto flex w-full flex-col items-center justify-center gap-5 p-5 lg:p-10"
+              noValidate
+              onSubmit={handleSubmit}
+            >
               <img src={LoginIconImg} alt="login-icon-img" />
               <div className="flex flex-col items-center justify-center">
                 <span className="w-full text-center text-4xl font-extrabold">
@@ -64,26 +128,53 @@ const Login = () => {
                   <Input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setError("");
+                    }}
                     placeholder="johndoe@email.com"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? "login-email-error" : undefined}
+                    className="flex-1 border-none bg-transparent text-black shadow-none"
+                  />
+                </div>
+                {error ? (
+                  <p
+                    id="login-email-error"
+                    className="w-full text-left text-sm text-destructive"
+                  >
+                    {error}
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex w-full flex-col items-center justify-center gap-1.5">
+                <Label className="w-full text-left">Password</Label>
+                <div className="flex w-full items-center justify-center gap-2.5 rounded-md bg-white px-2.5 py-1.5">
+                  <Lock className="size-5 text-gray-500" />
+                  <Input
+                    type="password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="Admin password"
+                    aria-invalid={Boolean(error)}
                     className="flex-1 border-none bg-transparent text-black shadow-none"
                   />
                 </div>
               </div>
               <Button
                 type="submit"
+                disabled={isLoading}
                 className="w-full bg-primary text-white"
                 size="lg"
-                onClick={() =>
-                  login({
-                    authUrlParams: {
-                      connection_id: `${import.meta.env.VITE_KINDE_EMAIL_CONNECTION_ID}`,
-                      login_hint: email,
-                    },
-                  })
-                }
               >
-                Login
+                {isLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  "Login"
+                )}
               </Button>
             </form>
           </div>

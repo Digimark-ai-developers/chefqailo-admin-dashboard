@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { CircleDollarSign, Loader2, User2, Users } from "lucide-react";
 
 import DataArea from "@/components/dashboard/data-area";
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSidebar } from "@/components/ui/sidebar";
 import { lineChartConfig } from "@/lib/graph-specs";
+import { getAdminAccessToken } from "@/lib/admin-auth";
 import { cn } from "@/lib/utils";
 import {
   useGetStatsGraphQuery,
@@ -26,7 +26,6 @@ import {
 
 const Dashboard = () => {
   const { open } = useSidebar();
-  const { getIdToken } = useKindeAuth();
   const [activeChart, setActiveChart] =
     useState<keyof typeof lineChartConfig>("inactive");
   const [selectedStat, setSelectedStat] = useState<
@@ -50,11 +49,7 @@ const Dashboard = () => {
   );
 
   const handleToken = async () => {
-    let token: string | undefined = "";
-
-    if (getIdToken) {
-      token = await getIdToken();
-    }
+    const token = getAdminAccessToken();
 
     if (token) {
       setAccessToken(token);
@@ -100,7 +95,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     handleToken();
-  }, [getIdToken]);
+  }, []);
 
   return (
     <div className="flex h-full w-full flex-col gap-2.5 overflow-y-auto lg:grid lg:grid-rows-3 lg:overflow-hidden">

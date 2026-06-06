@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,6 +15,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getAdminAccessToken } from "@/lib/admin-auth";
 import { cn } from "@/lib/utils";
 import {
   useGetPlansQuery,
@@ -23,7 +23,6 @@ import {
 } from "@/store/services/subscriptions";
 
 const Subscriptions = () => {
-  const { getIdToken } = useKindeAuth();
   const [add, setAdd] = useState<boolean>(false);
   const [position, setPosition] = useState<string>("weekly");
   const [accessToken, setAccessToken] = useState<string>("");
@@ -43,11 +42,7 @@ const Subscriptions = () => {
   });
 
   const handleToken = async () => {
-    let token: string | undefined = "";
-
-    if (getIdToken) {
-      token = await getIdToken();
-    }
+    const token = getAdminAccessToken();
 
     if (token) {
       setAccessToken(token);
@@ -56,7 +51,7 @@ const Subscriptions = () => {
 
   useEffect(() => {
     handleToken();
-  }, [getIdToken]);
+  }, []);
 
   return (
     <>

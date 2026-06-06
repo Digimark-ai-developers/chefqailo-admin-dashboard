@@ -91,3 +91,140 @@ declare type SubscriptionStats = {
   pro: number;
   premium: number;
 };
+
+declare type ApiEnvelope<T> = {
+  status_code?: number;
+  message?: string;
+  data?: T;
+};
+
+declare type ApiMessage<T = unknown> = ApiEnvelope<T> & {
+  message?: string;
+};
+
+declare type PaginatedResponse<T> = {
+  count: number;
+  next?: string | null;
+  previous?: string | null;
+  results: T[];
+};
+
+declare type InfluencerUserPayload = {
+  username: string;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  country: string;
+  state: string;
+};
+
+declare type InfluencerProfilePayload = {
+  display_name: string;
+  social_platform: string;
+  social_handle: string;
+  is_active: boolean;
+};
+
+declare type ReferralCodePayload = {
+  influencer_id: number;
+  code: string;
+  discount_percentage: string;
+  max_redemptions: number;
+  valid_from: string;
+  valid_until: string;
+  is_active: boolean;
+};
+
+declare type InitialReferralCodePayload = Omit<
+  ReferralCodePayload,
+  "influencer_id"
+>;
+
+declare type InfluencerOnboardingPayload = {
+  user: InfluencerUserPayload;
+  influencer: InfluencerProfilePayload;
+  referral_code: InitialReferralCodePayload;
+};
+
+declare type ReferralUser = {
+  id?: number;
+  username?: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  country?: string;
+  state?: string;
+};
+
+declare type Influencer = {
+  id: number;
+  display_name: string;
+  user_id?: number;
+  user?: ReferralUser | number;
+  social_platform: string;
+  social_handle: string;
+  is_active: boolean;
+  created_at?: string;
+};
+
+declare type InfluencerDetail = Influencer & {
+  referral_codes?: ReferralCode[];
+};
+
+declare type ReferralCode = {
+  id: number;
+  influencer_id?: number;
+  influencer?: Influencer | number;
+  influencer_name?: string;
+  code: string;
+  discount_percentage: string;
+  current_redemptions?: number;
+  max_redemptions: number;
+  valid_from: string;
+  valid_until: string;
+  is_active: boolean;
+  is_valid?: boolean;
+  valid?: boolean;
+  invalid_reason?: string | null;
+};
+
+declare type ReferralCodeDetail = ReferralCode;
+
+declare type InfluencerAnalytics = {
+  influencer_id: number;
+  total_codes: number;
+  total_redemptions: number;
+  total_discount_given: string;
+  total_subscription_revenue: string;
+};
+
+declare type ReferralValidationResponse = {
+  valid: boolean;
+  discount_percentage?: string;
+  influencer_name?: string;
+  message: string;
+};
+
+declare type AdminLoginPayload = {
+  email: string;
+  password: string;
+};
+
+declare type AdminLoginResponse = {
+  access?: string;
+  access_token?: string;
+  token?: string;
+  accessToken?: string;
+  message?: string;
+  data?: {
+    access?: string;
+    access_token?: string;
+    token?: string;
+    tokens?: {
+      access?: string;
+    };
+  };
+};

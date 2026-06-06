@@ -1,7 +1,6 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,6 +11,7 @@ import {
   useGetUserQuery,
   usePostUserMutation,
 } from "@/store/services/user";
+import { getAdminAccessToken } from "@/lib/admin-auth";
 
 import { Button } from "../ui/button";
 import CustomToast from "../ui/custom-toast";
@@ -65,7 +65,6 @@ const userFormSchema = z.object({
 });
 
 const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
-  const { getIdToken } = useKindeAuth();
   const [accessToken, setAccessToken] = useState<string>("");
   const [image, setImage] = useState<string | File | null>(null);
 
@@ -85,11 +84,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   const [editUser, { isLoading: editing }] = useEditUserMutation();
 
   const handleToken = async () => {
-    let token: string | undefined = "";
-
-    if (getIdToken) {
-      token = await getIdToken();
-    }
+    const token = getAdminAccessToken();
 
     if (token) {
       setAccessToken(token);
@@ -152,7 +147,7 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
       form.setValue("lastName", data.last_name);
       form.setValue("firstName", data.first_name);
     }
-  }, [getIdToken, data]);
+  }, [data]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

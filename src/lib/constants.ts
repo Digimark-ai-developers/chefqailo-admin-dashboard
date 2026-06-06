@@ -1,4 +1,10 @@
-import { BadgeCheck, ChartSpline, LayoutDashboard, User } from "lucide-react";
+import {
+  BadgeCheck,
+  ChartSpline,
+  LayoutDashboard,
+  TicketPercent,
+  User,
+} from "lucide-react";
 
 export const items = [
   {
@@ -20,6 +26,11 @@ export const items = [
     title: "Subscriptions",
     url: "/subscriptions",
     icon: BadgeCheck,
+  },
+  {
+    title: "Influencer Referrals",
+    url: "/influencer-referrals",
+    icon: TicketPercent,
   },
 ];
 

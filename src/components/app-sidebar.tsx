@@ -1,8 +1,7 @@
 import { useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 import { Power } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import LogoImage from "@/assets/img/login2.svg";
 import {
@@ -15,6 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { clearAdminSession, getAdminSession } from "@/lib/admin-auth";
 import { items } from "@/lib/constants";
 import { cn, truncateString } from "@/lib/utils";
 
@@ -23,8 +23,13 @@ import WarningModal from "./warning-modal";
 
 const AppSidebar = () => {
   const { pathname } = useLocation();
-  const { user, logout } = useKindeAuth();
+  const navigate = useNavigate();
+  const session = getAdminSession();
   const [open, setOpen] = useState<boolean>(false);
+  const logout = () => {
+    clearAdminSession();
+    navigate("/", { replace: true });
+  };
 
   return (
     <>
@@ -72,10 +77,10 @@ const AppSidebar = () => {
             />
             <div className="flex w-full flex-col items-center justify-center gap-1">
               <span className="w-full overflow-hidden truncate text-left text-sm font-semibold">
-                {user?.given_name}&nbsp;{user?.family_name}
+                Admin
               </span>
               <span className="w-full overflow-hidden truncate text-left text-xs font-light">
-                {truncateString(`${user?.email}`, 19)}
+                {truncateString(`${session?.email ?? "admin"}`, 19)}
               </span>
             </div>
             <Button

@@ -1,7 +1,6 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-
+import { getAdminAccessToken } from "@/lib/admin-auth";
 import { cn, truncateString } from "@/lib/utils";
 import { useGetUserQuery } from "@/store/services/user";
 
@@ -15,7 +14,6 @@ interface SheetTriggerProps {
 }
 
 const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
-  const { getIdToken } = useKindeAuth();
   const [accessToken, setAccessToken] = useState<string>("");
 
   const { data } = useGetUserQuery(
@@ -27,11 +25,7 @@ const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
   );
 
   const handleToken = async () => {
-    let token: string | undefined = "";
-
-    if (getIdToken) {
-      token = await getIdToken();
-    }
+    const token = getAdminAccessToken();
 
     if (token) {
       setAccessToken(token);
@@ -40,7 +34,7 @@ const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
 
   useEffect(() => {
     handleToken();
-  }, [getIdToken]);
+  }, []);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
