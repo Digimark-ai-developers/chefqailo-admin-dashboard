@@ -2,8 +2,14 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { clearAdminSession } from "@/lib/admin-auth";
 
+const fallbackBaseApiUrl =
+  "https://chefqailoapi.icyfield-144705e0.westus2.azurecontainerapps.io";
+
+const baseApiUrl =
+  import.meta.env.VITE_BASE_API_URL?.trim() || fallbackBaseApiUrl;
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_BASE_API_URL,
+  baseUrl: baseApiUrl,
 });
 
 const baseQueryWith401Handling: typeof baseQuery = async (
