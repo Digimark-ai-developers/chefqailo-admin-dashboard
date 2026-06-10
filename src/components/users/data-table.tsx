@@ -16,7 +16,6 @@ import {
   ChevronRight,
   Filter,
   Loader2,
-  Plus,
   X,
 } from "lucide-react";
 
@@ -189,10 +188,6 @@ const DataTable = <TData, TValue>({
               ) : null}
             </Button>
           </div>
-          {/* <Button onClick={() => setAddUser(true)} type="button" size="default">
-            <Plus />
-            <span>Add User</span>
-          </Button> */}
         </div>
         <div className="h-[calc(100vh-212px)] w-full">
           <div className="h-full w-full overflow-hidden rounded-lg border">
