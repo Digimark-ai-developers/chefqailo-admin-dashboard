@@ -6,12 +6,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { getAdminAccessToken } from "@/lib/admin-auth";
 import {
   useEditUserMutation,
   useGetUserQuery,
   usePostUserMutation,
 } from "@/store/services/user";
-import { getAdminAccessToken } from "@/lib/admin-auth";
 
 import { Button } from "../ui/button";
 import CustomToast from "../ui/custom-toast";
@@ -140,12 +140,12 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   useEffect(() => {
     handleToken();
 
-    if (data) {
-      setImage(data.image);
-      form.setValue("email", data.email);
-      form.setValue("username", data.username);
-      form.setValue("lastName", data.last_name);
-      form.setValue("firstName", data.first_name);
+    if (data?.user) {
+      setImage(data.user.image);
+      form.setValue("email", data.user.email);
+      form.setValue("username", data.user.username);
+      form.setValue("lastName", data.user.last_name);
+      form.setValue("firstName", data.user.first_name);
     }
   }, [data]);
 

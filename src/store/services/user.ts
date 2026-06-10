@@ -216,9 +216,9 @@ export const userApi = api.injectEndpoints({
       providesTags: ["Users"],
       transformResponse: normalizeUsersResponse,
     }),
-    getUser: build.query({
+    getUser: build.query<UserDetail, { id: string; token: string }>({
       query: ({ id, token }: { id: string; token: string }) => ({
-        url: `/get-user-data/${id}/`,
+        url: `/api/admin_app/get-user-data/${id}/`,
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       }),
@@ -226,7 +226,7 @@ export const userApi = api.injectEndpoints({
       transformResponse: (response: {
         status_code: number;
         message: string;
-        data: User;
+        data: UserDetail;
       }) => response.data,
     }),
     getUserStats: build.query<Card[], GetUserStatsArgs>({

@@ -17,10 +17,50 @@ declare type User = {
   first_name: string;
   last_name: string;
   email: string;
-  payment_status: "Free" | "Basic" | "Pro" | "Premium";
+  payment_status: string;
+  is_paid?: boolean;
   is_active: boolean;
   image: string;
   createdAt: string;
+};
+
+declare type UserQailos = {
+  purchased: string;
+  used: string;
+  remaining: string;
+  reserved: string;
+  available: string;
+};
+
+declare type UserPackage = {
+  id: number;
+  user: number;
+  package_name: string;
+  package_identifier: string;
+  expires_at: string;
+  qailos_added: string;
+  qailos_used: string;
+  amount: string;
+  currency: string;
+  payment_method: string;
+  transaction_id: string;
+  promo_code: string | null;
+  influencer_id: number | null;
+  influencer_name: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+declare type UserSubscription = Partial<UserPackage> & {
+  id: number;
+  status?: string;
+};
+
+declare type UserDetail = {
+  user: User;
+  qailos: UserQailos;
+  current_package: UserPackage | null;
+  subscriptions: UserSubscription[];
 };
 
 declare type UsersResponse = {
