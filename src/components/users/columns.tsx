@@ -1,40 +1,22 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useState } from "react";
-
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  Activity,
-  ArrowDown,
-  ArrowUpDown,
-  Edit,
-  EllipsisVertical,
-  Gift,
-  Trash2,
-} from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowDown, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 
 import { getAdminAccessToken } from "@/lib/admin-auth";
 import { truncateString } from "@/lib/utils";
-import { useGiftTokensMutation } from "@/store/services/token";
-import {
-  useDeleteUserMutation,
-  useToggleUserStatusMutation,
-} from "@/store/services/user";
+import { useToggleUserStatusMutation } from "@/store/services/user";
 
 import { Button } from "../ui/button";
 import CustomToast from "../ui/custom-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Switch } from "../ui/switch";
-import WarningModal from "../warning-modal";
-import AddUserDialog from "./add-user-dialog";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -184,134 +166,6 @@ export const columns: ColumnDef<User>[] = [
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-      );
-    },
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const [giftTokens] = useGiftTokensMutation();
-      const [warn, setWarn] = useState<boolean>(false);
-      const [open, setOpen] = useState<boolean>(false);
-      const [message, setMessage] = useState<string>("");
-      const [selected, setSelected] = useState<string>("");
-      const [deleteUser, { isLoading }] = useDeleteUserMutation();
-
-      const handleDelete = async (id: number) => {
-        let response = null;
-        const userToken = getAdminAccessToken();
-
-        if (userToken) {
-          response = await deleteUser({
-            id: `${id}`,
-            token: userToken,
-          });
-        }
-
-        if (!response?.error) {
-          toast.custom(() => (
-            <CustomToast
-              type="success"
-              title="Success"
-              description="Successfully Deleted User!"
-            />
-          ));
-        } else {
-          toast.custom(() => (
-            <CustomToast
-              type="error"
-              title="Error"
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              description={response.error.data.message}
-            />
-          ));
-        }
-      };
-
-      const giftUserTokens = async (id: number) => {
-        let response = null;
-        const userToken = getAdminAccessToken();
-
-        if (userToken) {
-          response = await giftTokens({
-            id,
-            token: userToken,
-          });
-        }
-
-        if (!response?.error) {
-          toast.custom(() => (
-            <CustomToast
-              type="success"
-              title="Success"
-              description="Successfully Gifted Tokens!"
-            />
-          ));
-        } else {
-          toast.custom(() => (
-            <CustomToast
-              type="error"
-              title="Error"
-              description="Failed to Gift Tokens!"
-            />
-          ));
-        }
-      };
-
-      return (
-        <>
-          <AddUserDialog
-            id={parseInt(selected)}
-            open={open}
-            setOpen={setOpen}
-          />
-          <WarningModal
-            open={warn}
-            setOpen={setWarn}
-            message={message}
-            loading={isLoading}
-            cta={() => handleDelete(parseInt(selected))}
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <EllipsisVertical />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="mr-5 w-auto">
-              <DropdownMenuItem
-                onClick={() => {
-                  setSelected(`${row.getAllCells()[0].row.original.id}`);
-                  setOpen(true);
-                }}
-              >
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSelected(`${row.getAllCells()[0].row.original.id}`);
-                  setMessage("delete this user");
-                  setWarn(true);
-                }}
-              >
-                <Trash2 className="mr-2 h-4 w-4 text-red-500" /> Delete
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSelected(`${row.getAllCells()[0].row.original.id}`);
-                  giftUserTokens(row.getAllCells()[0].row.original.id);
-                }}
-              >
-                <Gift className="mr-2 h-4 w-4 text-yellow-500" /> Gift Qailos
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Activity className="mr-2 h-4 w-4 text-blue-500" />
-                <Link to="/users/habit-tracker">Habit Tracking</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
       );
     },
   },

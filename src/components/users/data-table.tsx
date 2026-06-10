@@ -7,22 +7,30 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUp, Plus } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  Loader2,
+  Plus,
+  X,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 import { Button } from "../ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 import { Input } from "../ui/input";
 import {
   Table,
@@ -38,35 +46,60 @@ import UserBar from "./user-bar";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isFetching?: boolean;
+  startDate: string;
+  endDate: string;
+  isDateFilterActive: boolean;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalCount: number;
+  onStartDateChange: (value: string) => void;
+  onEndDateChange: (value: string) => void;
+  onApplyDateFilters: () => void;
+  onClearDateFilters: () => void;
+  onNextPage: () => void;
+  onPreviousPage: () => void;
 }
 
 const DataTable = <TData, TValue>({
   columns,
   data,
+  isFetching = false,
+  startDate,
+  endDate,
+  isDateFilterActive,
+  page,
+  pageSize,
+  totalPages,
+  totalCount,
+  onStartDateChange,
+  onEndDateChange,
+  onApplyDateFilters,
+  onClearDateFilters,
+  onNextPage,
+  onPreviousPage,
 }: DataTableProps<TData, TValue>) => {
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 20,
-  });
   const [open, setOpen] = useState<boolean>(false);
+  const [filterOpen, setFilterOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>("");
   const [addUser, setAddUser] = useState<boolean>(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const normalizedTotalPages = Math.max(1, totalPages);
+  const canGoPrevious = page > 1 && !isFetching;
+  const canGoNext = page < normalizedTotalPages && !isFetching;
 
   const table = useReactTable({
     data,
     columns,
     onSortingChange: setSorting,
-    onPaginationChange: setPagination,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      pagination,
       columnFilters,
     },
   });
@@ -75,22 +108,91 @@ const DataTable = <TData, TValue>({
     <>
       <UserBar open={open} setOpen={setOpen} id={selected} />
       <AddUserDialog open={addUser} setOpen={setAddUser} />
+      <Dialog open={filterOpen} onOpenChange={setFilterOpen}>
+        <DialogContent className="max-w-sm md:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Filter users</DialogTitle>
+            <DialogDescription>
+              Select a created date range for the users list.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <label className="flex flex-col gap-1 text-sm font-medium">
+              Start date
+              <Input
+                type="date"
+                value={startDate}
+                max={endDate || undefined}
+                onChange={(event) => onStartDateChange(event.target.value)}
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm font-medium">
+              End date
+              <Input
+                type="date"
+                value={endDate}
+                min={startDate || undefined}
+                onChange={(event) => onEndDateChange(event.target.value)}
+              />
+            </label>
+          </div>
+          <DialogFooter className="gap-2.5">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => {
+                table.resetColumnFilters();
+                onClearDateFilters();
+                setFilterOpen(false);
+              }}
+              disabled={isFetching}
+            >
+              <X className="size-4" />
+              Remove all filters
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                onApplyDateFilters();
+                setFilterOpen(false);
+              }}
+              disabled={!startDate || !endDate || isFetching}
+            >
+              <Check className="size-4" />
+              Apply filters
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="flex h-full w-full flex-col items-start justify-start gap-2.5 rounded-xl border p-2.5">
-        <div className="flex w-full items-center justify-between gap-2.5">
-          <Input
-            placeholder="Filter by name..."
-            value={
-              (table.getColumn("username")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("username")?.setFilterValue(event.target.value)
-            }
-            className="flex-1 md:max-w-sm md:flex-none"
-          />
-          <Button onClick={() => setAddUser(true)} type="button" size="default">
+        <div className="flex w-full flex-col gap-2.5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="grid w-full grid-cols-1 gap-2.5 md:grid-cols-[minmax(180px,1fr)_auto] xl:max-w-xl">
+            <Input
+              placeholder="Filter by name..."
+              value={
+                (table.getColumn("username")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("username")?.setFilterValue(event.target.value)
+              }
+            />
+            <Button
+              type="button"
+              variant={isDateFilterActive ? "default" : "outline"}
+              onClick={() => setFilterOpen(true)}
+              className="relative"
+            >
+              <Filter className="size-4" />
+              Filters
+              {isDateFilterActive ? (
+                <span className="absolute -right-1 -top-1 size-2 rounded-full bg-primary-foreground ring-2 ring-primary" />
+              ) : null}
+            </Button>
+          </div>
+          {/* <Button onClick={() => setAddUser(true)} type="button" size="default">
             <Plus />
             <span>Add User</span>
-          </Button>
+          </Button> */}
         </div>
         <div className="h-[calc(100vh-212px)] w-full">
           <div className="h-full w-full overflow-hidden rounded-lg border">
@@ -161,48 +263,41 @@ const DataTable = <TData, TValue>({
           </div>
         </div>
         <div className="flex w-full items-center justify-between">
-          <div className="flex flex-1 items-start justify-start">
-            <span className="w-full text-left text-sm text-muted-foreground">
-              Page&nbsp;{table.getState().pagination.pageIndex + 1} of&nbsp;
-              {table.getPageCount().toLocaleString()}
+          <div className="flex flex-1 items-center justify-start gap-3">
+            <span className="text-left text-sm text-muted-foreground">
+              Items per page: {data.length}/{pageSize}
             </span>
+            <span className="text-left text-sm text-muted-foreground">
+              Total users: {totalCount.toLocaleString()}
+            </span>
+            <span className="text-left text-sm text-muted-foreground">
+              Page&nbsp;{page}
+              {totalCount > data.length || page > 1
+                ? ` of ${normalizedTotalPages.toLocaleString()}`
+                : null}
+            </span>
+            {isFetching ? (
+              <Loader2 className="size-4 animate-spin text-primary" />
+            ) : null}
           </div>
           <div className="flex items-center justify-center space-x-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Rows
-                  <ArrowUp />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuRadioGroup
-                  value={`${table.getState().pagination.pageSize}`}
-                  onValueChange={(e) => {
-                    table.setPageSize(Number(e));
-                  }}
-                >
-                  <DropdownMenuRadioItem value="10">10</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="15">15</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="20">20</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
+              onClick={onPreviousPage}
+              disabled={!canGoPrevious}
             >
+              <ChevronLeft className="size-4" />
               Previous
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
+              onClick={onNextPage}
+              disabled={!canGoNext}
             >
               Next
+              <ChevronRight className="size-4" />
             </Button>
           </div>
         </div>
