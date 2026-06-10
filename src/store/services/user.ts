@@ -47,7 +47,6 @@ type GetAllUsersArgs =
       limit?: number;
       startDate?: string;
       endDate?: string;
-      url?: string | null;
     };
 
 type GetUserStatsArgs =
@@ -67,6 +66,29 @@ type GetStatsGraphArgs =
       startDate?: string;
       endDate?: string;
     };
+
+type GetPaidGraphArgs =
+  | string
+  | {
+      token: string;
+      period?: StatsDatePeriod;
+      startDate?: string;
+      endDate?: string;
+    };
+
+type PaidGraphResponse = {
+  chart1: {
+    month: string;
+    unpaid: number;
+    paid: number;
+  }[];
+  chart2: {
+    month: string;
+    free: number;
+    standard: number;
+    premium: number;
+  }[];
+};
 
 const normalizeUsersResponse = (response: unknown): PaginatedResponse<User> => {
   const getStringValue = (value: unknown) =>
@@ -104,18 +126,24 @@ const normalizeUsersResponse = (response: unknown): PaginatedResponse<User> => {
     const data = payload as {
       count?: number;
       next?: string | null;
+      page?: number;
+      limit?: number;
       previous?: string | null;
       results?: User[];
       total?: number;
       total_count?: number;
+      total_pages?: number;
       total_users?: number;
       users?: User[];
       pagination?: {
         count?: number;
+        page?: number;
+        limit?: number;
         next?: string | null;
         previous?: string | null;
         total?: number;
         total_count?: number;
+        total_pages?: number;
         total_users?: number;
       };
     };
@@ -133,9 +161,15 @@ const normalizeUsersResponse = (response: unknown): PaginatedResponse<User> => {
 
     return {
       count,
+      page: getNumberValue(data.page) ?? getNumberValue(data.pagination?.page),
+      limit:
+        getNumberValue(data.limit) ?? getNumberValue(data.pagination?.limit),
       next: data.next ?? getStringValue(data.pagination?.next),
       previous: data.previous ?? getStringValue(data.pagination?.previous),
       results: users,
+      total_pages:
+        getNumberValue(data.total_pages) ??
+        getNumberValue(data.pagination?.total_pages),
     };
   }
 
@@ -157,7 +191,6 @@ export const userApi = api.injectEndpoints({
                 limit: 10,
                 startDate: DEFAULT_USERS_START_DATE,
                 endDate: getTodayInputDate(),
-                url: null,
               }
             : {
                 token: args.token,
@@ -165,30 +198,11 @@ export const userApi = api.injectEndpoints({
                 limit: args.limit ?? 10,
                 startDate: args.startDate || DEFAULT_USERS_START_DATE,
                 endDate: args.endDate || getTodayInputDate(),
-                url: args.url,
               };
-
-        if (params.url) {
-          const url = params.url.startsWith("http")
-            ? new URL(params.url).pathname + new URL(params.url).search
-            : params.url;
-
-          return {
-            url,
-            method: "GET",
-            headers: { Authorization: `Bearer ${params.token}` },
-          };
-        }
-
-        const offset = (Math.max(params.page, 1) - 1) * params.limit;
         const searchParams = new URLSearchParams({
+          page: `${Math.max(params.page, 1)}`,
           limit: `${params.limit}`,
         });
-
-        if (offset > 0) {
-          searchParams.set("page", `${Math.max(params.page, 1)}`);
-          searchParams.set("offset", `${offset}`);
-        }
 
         searchParams.set("start_date", params.startDate);
         searchParams.set("end_date", params.endDate);
@@ -385,6 +399,39 @@ export const userApi = api.injectEndpoints({
         return formattedResponse;
       },
     }),
+    getPaidGraph: build.query<PaidGraphResponse, GetPaidGraphArgs>({
+      query: (args) => {
+        const params =
+          typeof args === "string"
+            ? {
+                token: args,
+                startDate: DEFAULT_USERS_START_DATE,
+                endDate: getTodayInputDate(),
+              }
+            : {
+                token: args.token,
+                startDate:
+                  args.startDate || getStatsPeriodStartDate(args.period),
+                endDate: args.endDate || getTodayInputDate(),
+              };
+        const searchParams = new URLSearchParams({
+          start_date: params.startDate,
+          end_date: params.endDate,
+        });
+
+        return {
+          url: `/api/admin_app/paid_graph/?${searchParams.toString()}`,
+          method: "GET",
+          headers: { Authorization: `Bearer ${params.token}` },
+        };
+      },
+      providesTags: ["Stats"],
+      transformResponse: (response: {
+        status_code: number;
+        message: string;
+        data: PaidGraphResponse;
+      }) => response.data,
+    }),
   }),
 });
 
@@ -399,4 +446,5 @@ export const {
   useDeleteUserMutation,
   useToggleUserStatusMutation,
   useGetStatsGraphQuery,
+  useGetPaidGraphQuery,
 } = userApi;

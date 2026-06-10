@@ -30,6 +30,7 @@ import { getAdminAccessToken } from "@/lib/admin-auth";
 import { lineChartConfig } from "@/lib/graph-specs";
 import { cn } from "@/lib/utils";
 import {
+  useGetPaidGraphQuery,
   useGetStatsGraphQuery,
   useGetUserStatsQuery,
 } from "@/store/services/user";
@@ -118,6 +119,18 @@ const Dashboard = () => {
     }
   );
   const { data: stats, isLoading: statsLoading } = useGetUserStatsQuery(
+    {
+      token: accessToken,
+      period: appliedStatsPeriod,
+      startDate: appliedStatsPeriod ? undefined : appliedStatsStartDate,
+      endDate: appliedStatsPeriod ? undefined : appliedStatsEndDate,
+    },
+    {
+      skip: !accessToken || accessToken === "",
+      refetchOnMountOrArgChange: true,
+    }
+  );
+  const { data: paidGraph, isLoading: paidGraphLoading } = useGetPaidGraphQuery(
     {
       token: accessToken,
       period: appliedStatsPeriod,
@@ -280,7 +293,7 @@ const Dashboard = () => {
               variant="outline"
               type="button"
               onClick={clearStatsDateFilters}
-              disabled={statsLoading || isLoading}
+              disabled={statsLoading || isLoading || paidGraphLoading}
             >
               <X className="size-4" />
               Remove all filters
@@ -289,7 +302,11 @@ const Dashboard = () => {
               type="button"
               onClick={applyStatsDateFilters}
               disabled={
-                !statsStartDate || !statsEndDate || statsLoading || isLoading
+                !statsStartDate ||
+                !statsEndDate ||
+                statsLoading ||
+                isLoading ||
+                paidGraphLoading
               }
             >
               <Check className="size-4" />
@@ -361,8 +378,8 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="col-span-2 flex h-full w-full flex-col items-start justify-start gap-2.5 rounded-xl md:flex-row lg:col-span-3 lg:flex-col xl:col-span-2">
-            <DataBar />
-            <DataArea />
+            <DataBar data={paidGraph?.chart1} isLoading={paidGraphLoading} />
+            <DataArea data={paidGraph?.chart2} isLoading={paidGraphLoading} />
           </div>
         </div>
         <div className="row-span-1 h-full w-full">

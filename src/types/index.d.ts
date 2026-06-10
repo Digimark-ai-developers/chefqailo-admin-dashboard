@@ -105,8 +105,11 @@ declare type ApiMessage<T = unknown> = ApiEnvelope<T> & {
 declare type PaginatedResponse<T> = {
   count: number;
   next?: string | null;
+  page?: number;
+  limit?: number;
   previous?: string | null;
   results: T[];
+  total_pages?: number;
 };
 
 declare type InfluencerUserPayload = {

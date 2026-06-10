@@ -21,7 +21,6 @@ const getTodayInputDate = () => {
 const Users = () => {
   const [accessToken, setAccessToken] = useState<string>("");
   const [page, setPage] = useState<number>(1);
-  const [pageUrl, setPageUrl] = useState<string | null>(null);
   const [defaultEndDate] = useState<string>(() => getTodayInputDate());
   const [startDate, setStartDate] = useState<string>(DEFAULT_USERS_START_DATE);
   const [endDate, setEndDate] = useState<string>(defaultEndDate);
@@ -39,7 +38,6 @@ const Users = () => {
       limit: 10,
       startDate: appliedStartDate,
       endDate: appliedEndDate,
-      url: pageUrl,
     },
     {
       skip: !accessToken || accessToken === "",
@@ -80,7 +78,6 @@ const Users = () => {
   const applyDateFilters = () => {
     setAppliedStartDate(startDate);
     setAppliedEndDate(endDate);
-    setPageUrl(null);
     setPage(1);
   };
 
@@ -89,27 +86,14 @@ const Users = () => {
     setEndDate(defaultEndDate);
     setAppliedStartDate(DEFAULT_USERS_START_DATE);
     setAppliedEndDate(defaultEndDate);
-    setPageUrl(null);
     setPage(1);
   };
 
   const goToNextPage = () => {
-    if (data?.next) {
-      setPageUrl(data.next);
-    } else {
-      setPageUrl(null);
-    }
-
     setPage((currentPage) => currentPage + 1);
   };
 
   const goToPreviousPage = () => {
-    if (data?.previous) {
-      setPageUrl(data.previous);
-    } else {
-      setPageUrl(null);
-    }
-
     setPage((currentPage) => Math.max(1, currentPage - 1));
   };
 
@@ -127,7 +111,7 @@ const Users = () => {
       startDate={startDate}
       endDate={endDate}
       isDateFilterActive={isDateFilterActive}
-      hasNextPage={Boolean(data?.next) || (data?.results.length ?? 0) === 10}
+      totalPages={data?.total_pages ?? 1}
       totalCount={data?.count ?? 0}
       onStartDateChange={handleStartDateChange}
       onEndDateChange={handleEndDateChange}

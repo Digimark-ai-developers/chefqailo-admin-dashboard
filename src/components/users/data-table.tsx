@@ -52,7 +52,7 @@ interface DataTableProps<TData, TValue> {
   isDateFilterActive: boolean;
   page: number;
   pageSize: number;
-  hasNextPage?: boolean;
+  totalPages: number;
   totalCount: number;
   onStartDateChange: (value: string) => void;
   onEndDateChange: (value: string) => void;
@@ -71,7 +71,7 @@ const DataTable = <TData, TValue>({
   isDateFilterActive,
   page,
   pageSize,
-  hasNextPage = false,
+  totalPages,
   totalCount,
   onStartDateChange,
   onEndDateChange,
@@ -86,9 +86,9 @@ const DataTable = <TData, TValue>({
   const [addUser, setAddUser] = useState<boolean>(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const normalizedTotalPages = Math.max(1, totalPages);
   const canGoPrevious = page > 1 && !isFetching;
-  const canGoNext = !isFetching && (page < totalPages || hasNextPage);
+  const canGoNext = page < normalizedTotalPages && !isFetching;
 
   const table = useReactTable({
     data,
@@ -189,10 +189,10 @@ const DataTable = <TData, TValue>({
               ) : null}
             </Button>
           </div>
-          <Button onClick={() => setAddUser(true)} type="button" size="default">
+          {/* <Button onClick={() => setAddUser(true)} type="button" size="default">
             <Plus />
             <span>Add User</span>
-          </Button>
+          </Button> */}
         </div>
         <div className="h-[calc(100vh-212px)] w-full">
           <div className="h-full w-full overflow-hidden rounded-lg border">
@@ -268,9 +268,12 @@ const DataTable = <TData, TValue>({
               Items per page: {data.length}/{pageSize}
             </span>
             <span className="text-left text-sm text-muted-foreground">
+              Total users: {totalCount.toLocaleString()}
+            </span>
+            <span className="text-left text-sm text-muted-foreground">
               Page&nbsp;{page}
               {totalCount > data.length || page > 1
-                ? ` of ${totalPages.toLocaleString()}`
+                ? ` of ${normalizedTotalPages.toLocaleString()}`
                 : null}
             </span>
             {isFetching ? (
