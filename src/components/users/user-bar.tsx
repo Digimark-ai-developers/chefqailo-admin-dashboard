@@ -175,6 +175,7 @@ const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
                 User Details
               </div>
               <div className="px-3">
+                <DetailRow label="User ID" value={user?.id} />
                 <DetailRow label="Username" value={user?.username} />
                 <DetailRow
                   label="Created"

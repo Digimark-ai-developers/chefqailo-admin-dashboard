@@ -1,6 +1,7 @@
 import {
-  BadgeCheck,
-  ChartSpline,
+  // BadgeCheck,
+  // ChartSpline,
+  Coins,
   LayoutDashboard,
   TicketPercent,
   User,
@@ -17,20 +18,25 @@ export const items = [
     url: "/users",
     icon: User,
   },
-  {
-    title: "Statistics",
-    url: "/statistics",
-    icon: ChartSpline,
-  },
-  {
-    title: "Subscriptions",
-    url: "/subscriptions",
-    icon: BadgeCheck,
-  },
+  // {
+  //   title: "Statistics",
+  //   url: "/statistics",
+  //   icon: ChartSpline,
+  // },
+  // {
+  //   title: "Subscriptions",
+  //   url: "/subscriptions",
+  //   icon: BadgeCheck,
+  // },
   {
     title: "Influencer Referrals",
     url: "/influencer-referrals",
     icon: TicketPercent,
+  },
+  {
+    title: "Qailo Management",
+    url: "/qailo-management",
+    icon: Coins,
   },
 ];
 

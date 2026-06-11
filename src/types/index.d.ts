@@ -153,14 +153,14 @@ declare type PaginatedResponse<T> = {
 };
 
 declare type InfluencerUserPayload = {
-  username: string;
   email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-  country: string;
-  state: string;
+  username?: string;
+  password?: string;
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  country?: string;
+  state?: string;
 };
 
 declare type InfluencerProfilePayload = {
@@ -185,16 +185,29 @@ declare type InitialReferralCodePayload = Omit<
   "influencer_id"
 >;
 
+declare type CreateInfluencerPayload = InfluencerProfilePayload & {
+  user_id: number;
+};
+
 declare type InfluencerOnboardingPayload = {
   user: InfluencerUserPayload;
   influencer: InfluencerProfilePayload;
   referral_code: InitialReferralCodePayload;
 };
 
+declare type InfluencerOnboardingResponse = InfluencerDetail & {
+  user_reused?: boolean;
+};
+
+declare type InfluencerOnboardingApiResponse =
+  ApiMessage<InfluencerOnboardingResponse> &
+    Partial<InfluencerOnboardingResponse>;
+
 declare type ReferralUser = {
   id?: number;
   username?: string;
   email?: string;
+  role?: string;
   first_name?: string;
   last_name?: string;
   phone_number?: string;
