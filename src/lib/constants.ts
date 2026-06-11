@@ -1,6 +1,6 @@
 import {
-  BadgeCheck,
-  ChartSpline,
+  // BadgeCheck,
+  // ChartSpline,
   Coins,
   LayoutDashboard,
   TicketPercent,
@@ -18,16 +18,16 @@ export const items = [
     url: "/users",
     icon: User,
   },
-  {
-    title: "Statistics",
-    url: "/statistics",
-    icon: ChartSpline,
-  },
-  {
-    title: "Subscriptions",
-    url: "/subscriptions",
-    icon: BadgeCheck,
-  },
+  // {
+  //   title: "Statistics",
+  //   url: "/statistics",
+  //   icon: ChartSpline,
+  // },
+  // {
+  //   title: "Subscriptions",
+  //   url: "/subscriptions",
+  //   icon: BadgeCheck,
+  // },
   {
     title: "Influencer Referrals",
     url: "/influencer-referrals",
