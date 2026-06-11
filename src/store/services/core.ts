@@ -41,6 +41,8 @@ export const api = createApi({
     "ReferralCodes",
     "ReferralCode",
     "InfluencerAnalytics",
+    "QailosCoefficients",
+    "QailosCoefficient",
   ],
   endpoints: () => ({}),
 });

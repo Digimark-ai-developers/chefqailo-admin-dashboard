@@ -1,6 +1,7 @@
 import {
   BadgeCheck,
   ChartSpline,
+  Coins,
   LayoutDashboard,
   TicketPercent,
   User,
@@ -31,6 +32,11 @@ export const items = [
     title: "Influencer Referrals",
     url: "/influencer-referrals",
     icon: TicketPercent,
+  },
+  {
+    title: "Qailo Management",
+    url: "/qailo-management",
+    icon: Coins,
   },
 ];
 
