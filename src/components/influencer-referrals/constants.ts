@@ -27,6 +27,14 @@ export const emptyOnboardingForm: InfluencerOnboardingPayload = {
   },
 };
 
+export const emptyCreateInfluencerForm: CreateInfluencerPayload = {
+  user_id: 0,
+  display_name: "",
+  social_platform: "instagram",
+  social_handle: "",
+  is_active: true,
+};
+
 export const emptyReferralForm: ReferralCodePayload = {
   influencer_id: 0,
   code: "",

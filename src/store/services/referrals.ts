@@ -6,11 +6,7 @@ const authHeaders = (token: string) => ({
 });
 
 const unwrapData = <T>(response: ApiEnvelope<T> | T): T => {
-  if (
-    response &&
-    typeof response === "object" &&
-    "data" in response
-  ) {
+  if (response && typeof response === "object" && "data" in response) {
     const payload = (response as ApiEnvelope<T>).data;
 
     if (payload !== undefined) {
@@ -44,7 +40,7 @@ const normalizePaginated = <T>(
 export const referralApi = api.injectEndpoints({
   endpoints: (build) => ({
     createInfluencerOnboarding: build.mutation<
-      ApiMessage<InfluencerDetail>,
+      InfluencerOnboardingApiResponse,
       { data: InfluencerOnboardingPayload; token: string }
     >({
       query: ({ data, token }) => ({
@@ -54,6 +50,18 @@ export const referralApi = api.injectEndpoints({
         headers: authHeaders(token),
       }),
       invalidatesTags: ["Influencers", "ReferralCodes", "InfluencerAnalytics"],
+    }),
+    createInfluencer: build.mutation<
+      ApiMessage<InfluencerDetail>,
+      { data: CreateInfluencerPayload; token: string }
+    >({
+      query: ({ data, token }) => ({
+        url: "/api/admin/influencers/",
+        method: "POST",
+        body: data,
+        headers: authHeaders(token),
+      }),
+      invalidatesTags: ["Influencers", "Influencer", "InfluencerAnalytics"],
     }),
     getInfluencers: build.query<
       PaginatedResponse<Influencer>,
@@ -73,21 +81,20 @@ export const referralApi = api.injectEndpoints({
             | Influencer[]
         ),
     }),
-    getInfluencer: build.query<
-      InfluencerDetail,
-      { id: number; token: string }
-    >({
-      query: ({ id, token }) => ({
-        url: `/api/admin/influencers/${id}/`,
-        method: "GET",
-        headers: authHeaders(token),
-      }),
-      providesTags: ["Influencer"],
-      transformResponse: (response: unknown) =>
-        unwrapData<InfluencerDetail>(
-          response as ApiEnvelope<InfluencerDetail> | InfluencerDetail
-        ),
-    }),
+    getInfluencer: build.query<InfluencerDetail, { id: number; token: string }>(
+      {
+        query: ({ id, token }) => ({
+          url: `/api/admin/influencers/${id}/`,
+          method: "GET",
+          headers: authHeaders(token),
+        }),
+        providesTags: ["Influencer"],
+        transformResponse: (response: unknown) =>
+          unwrapData<InfluencerDetail>(
+            response as ApiEnvelope<InfluencerDetail> | InfluencerDetail
+          ),
+      }
+    ),
     updateInfluencer: build.mutation<
       ApiMessage<InfluencerDetail>,
       { id: number; data: InfluencerProfilePayload; token: string }
@@ -216,6 +223,7 @@ export const referralApi = api.injectEndpoints({
 
 export const {
   useCreateInfluencerOnboardingMutation,
+  useCreateInfluencerMutation,
   useGetInfluencersQuery,
   useGetInfluencerQuery,
   useUpdateInfluencerMutation,

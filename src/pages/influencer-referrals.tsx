@@ -6,6 +6,7 @@ import { pageSize } from "@/components/influencer-referrals/constants";
 import {
   AnalyticsDialog,
   CreateInfluencerDialog,
+  CreateInfluencerProfileDialog,
   InfluencerDetailDialog,
   InfluencerEditDialog,
   ReferralCodeDialog,
@@ -38,6 +39,7 @@ const InfluencerReferrals = () => {
   const [influencerPage, setInfluencerPage] = useState(1);
   const [referralPage, setReferralPage] = useState(1);
   const [createOpen, setCreateOpen] = useState(false);
+  const [attachOpen, setAttachOpen] = useState(false);
   const [editInfluencerId, setEditInfluencerId] = useState<number | null>(null);
   const [detailInfluencerId, setDetailInfluencerId] = useState<number | null>(
     null
@@ -126,6 +128,11 @@ const InfluencerReferrals = () => {
         token={accessToken}
         setOpen={setCreateOpen}
       />
+      <CreateInfluencerProfileDialog
+        open={attachOpen}
+        token={accessToken}
+        setOpen={setAttachOpen}
+      />
       <InfluencerEditDialog
         id={editInfluencerId}
         token={accessToken}
@@ -175,9 +182,13 @@ const InfluencerReferrals = () => {
             <Plus />
             Add Referral Code
           </Button>
+          <Button type="button" size="sm" onClick={() => setAttachOpen(true)}>
+            <Plus />
+            Attach Existing User
+          </Button>
           <Button type="button" size="sm" onClick={() => setCreateOpen(true)}>
             <Plus />
-            Create Influencer
+            Onboard Influencer
           </Button>
         </div>
         <Tabs defaultValue="influencers" className="w-full">

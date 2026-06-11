@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  useCreateInfluencerMutation,
   useCreateInfluencerOnboardingMutation,
   useCreateReferralCodeMutation,
   useGetInfluencerAnalyticsQuery,
@@ -31,7 +32,11 @@ import {
   useUpdateReferralCodeMutation,
 } from "@/store/services/referrals";
 
-import { emptyOnboardingForm, emptyReferralForm } from "./constants";
+import {
+  emptyCreateInfluencerForm,
+  emptyOnboardingForm,
+  emptyReferralForm,
+} from "./constants";
 import {
   DetailItem,
   EmptyState,
@@ -48,6 +53,30 @@ import {
   toIsoDate,
 } from "./utils";
 
+const cleanUserPayload = (
+  user: InfluencerUserPayload,
+  reuseExistingUser: boolean
+): InfluencerUserPayload => {
+  if (reuseExistingUser) {
+    return {
+      email: user.email.trim(),
+    };
+  }
+
+  return {
+    email: user.email.trim(),
+    username: user.username?.trim(),
+    password: user.password,
+    first_name: user.first_name?.trim(),
+    last_name: user.last_name?.trim(),
+    ...(user.phone_number?.trim()
+      ? { phone_number: user.phone_number.trim() }
+      : {}),
+    ...(user.country?.trim() ? { country: user.country.trim() } : {}),
+    ...(user.state?.trim() ? { state: user.state.trim() } : {}),
+  };
+};
+
 export const CreateInfluencerDialog = ({
   open,
   token,
@@ -57,6 +86,7 @@ export const CreateInfluencerDialog = ({
   token: string;
   setOpen: (open: boolean) => void;
 }) => {
+  const [reuseExistingUser, setReuseExistingUser] = useState(true);
   const [form, setForm] =
     useState<InfluencerOnboardingPayload>(emptyOnboardingForm);
   const [createInfluencer, { isLoading }] =
@@ -64,14 +94,15 @@ export const CreateInfluencerDialog = ({
 
   const requiredFields = useMemo(
     () => [
-      form.user.username,
       form.user.email,
-      form.user.password,
-      form.user.first_name,
-      form.user.last_name,
-      form.user.phone_number,
-      form.user.country,
-      form.user.state,
+      ...(reuseExistingUser
+        ? []
+        : [
+            form.user.username ?? "",
+            form.user.password ?? "",
+            form.user.first_name ?? "",
+            form.user.last_name ?? "",
+          ]),
       form.influencer.display_name,
       form.influencer.social_platform,
       form.influencer.social_handle,
@@ -81,7 +112,7 @@ export const CreateInfluencerDialog = ({
       form.referral_code.valid_from,
       form.referral_code.valid_until,
     ],
-    [form]
+    [form, reuseExistingUser]
   );
 
   const setUserField = (field: keyof InfluencerUserPayload, value: string) => {
@@ -122,6 +153,7 @@ export const CreateInfluencerDialog = ({
         token,
         data: {
           ...form,
+          user: cleanUserPayload(form.user, reuseExistingUser),
           referral_code: {
             ...form.referral_code,
             code: form.referral_code.code.trim().toUpperCase(),
@@ -133,13 +165,19 @@ export const CreateInfluencerDialog = ({
         },
       }).unwrap();
 
+      const userReused = response.data?.user_reused ?? response.user_reused;
+
       toastMessage(
         "success",
         "Success",
-        response.message ?? "Influencer created."
+        response.message ??
+          (userReused
+            ? "Existing user reused and influencer profile created."
+            : "Influencer created.")
       );
       setOpen(false);
       setForm(emptyOnboardingForm);
+      setReuseExistingUser(true);
     } catch (error) {
       toastMessage("error", "Error", getApiError(error));
     }
@@ -149,24 +187,25 @@ export const CreateInfluencerDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Influencer With Referral Code</DialogTitle>
+          <DialogTitle>Onboard Influencer With Referral Code</DialogTitle>
           <DialogDescription>
-            Create the user account, influencer profile, and first referral
-            code.
+            Create or reuse a user account, then create the influencer profile
+            and first referral code.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6">
           <section className="grid gap-4">
-            <h3 className="text-sm font-semibold">User Account</h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Username">
-                <Input
-                  value={form.user.username}
-                  onChange={(event) =>
-                    setUserField("username", event.target.value)
-                  }
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold">User Account</h3>
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Switch
+                  checked={reuseExistingUser}
+                  onCheckedChange={setReuseExistingUser}
                 />
-              </Field>
+                Reuse existing user
+              </label>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
               <Field label="Email">
                 <Input
                   type="email"
@@ -176,55 +215,67 @@ export const CreateInfluencerDialog = ({
                   }
                 />
               </Field>
-              <Field label="Password">
-                <Input
-                  type="password"
-                  value={form.user.password}
-                  onChange={(event) =>
-                    setUserField("password", event.target.value)
-                  }
-                />
-              </Field>
-              <Field label="Phone number">
-                <Input
-                  value={form.user.phone_number}
-                  onChange={(event) =>
-                    setUserField("phone_number", event.target.value)
-                  }
-                />
-              </Field>
-              <Field label="First name">
-                <Input
-                  value={form.user.first_name}
-                  onChange={(event) =>
-                    setUserField("first_name", event.target.value)
-                  }
-                />
-              </Field>
-              <Field label="Last name">
-                <Input
-                  value={form.user.last_name}
-                  onChange={(event) =>
-                    setUserField("last_name", event.target.value)
-                  }
-                />
-              </Field>
-              <Field label="Country">
-                <Input
-                  value={form.user.country}
-                  onChange={(event) =>
-                    setUserField("country", event.target.value)
-                  }
-                />
-              </Field>
-              <Field label="State">
-                <Input
-                  value={form.user.state}
-                  onChange={(event) =>
-                    setUserField("state", event.target.value)
-                  }
-                />
-              </Field>
+              {!reuseExistingUser ? (
+                <>
+                  <Field label="Username">
+                    <Input
+                      value={form.user.username ?? ""}
+                      onChange={(event) =>
+                        setUserField("username", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Password">
+                    <Input
+                      type="password"
+                      value={form.user.password ?? ""}
+                      onChange={(event) =>
+                        setUserField("password", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="First name">
+                    <Input
+                      value={form.user.first_name ?? ""}
+                      onChange={(event) =>
+                        setUserField("first_name", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Last name">
+                    <Input
+                      value={form.user.last_name ?? ""}
+                      onChange={(event) =>
+                        setUserField("last_name", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Phone number">
+                    <Input
+                      value={form.user.phone_number ?? ""}
+                      onChange={(event) =>
+                        setUserField("phone_number", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Country">
+                    <Input
+                      value={form.user.country ?? ""}
+                      onChange={(event) =>
+                        setUserField("country", event.target.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="State">
+                    <Input
+                      value={form.user.state ?? ""}
+                      onChange={(event) =>
+                        setUserField("state", event.target.value)
+                      }
+                    />
+                  </Field>
+                </>
+              ) : null}
             </div>
           </section>
           <section className="grid gap-4">
@@ -328,6 +379,132 @@ export const CreateInfluencerDialog = ({
               </Field>
             </div>
           </section>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={isLoading || !token}
+              onClick={submit}
+            >
+              {isLoading ? <Loader2 className="animate-spin" /> : "Create"}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export const CreateInfluencerProfileDialog = ({
+  open,
+  token,
+  setOpen,
+}: {
+  open: boolean;
+  token: string;
+  setOpen: (open: boolean) => void;
+}) => {
+  const [form, setForm] = useState<CreateInfluencerPayload>(
+    emptyCreateInfluencerForm
+  );
+  const [createInfluencer, { isLoading }] = useCreateInfluencerMutation();
+
+  const setField = (
+    field: keyof CreateInfluencerPayload,
+    value: string | number | boolean
+  ) => {
+    setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const submit = async () => {
+    if (
+      !form.user_id ||
+      !form.display_name.trim() ||
+      !form.social_platform.trim() ||
+      !form.social_handle.trim()
+    ) {
+      toastMessage("error", "Error", "Please complete all required fields.");
+      return;
+    }
+
+    try {
+      const response = await createInfluencer({
+        token,
+        data: {
+          ...form,
+          user_id: Number(form.user_id),
+          display_name: form.display_name.trim(),
+          social_platform: form.social_platform.trim(),
+          social_handle: form.social_handle.trim(),
+        },
+      }).unwrap();
+
+      toastMessage(
+        "success",
+        "Success",
+        response.message ?? "Influencer profile created."
+      );
+      setOpen(false);
+      setForm(emptyCreateInfluencerForm);
+    } catch (error) {
+      toastMessage("error", "Error", getApiError(error));
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Attach Influencer Profile</DialogTitle>
+          <DialogDescription>
+            Attach influencer capability to an existing app user by user ID.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4">
+          <Field label="User ID">
+            <Input
+              type="number"
+              min={1}
+              value={form.user_id || ""}
+              onChange={(event) =>
+                setField("user_id", Number(event.target.value))
+              }
+            />
+          </Field>
+          <Field label="Display name">
+            <Input
+              value={form.display_name}
+              onChange={(event) => setField("display_name", event.target.value)}
+            />
+          </Field>
+          <Field label="Social platform">
+            <Input
+              value={form.social_platform}
+              onChange={(event) =>
+                setField("social_platform", event.target.value)
+              }
+            />
+          </Field>
+          <Field label="Social handle">
+            <Input
+              value={form.social_handle}
+              onChange={(event) =>
+                setField("social_handle", event.target.value)
+              }
+            />
+          </Field>
+          <Field label="Active">
+            <Switch
+              checked={form.is_active}
+              onCheckedChange={(checked) => setField("is_active", checked)}
+            />
+          </Field>
           <div className="flex justify-end gap-2">
             <Button
               type="button"
@@ -547,6 +724,7 @@ export const InfluencerDetailDialog = ({
                 }
               />
               <DetailItem label="Phone" value={user?.phone_number ?? "-"} />
+              <DetailItem label="Role" value={user?.role ?? "-"} />
               <DetailItem label="Country" value={user?.country ?? "-"} />
               <DetailItem label="State" value={user?.state ?? "-"} />
             </div>
