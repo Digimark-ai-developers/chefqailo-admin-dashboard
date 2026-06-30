@@ -115,7 +115,6 @@ const InfluencerDetail = () => {
           <section className="grid gap-3">
             <h2 className="text-sm font-semibold">View</h2>
             <div className="grid gap-3 md:grid-cols-3">
-              <DetailItem label="ID" value={String(influencer.id)} />
               <DetailItem
                 label="Display name"
                 value={influencer.display_name}
