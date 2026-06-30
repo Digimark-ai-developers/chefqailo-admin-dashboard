@@ -254,7 +254,7 @@ const CoefficientsTable = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
+              {/* <TableHead>ID</TableHead> */}
               <TableHead>Code</TableHead>
               <TableHead>Provider</TableHead>
               <TableHead>Model</TableHead>
@@ -272,7 +272,7 @@ const CoefficientsTable = ({
 
               return (
                 <TableRow key={coefficient.id ?? coefficient.code}>
-                  <TableCell>{coefficient.id ?? "-"}</TableCell>
+                  {/* <TableCell>{coefficient.id ?? "-"}</TableCell> */}
                   <TableCell className="font-medium">
                     {coefficient.code}
                   </TableCell>
