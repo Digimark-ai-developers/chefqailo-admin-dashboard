@@ -178,6 +178,23 @@ export const referralApi = api.injectEndpoints({
           response as ApiEnvelope<ReferralCodeDetail> | ReferralCodeDetail
         ),
     }),
+    getReferralCodePerformance: build.query<
+      ReferralCodePerformance,
+      { id: number; token: string }
+    >({
+      query: ({ id, token }) => ({
+        url: `/api/admin/referral-codes/${id}/performance/`,
+        method: "GET",
+        headers: authHeaders(token),
+      }),
+      providesTags: ["ReferralCodePerformance"],
+      transformResponse: (response: unknown) =>
+        unwrapData<ReferralCodePerformance>(
+          response as
+            | ApiEnvelope<ReferralCodePerformance>
+            | ReferralCodePerformance
+        ),
+    }),
     updateReferralCode: build.mutation<
       ApiMessage<ReferralCodeDetail>,
       { id: number; data: ReferralCodePayload; token: string }
@@ -188,7 +205,12 @@ export const referralApi = api.injectEndpoints({
         body: data,
         headers: authHeaders(token),
       }),
-      invalidatesTags: ["ReferralCodes", "ReferralCode", "InfluencerAnalytics"],
+      invalidatesTags: [
+        "ReferralCodes",
+        "ReferralCode",
+        "ReferralCodePerformance",
+        "InfluencerAnalytics",
+      ],
     }),
     deactivateReferralCode: build.mutation<
       ApiMessage<ReferralCodeDetail>,
@@ -199,7 +221,12 @@ export const referralApi = api.injectEndpoints({
         method: "DELETE",
         headers: authHeaders(token),
       }),
-      invalidatesTags: ["ReferralCodes", "ReferralCode", "InfluencerAnalytics"],
+      invalidatesTags: [
+        "ReferralCodes",
+        "ReferralCode",
+        "ReferralCodePerformance",
+        "InfluencerAnalytics",
+      ],
     }),
     validateReferralCode: build.mutation<
       ReferralValidationResponse,
@@ -232,6 +259,7 @@ export const {
   useCreateReferralCodeMutation,
   useGetReferralCodesQuery,
   useGetReferralCodeQuery,
+  useGetReferralCodePerformanceQuery,
   useUpdateReferralCodeMutation,
   useDeactivateReferralCodeMutation,
   useValidateReferralCodeMutation,

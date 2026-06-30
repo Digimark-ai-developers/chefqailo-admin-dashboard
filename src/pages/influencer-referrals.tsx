@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Plus, RefreshCcw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { pageSize } from "@/components/influencer-referrals/constants";
 import {
@@ -35,6 +36,7 @@ type DeleteTarget =
   | null;
 
 const InfluencerReferrals = () => {
+  const navigate = useNavigate();
   const [accessToken, setAccessToken] = useState("");
   const [influencerPage, setInfluencerPage] = useState(1);
   const [referralPage, setReferralPage] = useState(1);
@@ -208,6 +210,9 @@ const InfluencerReferrals = () => {
               onView={setDetailInfluencerId}
               onEdit={setEditInfluencerId}
               onAnalytics={setAnalyticsInfluencerId}
+              onOpen={(id) =>
+                navigate(`/influencer-referrals/influencers/${id}`)
+              }
               onDeactivate={(id, name) =>
                 setDeleteTarget({
                   type: "influencer",
@@ -223,6 +228,9 @@ const InfluencerReferrals = () => {
               loading={referralsQuery.isLoading || referralsQuery.isFetching}
               page={referralPage}
               onPageChange={setReferralPage}
+              onOpen={(id) =>
+                navigate(`/influencer-referrals/referral-codes/${id}`)
+              }
               onEdit={setEditReferralId}
               onDeactivate={(id, code) =>
                 setDeleteTarget({

@@ -257,6 +257,28 @@ declare type InfluencerAnalytics = {
   total_subscription_revenue: string;
 };
 
+declare type ReferralCodePerformance = {
+  referral_code_id: number;
+  code: string;
+  influencer_id: number;
+  influencer_name: string;
+  standard_conversions: number;
+  premium_conversions: number;
+  active_subscriptions: number;
+  renewals: number;
+  revenue_generated: {
+    gross: string;
+    net: string;
+    currency: string;
+  };
+  assumptions: {
+    paid_plans: string[];
+    renewal_rule: string;
+    default_platform_fee_percentages: Record<string, string>;
+    net_revenue_rule: string;
+  };
+};
+
 declare type ReferralValidationResponse = {
   valid: boolean;
   discount_percentage?: string;
