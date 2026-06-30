@@ -66,7 +66,6 @@ export const InfluencersTable = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Display name</TableHead>
               <TableHead>User ID</TableHead>
               <TableHead>Social platform</TableHead>
@@ -91,7 +90,6 @@ export const InfluencersTable = ({
                   }
                 }}
               >
-                <TableCell>{influencer.id}</TableCell>
                 <TableCell className="font-medium">
                   {influencer.display_name}
                 </TableCell>
