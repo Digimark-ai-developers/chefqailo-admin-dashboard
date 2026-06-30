@@ -40,6 +40,7 @@ export const InfluencersTable = ({
   onEdit,
   onDeactivate,
   onAnalytics,
+  onOpen,
 }: {
   data?: PaginatedResponse<Influencer>;
   loading: boolean;
@@ -49,6 +50,7 @@ export const InfluencersTable = ({
   onEdit: (id: number) => void;
   onDeactivate: (id: number, name: string) => void;
   onAnalytics: (id: number) => void;
+  onOpen: (id: number) => void;
 }) => {
   if (loading) {
     return <LoadingState />;
@@ -76,7 +78,19 @@ export const InfluencersTable = ({
           </TableHeader>
           <TableBody>
             {data.results.map((influencer) => (
-              <TableRow key={influencer.id}>
+              <TableRow
+                key={influencer.id}
+                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onClick={() => onOpen(influencer.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onOpen(influencer.id);
+                  }
+                }}
+              >
                 <TableCell>{influencer.id}</TableCell>
                 <TableCell className="font-medium">
                   {influencer.display_name}
@@ -90,7 +104,10 @@ export const InfluencersTable = ({
                   <StatusPill active={influencer.is_active} />
                 </TableCell>
                 <TableCell>{formatDate(influencer.created_at)}</TableCell>
-                <TableCell className="text-right">
+                <TableCell
+                  className="text-right"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -145,6 +162,7 @@ export const ReferralCodesTable = ({
   loading,
   page,
   onPageChange,
+  onOpen,
   onEdit,
   onDeactivate,
 }: {
@@ -152,6 +170,7 @@ export const ReferralCodesTable = ({
   loading: boolean;
   page: number;
   onPageChange: (page: number) => void;
+  onOpen: (id: number) => void;
   onEdit: (id: number) => void;
   onDeactivate: (id: number, code: string) => void;
 }) => {
@@ -185,7 +204,19 @@ export const ReferralCodesTable = ({
           </TableHeader>
           <TableBody>
             {data.results.map((referral) => (
-              <TableRow key={referral.id}>
+              <TableRow
+                key={referral.id}
+                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onClick={() => onOpen(referral.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onOpen(referral.id);
+                  }
+                }}
+              >
                 <TableCell>{referral.id}</TableCell>
                 <TableCell className="font-medium">{referral.code}</TableCell>
                 <TableCell>{getInfluencerName(referral)}</TableCell>
@@ -203,7 +234,10 @@ export const ReferralCodesTable = ({
                 <TableCell className="max-w-56 whitespace-normal">
                   {referral.invalid_reason || "-"}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell
+                  className="text-right"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button

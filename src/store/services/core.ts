@@ -40,6 +40,7 @@ export const api = createApi({
     "Influencer",
     "ReferralCodes",
     "ReferralCode",
+    "ReferralCodePerformance",
     "InfluencerAnalytics",
     "QailosCoefficients",
     "QailosCoefficient",
