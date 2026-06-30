@@ -80,9 +80,7 @@ const Dashboard = () => {
   const { open } = useSidebar();
   const [activeChart, setActiveChart] =
     useState<keyof typeof lineChartConfig>("inactive");
-  const [selectedStat, setSelectedStat] = useState<
-    "users" | "monthly_sales_amount" | "total_sales"
-  >("users");
+  const [selectedCardId, setSelectedCardId] = useState<number>(1);
   const accessToken = useAdminAccessToken();
   const [defaultStatsEndDate] = useState<string>(() => getTodayInputDate());
   const [statsFilterOpen, setStatsFilterOpen] = useState<boolean>(false);
@@ -174,9 +172,9 @@ const Dashboard = () => {
 
   const clickEvent = (
     chart: "views" | "inactive" | "active" | "tablet",
-    stat: "users" | "monthly_sales_amount" | "total_sales"
+    cardId: number
   ) => {
-    setSelectedStat(stat);
+    setSelectedCardId(cardId);
     setActiveChart(chart);
   };
 
@@ -340,17 +338,9 @@ const Dashboard = () => {
                 statsData?.map((card, idx) => (
                   <StatCard
                     card={card}
-                    key={idx}
-                    selectedStat={selectedStat}
-                    clickEvent={() =>
-                      clickEvent(
-                        card.chart,
-                        card.tag as
-                          | "users"
-                          | "monthly_sales_amount"
-                          | "total_sales"
-                      )
-                    }
+                    key={card.id ?? idx}
+                    selectedCardId={selectedCardId}
+                    clickEvent={() => clickEvent(card.chart, card.id ?? idx)}
                   />
                 ))
               )}
