@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import { cn } from "@/lib/utils";
 import {
   type QailosCoefficient,
@@ -173,7 +173,7 @@ const RateSourceControl = ({
 );
 
 const QailoManagement = () => {
-  const [accessToken, setAccessToken] = useState("");
+  const accessToken = useAdminAccessToken();
   const [page, setPage] = useState(1);
   const [viewTarget, setViewTarget] = useState<QailosCoefficient | null>(null);
   const [rateTarget, setRateTarget] = useState<QailosCoefficient | null>(null);
@@ -185,18 +185,6 @@ const QailoManagement = () => {
       refetchOnMountOrArgChange: true,
     }
   );
-
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
-
-  useEffect(() => {
-    handleToken();
-  }, []);
 
   return (
     <>

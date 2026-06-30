@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Plus, RefreshCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -22,7 +22,7 @@ import { ValidateCodeTool } from "@/components/influencer-referrals/validate-cod
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import WarningModal from "@/components/warning-modal";
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import {
   useDeactivateInfluencerMutation,
   useDeactivateReferralCodeMutation,
@@ -37,7 +37,7 @@ type DeleteTarget =
 
 const InfluencerReferrals = () => {
   const navigate = useNavigate();
-  const [accessToken, setAccessToken] = useState("");
+  const accessToken = useAdminAccessToken();
   const [influencerPage, setInfluencerPage] = useState(1);
   const [referralPage, setReferralPage] = useState(1);
   const [createOpen, setCreateOpen] = useState(false);
@@ -73,14 +73,6 @@ const InfluencerReferrals = () => {
   const [deactivateReferralCode, referralDeleteState] =
     useDeactivateReferralCodeMutation();
 
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
-
   const handleDeactivate = async () => {
     if (!deleteTarget || !accessToken) {
       return;
@@ -105,10 +97,6 @@ const InfluencerReferrals = () => {
       toastMessage("error", "Error", getApiError(error));
     }
   };
-
-  useEffect(() => {
-    handleToken();
-  }, []);
 
   return (
     <>

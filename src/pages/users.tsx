@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 import { columns } from "@/components/users/columns";
 import DataTable from "@/components/users/data-table";
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import { useGetAllUsersQuery } from "@/store/services/user";
 
 const DEFAULT_USERS_START_DATE = "2024-01-01";
@@ -19,7 +19,7 @@ const getTodayInputDate = () => {
 };
 
 const Users = () => {
-  const [accessToken, setAccessToken] = useState<string>("");
+  const accessToken = useAdminAccessToken();
   const [page, setPage] = useState<number>(1);
   const [defaultEndDate] = useState<string>(() => getTodayInputDate());
   const [startDate, setStartDate] = useState<string>(DEFAULT_USERS_START_DATE);
@@ -44,18 +44,6 @@ const Users = () => {
       refetchOnMountOrArgChange: true,
     }
   );
-
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
-
-  useEffect(() => {
-    handleToken();
-  }, []);
 
   useEffect(() => {
     if (data && page > 1 && data.results.length === 0) {

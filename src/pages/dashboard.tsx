@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   Check,
@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import { lineChartConfig } from "@/lib/graph-specs";
 import { cn } from "@/lib/utils";
 import {
@@ -83,7 +83,7 @@ const Dashboard = () => {
   const [selectedStat, setSelectedStat] = useState<
     "users" | "monthly_sales_amount" | "total_sales"
   >("users");
-  const [accessToken, setAccessToken] = useState<string>("");
+  const accessToken = useAdminAccessToken();
   const [defaultStatsEndDate] = useState<string>(() => getTodayInputDate());
   const [statsFilterOpen, setStatsFilterOpen] = useState<boolean>(false);
   const [statsStartDate, setStatsStartDate] = useState<string>(
@@ -143,15 +143,7 @@ const Dashboard = () => {
     }
   );
 
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
-
-  const statsDataFormatter = () => {
+  const statsData = useMemo(() => {
     const icons = [User2, CircleDollarSign, Users];
 
     if (stats) {
@@ -178,7 +170,7 @@ const Dashboard = () => {
         };
       });
     }
-  };
+  }, [stats]);
 
   const clickEvent = (
     chart: "views" | "inactive" | "active" | "tablet",
@@ -226,10 +218,6 @@ const Dashboard = () => {
     setAppliedStatsDateFilter("all");
     setStatsFilterOpen(false);
   };
-
-  useEffect(() => {
-    handleToken();
-  }, []);
 
   return (
     <>
@@ -349,7 +337,7 @@ const Dashboard = () => {
                   <Loader2 className="size-10 animate-spin text-primary" />
                 </div>
               ) : (
-                statsDataFormatter()?.map((card, idx) => (
+                statsData?.map((card, idx) => (
                   <StatCard
                     card={card}
                     key={idx}

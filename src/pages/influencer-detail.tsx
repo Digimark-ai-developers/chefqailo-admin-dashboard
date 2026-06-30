@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import { ArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -23,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import {
   useGetInfluencerAnalyticsQuery,
   useGetInfluencerQuery,
@@ -33,11 +31,7 @@ const InfluencerDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const influencerId = Number(id);
-  const [accessToken, setAccessToken] = useState("");
-
-  useEffect(() => {
-    setAccessToken(getAdminAccessToken() ?? "");
-  }, []);
+  const accessToken = useAdminAccessToken();
 
   const influencerQuery = useGetInfluencerQuery(
     { id: influencerId, token: accessToken },

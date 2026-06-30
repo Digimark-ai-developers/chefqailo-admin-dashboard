@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -6,12 +6,12 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import {
   useAddPlanMutation,
   useEditPlanMutation,
   useGetPlanQuery,
 } from "@/store/services/subscriptions";
-import { getAdminAccessToken } from "@/lib/admin-auth";
 
 import { Button } from "../ui/button";
 import CustomToast from "../ui/custom-toast";
@@ -64,7 +64,7 @@ const planFormSchema = z
   );
 
 const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
-  const [accessToken, setAccessToken] = useState<string>("");
+  const accessToken = useAdminAccessToken();
   const [addPlan, { isLoading: adding }] = useAddPlanMutation();
   const [editPlan, { isLoading: editing }] = useEditPlanMutation();
   const { data } = useGetPlanQuery(
@@ -81,14 +81,6 @@ const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
   const form = useForm<z.infer<typeof planFormSchema>>({
     resolver: zodResolver(planFormSchema),
   });
-
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
 
   const onSubmit = async (values: z.infer<typeof planFormSchema>) => {
     let response = null;
@@ -138,8 +130,6 @@ const AddPlanDialog = ({ id, open, setOpen }: AddPlanDialogProps) => {
   };
 
   useEffect(() => {
-    handleToken();
-
     if (data) {
       // @ts-ignore
       form.setValue("payment_status", data.payment_status);
