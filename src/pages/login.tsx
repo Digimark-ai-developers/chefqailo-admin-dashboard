@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useState } from "react";
 
-import { Loader2, Lock, Mail } from "lucide-react";
+import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -14,13 +14,57 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   clearAdminSession,
-  extractAdminEmail,
   extractAdminAccessToken,
+  extractAdminEmail,
   extractAdminRefreshToken,
   isAdminAuthenticated,
   setAdminSession,
 } from "@/lib/admin-auth";
 import { useAdminLoginMutation } from "@/store/services/auth";
+
+const getLoginErrorMessage = (error: unknown) => {
+  const fallback =
+    "Invalid email or password. Please check your details and try again.";
+
+  if (!error || typeof error !== "object" || !("data" in error)) {
+    return error instanceof Error ? error.message : fallback;
+  }
+
+  const data = (error as { data?: unknown }).data;
+
+  if (typeof data === "string") {
+    return data || fallback;
+  }
+
+  if (!data || typeof data !== "object") {
+    return fallback;
+  }
+
+  const record = data as Record<string, unknown>;
+  const preferredKeys = ["detail", "message", "error", "non_field_errors"];
+
+  for (const key of preferredKeys) {
+    const value = record[key];
+
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+
+    if (Array.isArray(value)) {
+      const message = value.filter(Boolean).join(" ");
+
+      if (message) {
+        return message;
+      }
+    }
+  }
+
+  const fieldMessage = Object.values(record)
+    .flatMap((value) => (Array.isArray(value) ? value : [value]))
+    .find((value) => typeof value === "string" && value.trim());
+
+  return typeof fieldMessage === "string" ? fieldMessage : fallback;
+};
 
 const Login = () => {
   const navigate = useNavigate();
@@ -67,12 +111,7 @@ const Login = () => {
       });
       navigate("/dashboard", { replace: true });
     } catch (loginError) {
-      const message =
-        loginError && typeof loginError === "object" && "data" in loginError
-          ? JSON.stringify((loginError as { data?: unknown }).data)
-          : "Unable to login. Please check your credentials and try again.";
-
-      setError(message);
+      setError(getLoginErrorMessage(loginError));
     }
   };
 
@@ -123,7 +162,7 @@ const Login = () => {
               </div>
               <div className="flex w-full flex-col items-center justify-center gap-1.5">
                 <Label className="w-full text-left">Email</Label>
-                <div className="flex w-full items-center justify-center gap-2.5 rounded-md bg-white px-2.5 py-1.5">
+                <div className="flex w-full items-center justify-center gap-2.5 rounded-md bg-white px-2.5 py-1.5 ring-offset-background transition-shadow focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
                   <Mail className="size-5 text-gray-500" />
                   <Input
                     type="email"
@@ -134,22 +173,14 @@ const Login = () => {
                     }}
                     placeholder="johndoe@email.com"
                     aria-invalid={Boolean(error)}
-                    aria-describedby={error ? "login-email-error" : undefined}
+                    aria-describedby={error ? "login-error" : undefined}
                     className="flex-1 border-none bg-transparent text-black shadow-none"
                   />
                 </div>
-                {error ? (
-                  <p
-                    id="login-email-error"
-                    className="w-full text-left text-sm text-destructive"
-                  >
-                    {error}
-                  </p>
-                ) : null}
               </div>
               <div className="flex w-full flex-col items-center justify-center gap-1.5">
                 <Label className="w-full text-left">Password</Label>
-                <div className="flex w-full items-center justify-center gap-2.5 rounded-md bg-white px-2.5 py-1.5">
+                <div className="flex w-full items-center justify-center gap-2.5 rounded-md bg-white px-2.5 py-1.5 ring-offset-background transition-shadow focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
                   <Lock className="size-5 text-gray-500" />
                   <Input
                     type="password"
@@ -160,21 +191,33 @@ const Login = () => {
                     }}
                     placeholder="Admin password"
                     aria-invalid={Boolean(error)}
+                    aria-describedby={error ? "login-error" : undefined}
                     className="flex-1 border-none bg-transparent text-black shadow-none"
                   />
                 </div>
               </div>
+              {error ? (
+                <div
+                  id="login-error"
+                  role="alert"
+                  className="flex w-full items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200"
+                >
+                  <AlertCircle className="mt-0.5 size-5 shrink-0" />
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-semibold">
+                      We could not sign you in
+                    </p>
+                    <p className="text-sm leading-5">{error}</p>
+                  </div>
+                </div>
+              ) : null}
               <Button
                 type="submit"
                 disabled={isLoading}
                 className="w-full bg-primary text-white"
                 size="lg"
               >
-                {isLoading ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  "Login"
-                )}
+                {isLoading ? <Loader2 className="animate-spin" /> : "Login"}
               </Button>
             </form>
           </div>

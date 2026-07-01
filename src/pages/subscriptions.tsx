@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -15,7 +15,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import { cn } from "@/lib/utils";
 import {
   useGetPlansQuery,
@@ -25,7 +25,7 @@ import {
 const Subscriptions = () => {
   const [add, setAdd] = useState<boolean>(false);
   const [position, setPosition] = useState<string>("weekly");
-  const [accessToken, setAccessToken] = useState<string>("");
+  const accessToken = useAdminAccessToken();
   const { data, isLoading } = useGetSubscriptionStatsQuery(
     {
       period: position,
@@ -40,18 +40,6 @@ const Subscriptions = () => {
     skip: !accessToken || accessToken === "",
     refetchOnMountOrArgChange: true,
   });
-
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
-
-  useEffect(() => {
-    handleToken();
-  }, []);
 
   return (
     <>

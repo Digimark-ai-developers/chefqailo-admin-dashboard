@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import {
   useEditUserMutation,
   useGetUserQuery,
@@ -65,7 +65,7 @@ const userFormSchema = z.object({
 });
 
 const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
-  const [accessToken, setAccessToken] = useState<string>("");
+  const accessToken = useAdminAccessToken();
   const [image, setImage] = useState<string | File | null>(null);
 
   const form = useForm<z.infer<typeof userFormSchema>>({
@@ -82,14 +82,6 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
 
   const [addUser, { isLoading: adding }] = usePostUserMutation();
   const [editUser, { isLoading: editing }] = useEditUserMutation();
-
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
 
   const postUser = async (values: z.infer<typeof userFormSchema>) => {
     let response = null;
@@ -138,8 +130,6 @@ const AddUserDialog = ({ id, open, setOpen }: AddUserDialogProps) => {
   };
 
   useEffect(() => {
-    handleToken();
-
     if (data?.user) {
       setImage(data.user.image);
       form.setValue("email", data.user.email);

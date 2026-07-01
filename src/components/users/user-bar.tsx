@@ -1,8 +1,8 @@
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 
 import { Loader2 } from "lucide-react";
 
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import { cn, truncateString } from "@/lib/utils";
 import { useGetUserQuery } from "@/store/services/user";
 
@@ -84,7 +84,7 @@ const DetailRow = ({
 );
 
 const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
-  const [accessToken, setAccessToken] = useState<string>("");
+  const accessToken = useAdminAccessToken();
 
   const { data, isFetching, isLoading } = useGetUserQuery(
     { id: `${id}`, token: `${accessToken}` },
@@ -93,18 +93,6 @@ const UserBar = ({ id, open, setOpen }: SheetTriggerProps) => {
       refetchOnMountOrArgChange: true,
     }
   );
-
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
-
-  useEffect(() => {
-    handleToken();
-  }, []);
 
   const user = data?.user;
   const qailos = data?.qailos;

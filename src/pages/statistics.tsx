@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { ChevronDown, Loader2 } from "lucide-react";
 
@@ -17,8 +17,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import { features } from "@/lib/constants";
-import { getAdminAccessToken } from "@/lib/admin-auth";
 import {
   useGetFeatureUsageGraphQuery,
   useGetOverallStatsQuery,
@@ -46,9 +46,13 @@ const featureChangeEnum = {
 };
 
 const Statistics = () => {
-  const [accessToken, setAccessToken] = useState<string>("");
+  const accessToken = useAdminAccessToken();
   const [feature, setFeature] = useState<keyof typeof featureEnum>("overview");
   const [activeTab, setActiveTab] = useState<string>("weekly");
+  const selectedFeature = useMemo(
+    () => features.find((item) => item.value === feature),
+    [feature]
+  );
   const { data, isLoading } = useGetOverallStatsQuery(
     {
       time: activeTab,
@@ -82,18 +86,6 @@ const Statistics = () => {
     }
   );
 
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
-
-  useEffect(() => {
-    handleToken();
-  }, []);
-
   return (
     <div className="flex h-full w-full flex-col items-start justify-start gap-5">
       <div className="flex w-full items-center justify-center border-b pb-5">
@@ -102,7 +94,7 @@ const Statistics = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                {features.find((f) => f.value === feature)?.name}
+                {selectedFeature?.name}
                 <ChevronDown />
               </Button>
             </DropdownMenuTrigger>
@@ -144,72 +136,54 @@ const Statistics = () => {
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph
             data={featureData!}
-            featureName={features.find((f) => f.value === feature)!.name}
+            featureName={selectedFeature!.name}
           />
-          <PeakGraph
-            data={peakData!}
-            featureName={features.find((f) => f.value === feature)!.name}
-          />
+          <PeakGraph data={peakData!} featureName={selectedFeature!.name} />
         </div>
       )}
       {feature === "inventory" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <NonVaryingUsageGraph
             data={featureData!}
-            featureName={features.find((f) => f.value === feature)!.name}
+            featureName={selectedFeature!.name}
           />
-          <PeakGraph
-            data={peakData!}
-            featureName={features.find((f) => f.value === feature)!.name}
-          />
+          <PeakGraph data={peakData!} featureName={selectedFeature!.name} />
         </div>
       )}
       {feature === "cart" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <NonVaryingUsageGraph
             data={featureData!}
-            featureName={features.find((f) => f.value === feature)!.name}
+            featureName={selectedFeature!.name}
           />
-          <PeakGraph
-            data={peakData!}
-            featureName={features.find((f) => f.value === feature)!.name}
-          />
+          <PeakGraph data={peakData!} featureName={selectedFeature!.name} />
         </div>
       )}
       {feature === "chefAI" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph
             data={featureData!}
-            featureName={features.find((f) => f.value === feature)!.name}
+            featureName={selectedFeature!.name}
           />
-          <PeakGraph
-            data={peakData!}
-            featureName={features.find((f) => f.value === feature)!.name}
-          />
+          <PeakGraph data={peakData!} featureName={selectedFeature!.name} />
         </div>
       )}
       {feature === "social" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph
             data={featureData!}
-            featureName={features.find((f) => f.value === feature)!.name}
+            featureName={selectedFeature!.name}
           />
-          <PeakGraph
-            data={peakData!}
-            featureName={features.find((f) => f.value === feature)!.name}
-          />
+          <PeakGraph data={peakData!} featureName={selectedFeature!.name} />
         </div>
       )}
       {feature === "extraTokens" && (
         <div className="grid h-full w-full grid-cols-2 gap-5">
           <VaryingUsageGraph
             data={featureData!}
-            featureName={features.find((f) => f.value === feature)!.name}
+            featureName={selectedFeature!.name}
           />
-          <PeakGraph
-            data={peakData!}
-            featureName={features.find((f) => f.value === feature)!.name}
-          />
+          <PeakGraph data={peakData!} featureName={selectedFeature!.name} />
         </div>
       )}
     </div>

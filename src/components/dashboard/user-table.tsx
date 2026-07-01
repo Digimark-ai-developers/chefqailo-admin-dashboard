@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import { cn, truncateString } from "@/lib/utils";
 import {
   useGetAllUsersQuery,
@@ -25,10 +25,12 @@ import { Switch } from "../ui/switch";
 const USERS_PAGE_SIZE = 10;
 
 const UserTable = () => {
-  const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState<number>(1);
+  const [optimisticStatus, setOptimisticStatus] = useState<
+    Record<number, boolean>
+  >({});
   const [toggleActive] = useToggleUserStatusMutation();
-  const [accessToken, setAccessToken] = useState<string>("");
+  const accessToken = useAdminAccessToken();
   const { data, isFetching, isLoading } = useGetAllUsersQuery(
     {
       token: accessToken,
@@ -42,29 +44,33 @@ const UserTable = () => {
   );
   const totalUsers = data?.count ?? 0;
   const totalPages = data?.total_pages ?? 1;
+  const users = useMemo(
+    () =>
+      (data?.results ?? []).map((user) => ({
+        ...user,
+        is_active: optimisticStatus[user.id] ?? user.is_active,
+      })),
+    [data?.results, optimisticStatus]
+  );
   const canGoPrevious = page > 1 && !isFetching;
   const canGoNext = page < totalPages && !isFetching;
 
-  const handleToken = async () => {
-    const token = getAdminAccessToken();
-
-    if (token) {
-      setAccessToken(token);
-    }
-  };
-
   const changeUserStatus = async (id: string) => {
-    setUsers((prev) =>
-      prev.map((user) =>
-        user.id === parseInt(id)
-          ? { ...user, is_active: !user.is_active }
-          : user
-      )
-    );
+    const userId = parseInt(id);
+    const currentStatus = users.find((user) => user.id === userId)?.is_active;
+
+    if (currentStatus === undefined) {
+      return;
+    }
+
+    setOptimisticStatus((prev) => ({
+      ...prev,
+      [userId]: !currentStatus,
+    }));
 
     try {
       await toggleActive({
-        id: parseInt(id),
+        id: userId,
         token: accessToken,
       });
 
@@ -76,13 +82,10 @@ const UserTable = () => {
         />
       ));
     } catch {
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === parseInt(id)
-            ? { ...user, is_active: !user.is_active }
-            : user
-        )
-      );
+      setOptimisticStatus((prev) => ({
+        ...prev,
+        [userId]: currentStatus,
+      }));
 
       toast.custom(() => (
         <CustomToast
@@ -95,12 +98,8 @@ const UserTable = () => {
   };
 
   useEffect(() => {
-    handleToken();
-  }, []);
-
-  useEffect(() => {
     if (data) {
-      setUsers(data.results);
+      setOptimisticStatus({});
     }
   }, [data]);
 

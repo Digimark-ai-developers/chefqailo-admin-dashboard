@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Power } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import LogoImage from "@/assets/img/login2.svg";
 import {
@@ -58,10 +58,10 @@ const AppSidebar = () => {
                   })}
                 >
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

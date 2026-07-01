@@ -3,21 +3,23 @@ import { cn, formatNumber } from "@/lib/utils";
 interface CardProps {
   card: Card;
   clickEvent: () => void;
-  selectedStat: "users" | "monthly_sales_amount" | "total_sales";
+  selectedCardId: number;
 }
 
 // bg-[hsl(var(--chart-1))]/20 text-[hsl(var(--chart-1))]
 // bg-[hsl(var(--chart-2))]/20 text-[hsl(var(--chart-2))]
 // bg-[hsl(var(--chart-3))]/20 text-[hsl(var(--chart-3))]
 
-const StatCard = ({ card, selectedStat, clickEvent }: CardProps) => {
+const StatCard = ({ card, selectedCardId, clickEvent }: CardProps) => {
+  const isSelected = selectedCardId === card.id;
+
   return (
     <div
       className={cn(
         "col-span-1 flex h-fit w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-lg p-2.5 transition-colors",
         {
-          "bg-card shadow-md": selectedStat === card.tag,
-          "bg-transparent": selectedStat !== card.tag,
+          "bg-card shadow-md": isSelected,
+          "bg-transparent": !isSelected,
         }
       )}
       onClick={clickEvent}

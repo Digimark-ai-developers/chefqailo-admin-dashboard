@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { ArrowLeft, ArrowUpRight, Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -59,11 +59,7 @@ const ReferralCodeDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const referralCodeId = Number(id);
-  const [accessToken, setAccessToken] = useState("");
-
-  useEffect(() => {
-    setAccessToken(getAdminAccessToken() ?? "");
-  }, []);
+  const accessToken = useAdminAccessToken();
 
   const referralQuery = useGetReferralCodeQuery(
     { id: referralCodeId, token: accessToken },
