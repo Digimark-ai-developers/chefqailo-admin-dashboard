@@ -257,6 +257,57 @@ declare type InfluencerAnalytics = {
   total_subscription_revenue: string;
 };
 
+declare type ReferralRevenueBasis = "gross" | "net";
+
+declare type ReferralRevenueGenerated = {
+  gross: string;
+  net: string;
+  currency: string;
+};
+
+declare type ReferralCommissionRule = {
+  commission_rate: string;
+  eligible_billing_cycles: number;
+  revenue_basis: ReferralRevenueBasis;
+  is_active: boolean;
+  configured?: boolean;
+};
+
+declare type ReferralCommissionRulePayload = {
+  commission_rate: string;
+  eligible_billing_cycles: number;
+  revenue_basis: ReferralRevenueBasis;
+  is_active: boolean;
+};
+
+declare type ReferralCommissionsDue = {
+  total: string;
+  paid: string;
+  unpaid: string;
+  commissionable_revenue: string;
+  currency: string;
+  rule: ReferralCommissionRule;
+};
+
+declare type ReferralCohorts = Record<string, number>;
+
+declare type ReferralCommissionPayment = {
+  id: number;
+  amount: string;
+  currency: string;
+  paid_at: string;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+declare type ReferralCommissionPaymentPayload = {
+  amount: string;
+  currency: string;
+  paid_at: string;
+  notes?: string;
+};
+
 declare type ReferralCodePerformance = {
   referral_code_id: number;
   code: string;
@@ -266,12 +317,10 @@ declare type ReferralCodePerformance = {
   premium_conversions: number;
   active_subscriptions: number;
   renewals: number;
-  revenue_generated: {
-    gross: string;
-    net: string;
-    currency: string;
-  };
-  assumptions: {
+  revenue_generated: ReferralRevenueGenerated;
+  commissions_due?: ReferralCommissionsDue;
+  cohorts?: ReferralCohorts;
+  assumptions?: {
     paid_plans: string[];
     renewal_rule: string;
     default_platform_fee_percentages: Record<string, string>;

@@ -147,13 +147,24 @@ export const referralApi = api.injectEndpoints({
     }),
     getReferralCodes: build.query<
       PaginatedResponse<ReferralCode>,
-      { page: number; pageSize: number; token: string }
+      { page: number; pageSize: number; token: string; influencerId?: number }
     >({
-      query: ({ page, pageSize, token }) => ({
-        url: `/api/admin/referral-codes/?page=${page}&page_size=${pageSize}`,
-        method: "GET",
-        headers: authHeaders(token),
-      }),
+      query: ({ page, pageSize, token, influencerId }) => {
+        const params = new URLSearchParams({
+          page: String(page),
+          page_size: String(pageSize),
+        });
+
+        if (influencerId) {
+          params.set("influencer_id", String(influencerId));
+        }
+
+        return {
+          url: `/api/admin/referral-codes/?${params.toString()}`,
+          method: "GET",
+          headers: authHeaders(token),
+        };
+      },
       providesTags: ["ReferralCodes"],
       transformResponse: (response: unknown) =>
         normalizePaginated<ReferralCode>(
@@ -194,6 +205,74 @@ export const referralApi = api.injectEndpoints({
             | ApiEnvelope<ReferralCodePerformance>
             | ReferralCodePerformance
         ),
+    }),
+    getReferralCommissionRule: build.query<
+      ReferralCommissionRule,
+      { id: number; token: string }
+    >({
+      query: ({ id, token }) => ({
+        url: `/api/admin/referral-codes/${id}/commission-rule/`,
+        method: "GET",
+        headers: authHeaders(token),
+      }),
+      providesTags: ["ReferralCommissionRule"],
+      transformResponse: (response: unknown) =>
+        unwrapData<ReferralCommissionRule>(
+          response as ApiEnvelope<ReferralCommissionRule> | ReferralCommissionRule
+        ),
+    }),
+    updateReferralCommissionRule: build.mutation<
+      ApiMessage<ReferralCommissionRule>,
+      { id: number; data: ReferralCommissionRulePayload; token: string }
+    >({
+      query: ({ id, data, token }) => ({
+        url: `/api/admin/referral-codes/${id}/commission-rule/`,
+        method: "PATCH",
+        body: data,
+        headers: authHeaders(token),
+      }),
+      invalidatesTags: [
+        "ReferralCommissionRule",
+        "ReferralCodePerformance",
+        "ReferralCommissionPayments",
+      ],
+    }),
+    getReferralCommissionPayments: build.query<
+      PaginatedResponse<ReferralCommissionPayment>,
+      { id: number; token: string }
+    >({
+      query: ({ id, token }) => ({
+        url: `/api/admin/referral-codes/${id}/commission-payments/`,
+        method: "GET",
+        headers: authHeaders(token),
+      }),
+      providesTags: ["ReferralCommissionPayments"],
+      transformResponse: (response: unknown) =>
+        normalizePaginated<ReferralCommissionPayment>(
+          response as
+            | ApiEnvelope<
+                | PaginatedResponse<ReferralCommissionPayment>
+                | ReferralCommissionPayment[]
+              >
+            | PaginatedResponse<ReferralCommissionPayment>
+            | ReferralCommissionPayment[]
+        ),
+    }),
+    createReferralCommissionPayment: build.mutation<
+      ApiMessage<ReferralCommissionPayment>,
+      { id: number; data: ReferralCommissionPaymentPayload; token: string }
+    >({
+      query: ({ id, data, token }) => ({
+        url: `/api/admin/referral-codes/${id}/commission-payments/`,
+        method: "POST",
+        body: data,
+        headers: authHeaders(token),
+      }),
+      invalidatesTags: [
+        "ReferralCommissionPayments",
+        "ReferralCodePerformance",
+        "ReferralCommissionRule",
+      ],
     }),
     updateReferralCode: build.mutation<
       ApiMessage<ReferralCodeDetail>,
@@ -260,6 +339,10 @@ export const {
   useGetReferralCodesQuery,
   useGetReferralCodeQuery,
   useGetReferralCodePerformanceQuery,
+  useGetReferralCommissionRuleQuery,
+  useUpdateReferralCommissionRuleMutation,
+  useGetReferralCommissionPaymentsQuery,
+  useCreateReferralCommissionPaymentMutation,
   useUpdateReferralCodeMutation,
   useDeactivateReferralCodeMutation,
   useValidateReferralCodeMutation,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -8,10 +8,12 @@ import {
   EmptyState,
   LoadingState,
   StatusPill,
+  ValidPill,
 } from "@/components/influencer-referrals/shared";
 import {
   formatDate,
   getInfluencerUserId,
+  isReferralValid,
 } from "@/components/influencer-referrals/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +29,7 @@ import { getAdminAccessToken } from "@/lib/admin-auth";
 import {
   useGetInfluencerAnalyticsQuery,
   useGetInfluencerQuery,
+  useGetReferralCodesQuery,
 } from "@/store/services/referrals";
 
 const InfluencerDetail = () => {
@@ -53,10 +56,47 @@ const InfluencerDetail = () => {
       refetchOnMountOrArgChange: true,
     }
   );
+  const referralCodesQuery = useGetReferralCodesQuery(
+    {
+      page: 1,
+      pageSize: 100,
+      token: accessToken,
+      influencerId,
+    },
+    {
+      skip: !accessToken || !influencerId,
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const influencer = influencerQuery.data;
   const user =
     typeof influencer?.user === "object" ? influencer.user : undefined;
+  const embeddedReferralCodes = influencer?.referral_codes ?? [];
+  const fetchedReferralCodes = (referralCodesQuery.data?.results ?? []).filter(
+    (code) => {
+      if (code.influencer_id) {
+        return code.influencer_id === influencerId;
+      }
+
+      if (typeof code.influencer === "number") {
+        return code.influencer === influencerId;
+      }
+
+      return code.influencer?.id === influencerId;
+    }
+  );
+  const referralCodes = mergeReferralCodes(
+    embeddedReferralCodes,
+    fetchedReferralCodes
+  );
+  const referralsLoading =
+    referralCodesQuery.isLoading || referralCodesQuery.isFetching;
+  const activeReferralCodes = referralCodes.filter((code) => code.is_active);
+  const totalRedemptions = referralCodes.reduce(
+    (total, code) => total + (code.current_redemptions ?? 0),
+    0
+  );
 
   return (
     <div className="flex h-full w-full flex-col gap-5 overflow-y-auto pr-1">
@@ -75,7 +115,7 @@ const InfluencerDetail = () => {
             {influencer?.display_name ?? "Influencer Detail"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Profile details and referral analytics.
+            Profile details, referral codes, and referral analytics.
           </p>
         </div>
       </div>
@@ -92,19 +132,27 @@ const InfluencerDetail = () => {
               <div className="grid gap-4 md:grid-cols-4">
                 <MetricCard
                   label="Total codes"
-                  value={String(analyticsQuery.data.total_codes)}
+                  value={String(
+                    analyticsQuery.data.total_codes || referralCodes.length
+                  )}
                 />
                 <MetricCard
                   label="Total redemptions"
-                  value={String(analyticsQuery.data.total_redemptions)}
+                  value={String(
+                    analyticsQuery.data.total_redemptions || totalRedemptions
+                  )}
                 />
                 <MetricCard
-                  label="Total discount given"
-                  value={`$${analyticsQuery.data.total_discount_given}`}
+                  label="Active codes"
+                  value={String(activeReferralCodes.length)}
                 />
                 <MetricCard
-                  label="Total subscription revenue"
+                  label="Subscription revenue"
                   value={`$${analyticsQuery.data.total_subscription_revenue}`}
+                />
+                <MetricCard
+                  label="Discount given"
+                  value={`$${analyticsQuery.data.total_discount_given}`}
                 />
               </div>
             ) : (
@@ -158,8 +206,15 @@ const InfluencerDetail = () => {
           </section>
 
           <section className="grid gap-3">
-            <h2 className="text-sm font-semibold">Referral Codes</h2>
-            {influencer.referral_codes?.length ? (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold">Referrals</h2>
+              <span className="text-sm text-muted-foreground">
+                {referralCodes.length} code{referralCodes.length === 1 ? "" : "s"}
+              </span>
+            </div>
+            {referralsLoading && !referralCodes.length ? (
+              <LoadingState />
+            ) : referralCodes.length ? (
               <div className="overflow-x-auto rounded-md border">
                 <Table>
                   <TableHeader>
@@ -167,19 +222,32 @@ const InfluencerDetail = () => {
                       <TableHead>Code</TableHead>
                       <TableHead>Discount</TableHead>
                       <TableHead>Redemptions</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Valid window</TableHead>
+                      <TableHead>Active</TableHead>
+                      <TableHead>Valid</TableHead>
+                      <TableHead className="w-24 text-right">Detail</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {influencer.referral_codes.map((code) => (
+                    {referralCodes.map((code) => (
                       <TableRow
                         key={code.id}
                         className="cursor-pointer"
+                        role="button"
+                        tabIndex={0}
                         onClick={() =>
                           navigate(
                             `/influencer-referrals/referral-codes/${code.id}`
                           )
                         }
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            navigate(
+                              `/influencer-referrals/referral-codes/${code.id}`
+                            );
+                          }
+                        }}
                       >
                         <TableCell className="font-medium">
                           {code.code}
@@ -189,7 +257,32 @@ const InfluencerDetail = () => {
                           {code.current_redemptions ?? 0}/{code.max_redemptions}
                         </TableCell>
                         <TableCell>
+                          {formatDate(code.valid_from)} -{" "}
+                          {formatDate(code.valid_until)}
+                        </TableCell>
+                        <TableCell>
                           <StatusPill active={code.is_active} />
+                        </TableCell>
+                        <TableCell>
+                          <ValidPill valid={isReferralValid(code)} />
+                        </TableCell>
+                        <TableCell
+                          className="text-right"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              navigate(
+                                `/influencer-referrals/referral-codes/${code.id}`
+                              )
+                            }
+                          >
+                            Open
+                            <ArrowUpRight />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -206,6 +299,19 @@ const InfluencerDetail = () => {
       )}
     </div>
   );
+};
+
+const mergeReferralCodes = (
+  embedded: ReferralCode[],
+  fetched: ReferralCode[]
+) => {
+  const codes = new Map<number, ReferralCode>();
+
+  [...embedded, ...fetched].forEach((code) => {
+    codes.set(code.id, code);
+  });
+
+  return Array.from(codes.values());
 };
 
 const MetricCard = ({ label, value }: { label: string; value: string }) => (
