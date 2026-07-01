@@ -41,6 +41,8 @@ export const api = createApi({
     "ReferralCodes",
     "ReferralCode",
     "ReferralCodePerformance",
+    "ReferralCommissionRule",
+    "ReferralCommissionPayments",
     "InfluencerAnalytics",
     "QailosCoefficients",
     "QailosCoefficient",
