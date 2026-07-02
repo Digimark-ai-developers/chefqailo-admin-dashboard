@@ -31,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import {
   useCreateReferralCommissionPaymentMutation,
@@ -180,215 +181,239 @@ const ReferralCodeDetail = () => {
       {referralQuery.isLoading || referralQuery.isFetching ? (
         <LoadingState />
       ) : referral ? (
-        <div className="grid gap-5">
-          <section className="grid gap-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold">Referral Summary</h2>
-              <div className="flex flex-wrap gap-2">
-                <StatusPill active={referral.is_active} />
-                <ValidPill valid={isReferralValid(referral)} />
-              </div>
-            </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              <DetailItem label="ID" value={String(referral.id)} />
-              <DetailItem label="Code" value={referral.code} />
-              <DetailItem
-                label="Influencer"
-                value={String(getInfluencerName(referral))}
-              />
-              <DetailItem
-                label="Discount"
-                value={`${referral.discount_percentage}%`}
-              />
-              <DetailItem
-                label="Redemptions"
-                value={`${referral.current_redemptions ?? 0}/${referral.max_redemptions}`}
-              />
-              <DetailItem
-                label="Valid from"
-                value={formatDate(referral.valid_from)}
-              />
-              <DetailItem
-                label="Valid until"
-                value={formatDate(referral.valid_until)}
-              />
-              <DetailItem
-                label="Active"
-                value={referral.is_active ? "Active" : "Inactive"}
-              />
-              <DetailItem
-                label="Valid"
-                value={isReferralValid(referral) ? "Valid" : "Invalid"}
-              />
-              <DetailItem
-                label="Invalid reason"
-                value={referral.invalid_reason || "-"}
-              />
-            </div>
-          </section>
+        <Tabs defaultValue="summary" className="grid gap-5">
+          <TabsList className="grid h-auto w-full grid-cols-1 md:grid-cols-3">
+            <TabsTrigger value="summary" className="py-2">
+              Referral Summary
+            </TabsTrigger>
+            <TabsTrigger value="performance" className="py-2">
+              Performance
+            </TabsTrigger>
+            <TabsTrigger value="commissions" className="py-2">
+              Commission Setup
+            </TabsTrigger>
+          </TabsList>
 
-          <section className="grid gap-3">
-            <h2 className="text-sm font-semibold">Performance</h2>
-            {performanceLoading ? (
-              <LoadingState />
-            ) : performance ? (
-              <div className="grid gap-4 md:grid-cols-4">
-                <MetricCard
-                  label="Standard conversions"
-                  value={String(performance.standard_conversions)}
-                />
-                <MetricCard
-                  label="Premium conversions"
-                  value={String(performance.premium_conversions)}
-                />
-                <MetricCard
-                  label="Active subscriptions"
-                  value={String(performance.active_subscriptions)}
-                />
-                <MetricCard
-                  label="Renewals"
-                  value={String(performance.renewals)}
-                />
-                <MetricCard
-                  label="Gross revenue"
-                  value={formatMoney(
-                    performance.revenue_generated.gross,
-                    performance.revenue_generated.currency
-                  )}
-                />
-                <MetricCard
-                  label="Net revenue"
-                  value={formatMoney(
-                    performance.revenue_generated.net,
-                    performance.revenue_generated.currency
-                  )}
-                />
-              </div>
-            ) : (
-              <EmptyState message="No performance metrics found." />
-            )}
-          </section>
-
-          <section className="grid gap-3">
-            <h2 className="text-sm font-semibold">Commissions Due</h2>
-            {performanceLoading ? (
-              <LoadingState />
-            ) : commissions ? (
-              <div className="grid gap-4">
-                <div className="grid gap-4 md:grid-cols-4">
-                  <MetricCard
-                    label="Total owed"
-                    value={formatMoney(commissions.total, commissions.currency)}
-                  />
-                  <MetricCard
-                    label="Paid"
-                    value={formatMoney(commissions.paid, commissions.currency)}
-                  />
-                  <MetricCard
-                    label="Unpaid"
-                    value={formatMoney(
-                      commissions.unpaid,
-                      commissions.currency
-                    )}
-                  />
-                  <MetricCard
-                    label="Commissionable revenue"
-                    value={formatMoney(
-                      commissions.commissionable_revenue,
-                      commissions.currency
-                    )}
-                  />
-                </div>
-                <div className="grid gap-3 md:grid-cols-4">
-                  <DetailItem
-                    label="Rate"
-                    value={`${commissions.rule.commission_rate}%`}
-                  />
-                  <DetailItem
-                    label="Eligible billing cycles"
-                    value={String(commissions.rule.eligible_billing_cycles)}
-                  />
-                  <DetailItem
-                    label="Revenue basis"
-                    value={formatRevenueBasis(commissions.rule.revenue_basis)}
-                  />
-                  <DetailItem
-                    label="Rule status"
-                    value={
-                      commissions.rule.is_active
-                        ? commissions.rule.configured === false
-                          ? "Active, not configured"
-                          : "Active"
-                        : "Inactive"
-                    }
-                  />
-                </div>
-              </div>
-            ) : (
-              <EmptyState message="No commission metrics found." />
-            )}
-          </section>
-
-          <section className="grid gap-3">
-            <h2 className="text-sm font-semibold">Cohorts</h2>
-            {performanceLoading ? (
-              <LoadingState />
-            ) : cohortEntries.length ? (
-              <div className="overflow-x-auto rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Cycle</TableHead>
-                      <TableHead>Active subscribers</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {cohortEntries.map(([cycle, activeSubscribers]) => (
-                      <TableRow key={cycle}>
-                        <TableCell className="font-medium">{cycle}</TableCell>
-                        <TableCell>{activeSubscribers}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <EmptyState message="No cohort metrics found." />
-            )}
-          </section>
-
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
-            <CommissionRuleEditor
-              token={accessToken}
-              referralCodeId={referralCodeId}
-              rule={rule}
-              loading={ruleQuery.isLoading || ruleQuery.isFetching}
-            />
-
-            <CommissionPaymentsPanel
-              token={accessToken}
-              referralCodeId={referralCodeId}
-              payments={payments}
-              loading={paymentsQuery.isLoading || paymentsQuery.isFetching}
-              defaultCurrency={commissions?.currency}
-            />
-          </div>
-
-          {assumptions.length ? (
+          <TabsContent value="summary" className="mt-0">
             <section className="grid gap-3">
-              <h2 className="text-sm font-semibold">Assumptions</h2>
-              <div className="grid gap-3 md:grid-cols-2">
-                {assumptions.map((item) => (
-                  <DetailItem
-                    key={item.label}
-                    label={item.label}
-                    value={item.value || "-"}
-                  />
-                ))}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-sm font-semibold">Referral Summary</h2>
+                <div className="flex flex-wrap gap-2">
+                  <StatusPill active={referral.is_active} />
+                  <ValidPill valid={isReferralValid(referral)} />
+                </div>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                <DetailItem label="ID" value={String(referral.id)} />
+                <DetailItem label="Code" value={referral.code} />
+                <DetailItem
+                  label="Influencer"
+                  value={String(getInfluencerName(referral))}
+                />
+                <DetailItem
+                  label="Discount"
+                  value={`${referral.discount_percentage}%`}
+                />
+                <DetailItem
+                  label="Redemptions"
+                  value={`${referral.current_redemptions ?? 0}/${referral.max_redemptions}`}
+                />
+                <DetailItem
+                  label="Valid from"
+                  value={formatDate(referral.valid_from)}
+                />
+                <DetailItem
+                  label="Valid until"
+                  value={formatDate(referral.valid_until)}
+                />
+                <DetailItem
+                  label="Active"
+                  value={referral.is_active ? "Active" : "Inactive"}
+                />
+                <DetailItem
+                  label="Valid"
+                  value={isReferralValid(referral) ? "Valid" : "Invalid"}
+                />
+                <DetailItem
+                  label="Invalid reason"
+                  value={referral.invalid_reason || "-"}
+                />
               </div>
             </section>
-          ) : null}
-        </div>
+          </TabsContent>
+
+          <TabsContent value="performance" className="mt-0 grid gap-5">
+            <section className="grid gap-3">
+              <h2 className="text-sm font-semibold">Performance</h2>
+              {performanceLoading ? (
+                <LoadingState />
+              ) : performance ? (
+                <div className="grid gap-4 md:grid-cols-4">
+                  <MetricCard
+                    label="Standard conversions"
+                    value={String(performance.standard_conversions)}
+                  />
+                  <MetricCard
+                    label="Premium conversions"
+                    value={String(performance.premium_conversions)}
+                  />
+                  <MetricCard
+                    label="Active subscriptions"
+                    value={String(performance.active_subscriptions)}
+                  />
+                  <MetricCard
+                    label="Renewals"
+                    value={String(performance.renewals)}
+                  />
+                  <MetricCard
+                    label="Gross revenue"
+                    value={formatMoney(
+                      performance.revenue_generated.gross,
+                      performance.revenue_generated.currency
+                    )}
+                  />
+                  <MetricCard
+                    label="Net revenue"
+                    value={formatMoney(
+                      performance.revenue_generated.net,
+                      performance.revenue_generated.currency
+                    )}
+                  />
+                </div>
+              ) : (
+                <EmptyState message="No performance metrics found." />
+              )}
+            </section>
+
+            <section className="grid gap-3">
+              <h2 className="text-sm font-semibold">Commissions Due</h2>
+              {performanceLoading ? (
+                <LoadingState />
+              ) : commissions ? (
+                <div className="grid gap-4">
+                  <div className="grid gap-4 md:grid-cols-4">
+                    <MetricCard
+                      label="Total owed"
+                      value={formatMoney(
+                        commissions.total,
+                        commissions.currency
+                      )}
+                    />
+                    <MetricCard
+                      label="Paid"
+                      value={formatMoney(
+                        commissions.paid,
+                        commissions.currency
+                      )}
+                    />
+                    <MetricCard
+                      label="Unpaid"
+                      value={formatMoney(
+                        commissions.unpaid,
+                        commissions.currency
+                      )}
+                    />
+                    <MetricCard
+                      label="Commissionable revenue"
+                      value={formatMoney(
+                        commissions.commissionable_revenue,
+                        commissions.currency
+                      )}
+                    />
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-4">
+                    <DetailItem
+                      label="Rate"
+                      value={`${commissions.rule.commission_rate}%`}
+                    />
+                    <DetailItem
+                      label="Eligible billing cycles"
+                      value={String(commissions.rule.eligible_billing_cycles)}
+                    />
+                    <DetailItem
+                      label="Revenue basis"
+                      value={formatRevenueBasis(commissions.rule.revenue_basis)}
+                    />
+                    <DetailItem
+                      label="Rule status"
+                      value={
+                        commissions.rule.is_active
+                          ? commissions.rule.configured === false
+                            ? "Active, not configured"
+                            : "Active"
+                          : "Inactive"
+                      }
+                    />
+                  </div>
+                </div>
+              ) : (
+                <EmptyState message="No commission metrics found." />
+              )}
+            </section>
+
+            <section className="grid gap-3">
+              <h2 className="text-sm font-semibold">Cohorts</h2>
+              {performanceLoading ? (
+                <LoadingState />
+              ) : cohortEntries.length ? (
+                <div className="overflow-x-auto rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Cycle</TableHead>
+                        <TableHead>Active subscribers</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {cohortEntries.map(([cycle, activeSubscribers]) => (
+                        <TableRow key={cycle}>
+                          <TableCell className="font-medium">{cycle}</TableCell>
+                          <TableCell>{activeSubscribers}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <EmptyState message="No cohort metrics found." />
+              )}
+            </section>
+
+            {assumptions.length ? (
+              <section className="grid gap-3">
+                <h2 className="text-sm font-semibold">Assumptions</h2>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {assumptions.map((item) => (
+                    <DetailItem
+                      key={item.label}
+                      label={item.label}
+                      value={item.value || "-"}
+                    />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </TabsContent>
+
+          <TabsContent value="commissions" className="mt-0">
+            <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
+              <CommissionRuleEditor
+                token={accessToken}
+                referralCodeId={referralCodeId}
+                rule={rule}
+                loading={ruleQuery.isLoading || ruleQuery.isFetching}
+              />
+
+              <CommissionPaymentsPanel
+                token={accessToken}
+                referralCodeId={referralCodeId}
+                payments={payments}
+                loading={paymentsQuery.isLoading || paymentsQuery.isFetching}
+                defaultCurrency={commissions?.currency}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
       ) : (
         <EmptyState message="Referral code detail was not found." />
       )}
