@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -205,7 +203,8 @@ const InfluencerDetail = () => {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-sm font-semibold">Referrals</h2>
               <span className="text-sm text-muted-foreground">
-                {referralCodes.length} code{referralCodes.length === 1 ? "" : "s"}
+                {referralCodes.length} code
+                {referralCodes.length === 1 ? "" : "s"}
               </span>
             </div>
             {referralsLoading && !referralCodes.length ? (

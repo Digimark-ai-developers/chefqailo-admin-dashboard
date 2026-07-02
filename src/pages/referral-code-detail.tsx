@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { ArrowLeft, ArrowUpRight, Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,8 +9,8 @@ import {
   Field,
   LoadingState,
   StatusPill,
-  toastMessage,
   ValidPill,
+  toastMessage,
 } from "@/components/influencer-referrals/shared";
 import {
   formatDate,
@@ -31,7 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAdminAccessToken } from "@/lib/admin-auth";
+import { useAdminAccessToken } from "@/hooks/use-admin-access-token";
 import {
   useCreateReferralCommissionPaymentMutation,
   useGetReferralCodePerformanceQuery,
@@ -100,7 +100,9 @@ const ReferralCodeDetail = () => {
   const influencerId =
     performance?.influencer_id ??
     referral?.influencer_id ??
-    (typeof referral?.influencer === "number" ? referral.influencer : undefined);
+    (typeof referral?.influencer === "number"
+      ? referral.influencer
+      : undefined);
 
   const cohortEntries = useMemo(
     () =>
@@ -492,10 +494,7 @@ const CommissionRuleEditor = ({
               step={1}
               value={form.eligible_billing_cycles}
               onChange={(event) =>
-                setField(
-                  "eligible_billing_cycles",
-                  Number(event.target.value)
-                )
+                setField("eligible_billing_cycles", Number(event.target.value))
               }
             />
           </Field>
@@ -523,11 +522,7 @@ const CommissionRuleEditor = ({
             </div>
           </Field>
           <div className="flex justify-end md:col-span-2">
-            <Button
-              type="button"
-              disabled={saving || !token}
-              onClick={submit}
-            >
+            <Button type="button" disabled={saving || !token} onClick={submit}>
               {saving ? <Loader2 className="animate-spin" /> : "Save Rule"}
             </Button>
           </div>

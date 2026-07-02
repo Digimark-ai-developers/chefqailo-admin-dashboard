@@ -1,6 +1,6 @@
 import { type FormEvent, useEffect, useState } from "react";
 
-import { AlertCircle, Loader2, Lock, Mail } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -71,6 +71,7 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [adminLogin, { isLoading }] = useAdminLoginMutation();
 
@@ -183,7 +184,7 @@ const Login = () => {
                 <div className="flex w-full items-center justify-center gap-2.5 rounded-md bg-white px-2.5 py-1.5 ring-offset-background transition-shadow focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2">
                   <Lock className="size-5 text-gray-500" />
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
@@ -194,6 +195,23 @@ const Login = () => {
                     aria-describedby={error ? "login-error" : undefined}
                     className="flex-1 border-none bg-transparent text-black shadow-none"
                   />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowPassword((current) => !current)}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                    aria-pressed={showPassword}
+                    className="size-8 shrink-0 text-gray-500 hover:bg-transparent hover:text-gray-700"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-5" />
+                    ) : (
+                      <Eye className="size-5" />
+                    )}
+                  </Button>
                 </div>
               </div>
               {error ? (
